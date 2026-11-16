@@ -56,7 +56,7 @@ sich aufs Handy installieren. Der Richter ist die Playwright-Abnahme in `tests/a
 ## Git
 
 - Arbeiten auf `main`, kleine Commits, **Push auf `origin/main` ist freigegeben** (Repo Kylorin/abc-werkstatt,
-  öffentlich). Push immer so: `GH_TOKEN=$(gh auth token --user Kylorin) git push origin main`.
+  öffentlich). Push immer so: `bash tools/push.sh` (Kylorin-Token je Aufruf).
 - **Nie** `gh auth switch` — aktiver gh-Account bleibt NeuraMax. Lokale Identity ist Kylorin (schon gesetzt).
 - Branch `richter-probe` war die Prüfung der Richter-Kette, nicht anfassen.
 
