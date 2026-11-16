@@ -6,3 +6,4 @@ tools/.lokal/
 .env
 .claude/carpe-noctem/*.json
 .claude/carpe-noctem/*.jsonl
+.claude/settings.local.json
