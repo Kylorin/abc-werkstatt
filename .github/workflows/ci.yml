@@ -1,0 +1,60 @@
+# RICHTER-DATEI — nachts schreibgeschützt.
+# Baut, prüft per Playwright-Abnahme und deployt nur bei Grün auf GitHub Pages.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  abnahme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Abnahme
+        run: npx playwright test || (mkdir -p abnahme-ergebnis && touch abnahme-ergebnis/ROT)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: abnahme-ergebnis
+          path: abnahme-ergebnis/ergebnis.json
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-spuren
+          path: test-results/
+          retention-days: 3
+          if-no-files-found: ignore
+      - name: Abnahme muss vollständig grün sein
+        run: test ! -f abnahme-ergebnis/ROT
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: abnahme
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

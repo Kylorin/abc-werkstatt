@@ -1,0 +1,8 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+tools/.lokal/
+.env
+.claude/carpe-noctem/*.json
+.claude/carpe-noctem/*.jsonl
