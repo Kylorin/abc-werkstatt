@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABC-Werkstatt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #fff8e7; --ink: #2b2b2b; --leiste: #ffe8b8; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+    font-family: 'Andika', 'Comic Sans MS', 'Segoe UI', sans-serif;
+    overflow: hidden; user-select: none; -webkit-user-select: none;
+  }
+  body { display: flex; flex-direction: column; }
+
+  #gross {
+    height: 38vh; display: flex; align-items: center; justify-content: center;
+    font-size: 30vh; line-height: 1; font-weight: 700;
+    text-shadow: 0 0.04em 0 rgba(0,0,0,.12);
+  }
+  #gross.hupf { animation: hupf .45s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes hupf {
+    0% { transform: scale(.3) rotate(-12deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  #text {
+    flex: 1; overflow-y: auto; padding: 1vh 4vw; line-height: 1.15;
+    font-size: 12vw; font-weight: 700; word-break: break-word;
+    display: flex; flex-wrap: wrap; align-content: flex-start;
+    border-top: 6px dashed #f3c76b;
+  }
+  #text .z { display: inline-block; }
+  #text .neu { animation: hupf .35s cubic-bezier(.3,1.6,.5,1); }
+  #text .lz { display: inline-block; width: .45em; }
+  #text .cursor {
+    display: inline-block; width: .08em; height: .9em; margin-left: .05em;
+    background: #f39c12; align-self: center; animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  #zwischen { color: #999; }
+
+  #leiste {
+    display: flex; gap: 2vw; justify-content: center; align-items: center;
+    padding: 1.5vh 2vw; background: var(--leiste); flex-wrap: wrap;
+  }
+  #leiste button {
+    font-size: 6vh; width: 12vh; height: 12vh; border-radius: 50%;
+    border: none; cursor: pointer; background: #fff;
+    box-shadow: 0 .6vh 0 rgba(0,0,0,.18); transition: transform .1s;
+  }
+  #leiste button:active { transform: translateY(.5vh); box-shadow: 0 .1vh 0 rgba(0,0,0,.18); }
+  #leiste button:disabled { opacity: .35; cursor: not-allowed; }
+  #mic.an { background: #ff6b6b; animation: puls 1s ease-in-out infinite; }
+  @keyframes puls { 50% { transform: scale(1.12); } }
+  #mic { width: 15vh; height: 15vh; font-size: 7.5vh; }
+
+  #hinweis {
+    position: fixed; bottom: 1vh; left: 1.5vw; font-size: 13px; color: #8a7a55;
+    font-family: 'Segoe UI', sans-serif; max-width: 40vw;
+  }
+  #meldung {
+    position: fixed; top: 2vh; left: 50%; transform: translateX(-50%);
+    background: #fff; padding: .6em 1.2em; border-radius: 1em; font-size: 3vh;
+    box-shadow: 0 4px 14px rgba(0,0,0,.15); display: none;
+  }
+</style>
+</head>
+<body>
+  <div id="gross" aria-live="polite"></div>
+  <div id="text"></div>
+  <div id="leiste">
+    <button id="neu" title="Alles löschen">🧹</button>
+    <button id="mic" title="Sprechen">🎤</button>
+    <button id="vorlesen" title="Alles vorlesen">🔊</button>
+    <button id="vollbild" title="Vollbild (Tasten bleiben in der App)">⛶</button>
+  </div>
+  <div id="hinweis">Tippen = Buchstabe wird gesagt · Leertaste = Wort vorlesen · Enter = alles vorlesen · ⌫ = löschen</div>
+  <div id="meldung"></div>
+
+<script>
+// Deutsche Buchstabennamen, damit die Stimme nicht englisch buchstabiert
+const NAMEN = {
+  A:'A', B:'Be', C:'Ze', D:'De', E:'E', F:'Ef', G:'Ge', H:'Ha', I:'I', J:'Jott',
+  K:'Ka', L:'El', M:'Em', N:'En', O:'O', P:'Pe', Q:'Ku', R:'Er', S:'Es', T:'Te',
+  U:'U', V:'Fau', W:'We', X:'Ix', Y:'Üpsilon', Z:'Zett', 'Ä':'Ä', 'Ö':'Ö', 'Ü':'Ü', 'ß':'Eszett'
+};
+const FARBEN = ['#e74c3c','#3498db','#27ae60','#9b59b6','#f39c12','#16a085','#e84393','#2d98da'];
+const ERLAUBT = /^[a-zA-ZäöüÄÖÜß0-9]$/;
+
+const $ = id => document.getElementById(id);
+const grossEl = $('gross'), textEl = $('text'), micBtn = $('mic');
+
+let text = '';
+let neuerIndex = -1;
+let zwischenText = '';
+
+// ---------- Stimme ----------
+let stimme = null;
+function stimmeWaehlen() {
+  const de = speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith('de'));
+  stimme =
+    de.find(v => /natural|online|neural/i.test(v.name)) ||
+    de.find(v => /katja|hedda|anna|google/i.test(v.name)) ||
+    de[0] || null;
+}
+stimmeWaehlen();
+speechSynthesis.onvoiceschanged = stimmeWaehlen;
+
+function sprechen(s) {
+  if (!s || !s.trim()) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(s);
+  u.lang = 'de-DE';
+  if (stimme) u.voice = stimme;
+  u.rate = 0.85;
+  u.pitch = 1.15;
+  speechSynthesis.speak(u);
+}
+
+// Großbuchstaben-Wörter würden sonst als Abkürzung buchstabiert (M-A-M-A)
+function zumVorlesen(s) {
+  return s.toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase());
+}
+
+// ---------- Anzeige ----------
+function gross(s) {
+  return Array.from(s).map(c => c === 'ß' ? 'ß' : c.toUpperCase()).join('');
+}
+
+function schriftgroesse() {
+  const n = text.length + zwischenText.length;
+  if (n < 8) return '12vw';
+  if (n < 16) return '9vw';
+  if (n < 30) return '7vw';
+  if (n < 60) return '5vw';
+  return '3.5vw';
+}
+
+function zeichnen() {
+  textEl.innerHTML = '';
+  let farbe = 0;
+  Array.from(text).forEach((c, i) => {
+    const span = document.createElement('span');
+    if (c === ' ') {
+      span.className = 'lz';
+    } else {
+      span.className = 'z' + (i === neuerIndex ? ' neu' : '');
+      span.textContent = c;
+      span.style.color = FARBEN[farbe++ % FARBEN.length];
+    }
+    textEl.appendChild(span);
+  });
+  if (zwischenText) {
+    const z = document.createElement('span');
+    z.id = 'zwischen';
+    z.textContent = (text && !text.endsWith(' ') ? ' ' : '') + zwischenText;
+    textEl.appendChild(z);
+  }
+  const cur = document.createElement('span');
+  cur.className = 'cursor';
+  textEl.appendChild(cur);
+  textEl.style.fontSize = schriftgroesse();
+  textEl.scrollTop = textEl.scrollHeight;
+  neuerIndex = -1;
+}
+
+function grossZeigen(c) {
+  grossEl.textContent = c;
+  grossEl.style.color = FARBEN[Math.floor(Math.random() * FARBEN.length)];
+  grossEl.classList.remove('hupf');
+  void grossEl.offsetWidth;
+  grossEl.classList.add('hupf');
+}
+
+let meldungTimer;
+function meldung(s) {
+  const m = $('meldung');
+  m.textContent = s;
+  m.style.display = 'block';
+  clearTimeout(meldungTimer);
+  meldungTimer = setTimeout(() => m.style.display = 'none', 3500);
+}
+
+function letztesWort() {
+  const teile = text.trim().split(/\s+/);
+  return teile[teile.length - 1] || '';
+}
+
+// ---------- Tastatur ----------
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key;
+
+  if (ERLAUBT.test(k)) {
+    e.preventDefault();
+    if (e.repeat) return; // Taste festhalten erzeugt keine Buchstabenschlange
+    const c = gross(k);
+    text += c;
+    neuerIndex = text.length - 1;
+    zeichnen();
+    grossZeigen(c);
+    sprechen(NAMEN[c] || c);
+    return;
+  }
+  if (k === ' ') {
+    e.preventDefault();
+    if (e.repeat || !text || text.endsWith(' ')) return;
+    const w = letztesWort();
+    text += ' ';
+    zeichnen();
+    if (w.length > 1) sprechen(zumVorlesen(w));
+    return;
+  }
+  if (k === 'Enter') {
+    e.preventDefault();
+    if (!e.repeat) sprechen(zumVorlesen(text));
+    return;
+  }
+  if (k === 'Backspace') {
+    e.preventDefault();
+    if (!text) return;
+    text = Array.from(text).slice(0, -1).join('');
+    zeichnen();
+    const letzt = Array.from(text.trimEnd()).pop();
+    grossEl.textContent = letzt || '';
+    return;
+  }
+});
+
+// ---------- Mikrofon ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let erkenner = null, hoert = false, fertig = '';
+
+if (!SR) {
+  micBtn.disabled = true;
+  micBtn.title = 'Spracherkennung gibt es in diesem Browser nicht – bitte Edge oder Chrome nehmen';
+}
+
+function hoeren() {
+  if (hoert) { erkenner.stop(); return; }
+  speechSynthesis.cancel();
+  fertig = '';
+  erkenner = new SR();
+  erkenner.lang = 'de-DE';
+  erkenner.interimResults = true;
+  erkenner.maxAlternatives = 1;
+  erkenner.continuous = false;
+
+  erkenner.onstart = () => { hoert = true; micBtn.classList.add('an'); grossZeigen('👂'); };
+  erkenner.onresult = e => {
+    let s = '';
+    for (const r of e.results) s += r[0].transcript;
+    zwischenText = gross(s.trim());
+    if (e.results[e.results.length - 1].isFinal) fertig = s.trim();
+    zeichnen();
+  };
+  erkenner.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      meldung('Mikrofon ist nicht erlaubt – oben in der Adressleiste freigeben');
+    } else if (e.error === 'no-speech') {
+      meldung('Ich habe nichts gehört 🙉');
+    } else if (e.error !== 'aborted') {
+      meldung('Spracherkennung: ' + e.error);
+    }
+  };
+  erkenner.onend = () => {
+    hoert = false;
+    micBtn.classList.remove('an');
+    zwischenText = '';
+    if (fertig) {
+      if (text && !text.endsWith(' ')) text += ' ';
+      neuerIndex = text.length;
+      text += gross(fertig) + ' ';
+      grossZeigen('⭐');
+      sprechen(zumVorlesen(fertig));
+    } else {
+      grossEl.textContent = '';
+    }
+    zeichnen();
+  };
+  erkenner.start();
+}
+
+// ---------- Knöpfe ----------
+micBtn.addEventListener('click', hoeren);
+$('vorlesen').addEventListener('click', () => sprechen(zumVorlesen(text)));
+$('neu').addEventListener('click', () => {
+  text = '';
+  grossEl.textContent = '';
+  zeichnen();
+  sprechen('Alles weg!');
+});
+$('vollbild').addEventListener('click', async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      // Chrome/Edge: im Vollbild fängt die Seite auch Esc & Co. ab (Esc lange halten = raus)
+      if (navigator.keyboard && navigator.keyboard.lock) await navigator.keyboard.lock();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (err) {
+    meldung('Vollbild ging nicht: ' + err.message);
+  }
+});
+// Knöpfe nicht fokussiert lassen, sonst löst die Leertaste sie aus
+document.querySelectorAll('button').forEach(b => b.addEventListener('click', () => b.blur()));
+
+zeichnen();
+</script>
+</body>
+</html>
