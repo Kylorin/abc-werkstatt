@@ -1,0 +1,8 @@
+/* B14: Hinweis auf den Stummschalter. Nur Tokens aus src/kern/stil/tokens.css. */
+.stummhinweis { display: flex; flex-wrap: wrap; align-items: center; gap: var(--abstand-3); color: var(--tinte-sanft); }
+.stummhinweis--einmal { background: var(--karte); border: 1px solid var(--linie); border-radius: var(--radius); padding: var(--abstand-3); }
+.stummhinweis__bild { flex: none; color: var(--tinte-sanft); line-height: 0; }
+.stummhinweis__schalter { fill: var(--sonne); }
+.stummhinweis__pfeil { stroke: var(--sonne); }
+.stummhinweis__text { flex: 1 1 12em; margin: 0; font-size: var(--gr-s); line-height: 1.5; }
+.stummhinweis__ok { font-size: var(--gr-s); }

@@ -74,6 +74,17 @@ function zeile(ctx: Kontext, b: Buchstabe): HTMLElement {
     }
   }
 
+  // B13: der gedehnte Laut (manifest.laute_lang) zum Gegenhören — wird nicht ausgewählt, nur verglichen.
+  const gedehnt = el('button', {
+    klasse: 'knopf knopf--leise laut__gedehnt',
+    testid: `laut-lang-${b}`,
+    attr: { title: 'So klingt der Laut lang gezogen (wie in „Wer ist unter der Decke?“)' },
+    beiKlick: () => {
+      meldung.replaceChildren();
+      ctx.audio.lautLang(b).catch((f: unknown) => meldung.replaceChildren(fehlerHinweis(f)));
+    },
+  }, icon('welle', { groesse: 20 }), el('span', { text: 'gedehnt anhören' }));
+
   const aufnahme = aufnahmeKnoepfe(ctx.audio, { art: 'laut', text: b }, {
     testid: `laut-aufnahme-${b}`,
     beiAenderung: () => void lade(),
@@ -88,6 +99,7 @@ function zeile(ctx: Kontext, b: Buchstabe): HTMLElement {
       standard,
     ),
     varianten,
+    gedehnt,
     aufnahme.el,
     meldung,
   );
@@ -109,7 +121,8 @@ export const modus: Modus = {
           text:
             'Nach Montessori lernt ein Kind zuerst den Laut („mmm“), nicht den Namen („em“), denn beim Schreiben ' +
             'setzt es Wörter aus dem zusammen, was es hört. Wählen Sie hier die Aussprache, die Ihnen am klarsten ' +
-            'klingt, oder sprechen Sie den Laut selbst ein – Ihre Stimme hat dann Vorrang.',
+            'klingt, oder sprechen Sie den Laut selbst ein – Ihre Stimme hat dann Vorrang. „Gedehnt anhören“ ' +
+            'spielt die lang gezogene Fassung, die einige Spiele zum Lauschen benutzen.',
         }),
         liste,
       ),
