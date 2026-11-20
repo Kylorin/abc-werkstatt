@@ -1,6 +1,6 @@
 /**
  * Dauerhafter Gerätespeicher (Fundament). Ohne `navigator.storage.persist()` gilt der Speicher
- * als „best effort": Chrome auf Android darf ihn bei Platzmangel ganz räumen — Tier-Paket,
+ * als „best effort“: Chrome auf Android darf ihn bei Platzmangel ganz räumen — Tier-Paket,
  * Elternaufnahmen und Wörterbuch wären dann ohne Meldung weg.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Bewegliches Alphabet (Bau „schreiben").
+ * Bewegliches Alphabet (Bau „schreiben“).
  *
  * Wie der Holzkasten: Buchstaben in Alphabet-Reihenfolge, Vokale blau, Konsonanten rot,
  * Umlaute zählen als Vokale. Tasten:

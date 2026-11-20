@@ -1,15 +1,15 @@
 /**
- * Freies Schreiben (Bau „schreiben") — das bewegliche Alphabet auf dem Teppich.
+ * Freies Schreiben (Bau „schreiben“) — das bewegliche Alphabet auf dem Teppich.
  *
  * - data-testid="text" enthält exakt den geschriebenen Text (der Cursor liegt daneben).
  * - Jeder Buchstabe klingt (Laut bzw. Name je Einstellung), Leertaste liest das letzte Wort,
- *   „Vorlesen" liest den ganzen Text.
+ *   „Vorlesen“ liest den ganzen Text.
  * - Spracheingabe (Web Speech API): Ergebnis anhängen und vorlesen; ohne API kein Knopf.
  * - Passt das Wort am Ende des Texts zu einem Tier aus einem installierten Paket, kommt das
  *   Tier groß und freut sich (data-testid="tier-freude") — als Einblendung über dem Blatt,
  *   damit das Alphabet beim Tippen nicht verrutscht.
  * - Der Text bleibt erhalten, wenn das Kind den Modus verlässt (bis zum Neuladen der Seite).
- *   „Alles wegräumen" lässt sich einige Sekunden lang zurückholen.
+ *   „Alles wegräumen“ lässt sich einige Sekunden lang zurückholen.
  */
 import { anzeigeZeichen, artVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
@@ -22,7 +22,7 @@ import './frei.css';
 
 const MAX_ZEICHEN = 240;
 const BESUCH_DAUER_MS = 5200;
-/** So lange lässt sich „Alles wegräumen" zurückholen. */
+/** So lange lässt sich „Alles wegräumen“ zurückholen. */
 const ZURUECKHOLEN_MS = 10_000;
 
 /** Text des Kindes über das Verlassen des Modus hinweg (Respekt vor dem Werk, versehentliches Zurück kostet nichts). */
@@ -227,7 +227,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   const leerenKnopf = el(
     'button',
     {
-      klasse: 'knopf knopf--icon knopf--leise',
+      klasse: 'knopf knopf--icon knopf--gross',
       testid: 'text-leeren',
       attr: { 'aria-label': 'Alles wegräumen' },
       beiKlick: () => {
@@ -247,11 +247,11 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
     },
     icon('loeschen', { groesse: 26 }),
   );
-  // Nach dem Wegräumen steht an derselben Stelle „zurückholen": ein zweiter Tipp bringt alles wieder.
+  // Nach dem Wegräumen steht an derselben Stelle „zurückholen“: ein zweiter Tipp bringt alles wieder.
   const holKnopf = el(
     'button',
     {
-      klasse: 'knopf knopf--icon frei__holen',
+      klasse: 'knopf knopf--icon knopf--gross frei__holen',
       testid: 'text-zurueckholen',
       attr: { 'aria-label': 'Text zurückholen', hidden: true },
       beiKlick: () => {

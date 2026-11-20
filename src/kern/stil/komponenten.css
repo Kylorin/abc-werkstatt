@@ -14,9 +14,13 @@
   background: color-mix(in srgb, var(--papier) 92%, transparent);
   backdrop-filter: blur(6px);
 }
+/* Lange Titel (z. B. von Tier-Paketen) brechen um statt abgeschnitten zu werden — höchstens zwei
+   Zeilen, die passen in die Höhe der Zurück-Taste. */
 .kopf__titel {
-  font-size: var(--gr-l); text-align: center; color: var(--tinte-sanft);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: clamp(1.05rem, 4.8vw, var(--gr-l)); line-height: 1.15;
+  text-align: center; color: var(--tinte-sanft);
+  overflow-wrap: break-word; text-wrap: balance;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
 }
 .kopf__platz { width: var(--touch); }
 .flaeche {
@@ -43,6 +47,10 @@
 @media (hover: hover) and (pointer: fine) { .knopf--leise:hover { background: var(--papier-tief); } }
 .knopf--icon { padding: 0; width: var(--touch); border-radius: var(--radius-rund); }
 .knopf--gross { min-height: var(--touch-gross); font-size: var(--gr-l); }
+/* Runde Icon-Knöpfe bleiben Kreise, auch in groß. */
+.knopf--icon.knopf--gross { width: var(--touch-gross); min-width: var(--touch-gross); }
+/* Icons im Knopf werden im Flex-Layout nie zusammengedrückt. */
+.knopf > .icon { flex: none; }
 .knopf--gefahr { color: var(--konsonant); }
 .knopf[aria-pressed='true'] { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen-tief); }
 
@@ -59,9 +67,12 @@
 .start__titel > span { font-size: 1.25em; }
 .start__tiere { display: flex; flex-direction: column; gap: var(--abstand-4); }
 .start__tiere:empty { display: none; }
-.start__arbeiten { display: grid; grid-template-columns: 1fr; gap: var(--abstand-4); }
-@media (min-width: 560px) { .start__arbeiten { grid-template-columns: repeat(2, 1fr); } }
-.start__fuss { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-2); padding-top: var(--abstand-5); }
+/* Die Arbeiten wachsen in den freien Platz hinein (bis zu einer Obergrenze), statt eine leere
+   Fläche zwischen Kacheln und Elternbereich zu lassen. */
+.start__arbeiten { flex: 1 1 auto; max-height: 460px; display: grid; grid-template-columns: 1fr; grid-auto-rows: minmax(112px, 1fr); gap: var(--abstand-4); }
+@media (min-width: 560px) { .start__arbeiten { grid-template-columns: repeat(2, 1fr); grid-auto-rows: auto; max-height: none; flex: none; } }
+.start__fuss { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-1); padding-top: var(--abstand-3); }
+.start__fuss .knopf { font-size: var(--gr-s); padding: 0 var(--abstand-4); }
 
 /* ---------- Kacheln (Start) ---------- */
 .kachel {
@@ -197,3 +208,29 @@
 }
 .herz { position: absolute; color: var(--herz); pointer-events: none; animation: herz-steigen 1.8s var(--kurve) forwards; }
 .herz svg { fill: currentColor; }
+
+/* Rundes Tierbild (Tier-Modus, Tier-Besuch): Kreis mit hellem Rand, das Bild leicht herangezoomt,
+   damit Ränder und Ecken der Paketbilder verschwinden. */
+.medaillon {
+  display: block; position: relative; overflow: hidden;
+  aspect-ratio: 1; border-radius: 50%;
+  border: 6px solid var(--karte);
+  background: var(--karte);
+  box-shadow: var(--schatten);
+}
+.medaillon__bild {
+  position: absolute; left: -8%; top: -8%;
+  width: 116%; height: 116%; max-width: none;
+  object-fit: cover;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* Elternsperre (installierte App): der Knopf füllt sich beim Gedrückthalten, kurzer Tipp zeigt den Hinweis. */
+.knopf--halten { position: relative; overflow: hidden; }
+.knopf--halten[data-halten='laeuft']::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background: var(--gruen); transform-origin: left center;
+  animation: halten-fuellen var(--halten-dauer, 2s) linear forwards;
+}
+@keyframes halten-fuellen { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.start__sperrhinweis { flex-basis: 100%; text-align: center; font-size: var(--gr-s); color: var(--tinte-leise); }

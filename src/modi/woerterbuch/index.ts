@@ -1,5 +1,5 @@
 /**
- * Wörterbuch (Bau „verwaltung") — Erwachsenen-Bereich: Wörter hinzufügen, löschen,
+ * Wörterbuch (Bau „verwaltung“) — Erwachsenen-Bereich: Wörter hinzufügen, löschen,
  * fürs Üben an-/abwählen, anhören und selbst einsprechen.
  *
  * Speicher: Wörter und Üben-Auswahl über den Kern-WoerterDienst (IndexedDB);
@@ -197,7 +197,7 @@ export const modus: Modus = {
         meldung.replaceChildren();
         try {
           const wort = pruefeWort(eingabe.value);
-          if (zeilen.has(wort)) throw new WortFehler(`„${wort}" steht schon im Wörterbuch.`);
+          if (zeilen.has(wort)) throw new WortFehler(`„${wort}“ steht schon im Wörterbuch.`);
           await ctx.woerter.hinzufuegen(wort);
           if (!aktiv) return;
           einfuegen(wort);

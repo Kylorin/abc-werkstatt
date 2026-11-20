@@ -18,7 +18,8 @@ mein-paket.zip
 │   └── baer.png
 └── audio/
     ├── igel-name.mp3
-    └── igel-freude-1.mp3
+    ├── igel-freude-1.mp3
+    └── igel-kann.mp3
 ```
 
 ## paket.json
@@ -39,7 +40,11 @@ mein-paket.zip
       "bild": "bilder/igel.webp",
       "kann": "Der Igel kann sich ganz rund machen.",
       "freude": "Juhu, du hast mich geschrieben!",
-      "audio": { "name": "audio/igel-name.mp3", "freude": ["audio/igel-freude-1.mp3"] }
+      "audio": {
+        "name": "audio/igel-name.mp3",
+        "freude": ["audio/igel-freude-1.mp3"],
+        "kann": "audio/igel-kann.mp3"
+      }
     },
     { "id": "baer", "name": "Bär", "artikel": "der", "bild": "bilder/baer.png" }
   ]
@@ -68,6 +73,14 @@ Je Tier:
 | `freude` | nein | Satz, den das Tier sagt, wenn sein Name geschrieben ist (1–300 Zeichen) |
 | `audio.name` | nein | mp3 mit dem gesprochenen Namen |
 | `audio.freude` | nein | Liste von mp3s; bei Erfolg wird eine zufällig gespielt (sonst wird `freude` vorgelesen) |
+| `audio.kann` | nein | mp3 mit dem `kann`-Satz; ohne sie liest die App `kann` mit der eingestellten Stimme vor. Wer Name und Freude vertont, sollte auch `kann` vertonen, sonst wechselt mitten in der Freude die Stimme. |
+
+## Bilder
+
+Die App zeigt jedes Tierbild **rund** (Kreis mit hellem Rand) und zoomt dabei etwa 8 % heran.
+Ecken und ein schmaler Rand des Bildes sind also nie zu sehen. Das Tier sollte mittig stehen und
+gut die Hälfte des Bildes füllen, sonst ist es auf dem Handy kaum zu erkennen. Quadratische
+Bilder ab 512 × 512 px sind ideal.
 
 ## Schreibwort
 

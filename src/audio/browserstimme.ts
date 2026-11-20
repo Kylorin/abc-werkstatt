@@ -1,6 +1,6 @@
 /**
  * Letzte Stufe: die Sprachausgabe des Browsers (speechSynthesis), de-DE.
- * Bevorzugt natürliche Stimmen („Natural", „Online", „Premium", „Enhanced").
+ * Bevorzugt natürliche Stimmen („Natural“, „Online“, „Premium“, „Enhanced“).
  */
 import { AudioFehler, type Ausgang } from '../kern/vertrag';
 

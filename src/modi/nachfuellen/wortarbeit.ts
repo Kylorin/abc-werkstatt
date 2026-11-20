@@ -1,5 +1,5 @@
 /**
- * Wortarbeit (Bau „schreiben"): ein Wort Buchstabe für Buchstabe in Felder legen.
+ * Wortarbeit (Bau „schreiben“): ein Wort Buchstabe für Buchstabe in Felder legen.
  * Gemeinsam genutzt von Nachfüllen und Tier-Modus.
  *
  * Testvertrag:
@@ -30,6 +30,8 @@ export interface WortarbeitOptionen {
   vollesAlphabet: boolean;
   /** Klein vor dem Wort angezeigt, wird nicht geschrieben (Tier-Modus). */
   artikel?: string;
+  /** Sichtbares Lautsprecher-Zeichen über dem Wort (Nachfüllen: dort gibt es kein Bild zum Antippen). */
+  hoerZeichen?: boolean;
   melde(fehler: unknown): void;
   /**
    * Wort fertig. `letzterLaut` löst auf, wenn der Laut des letzten Buchstabens verklungen ist:
@@ -102,8 +104,9 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
       attr: { 'data-wort': wort, 'aria-label': `Vorlesen: ${o.artikel ? o.artikel + ' ' : ''}${wort}` },
       beiKlick: () => void spiele(ctx.audio.wort(wort), o.melde),
     },
+    o.hoerZeichen ? el('span', { klasse: 'zielwort__hoeren' }, icon('lautsprecher', { groesse: 40, strich: 2 })) : null,
     o.artikel ? el('span', { klasse: 'zielwort__artikel', text: o.artikel }) : null,
-    el('span', { klasse: 'felder' }, ...slots),
+    el('span', { klasse: 'felder', attr: { style: `--n: ${Math.max(3, buchstaben.length)}` } }, ...slots),
   );
 
   const rueckmeldung = el('p', {

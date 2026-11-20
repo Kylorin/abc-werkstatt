@@ -1,8 +1,8 @@
-/** Hilfen rund um das Schreibwort eines Tiers (Bau „paket"). */
+/** Hilfen rund um das Schreibwort eines Tiers (Bau „paket“). */
 import { schreibwort } from '../kern/alphabet';
 import type { Tier } from '../kern/vertrag';
 
-/** Kanonisches Schreibwort eines Tiernamens: „Bär" → „bär" (wie überall in der App). */
+/** Kanonisches Schreibwort eines Tiernamens: „Bär“ → „bär“ (wie überall in der App). */
 export function kanonischesWort(name: string): string {
   return schreibwort(name);
 }

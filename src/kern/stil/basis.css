@@ -40,6 +40,9 @@ body {
 .rahmen[data-modus='nachfuellen'] img,
 .rahmen[data-modus='tiere'] img { -webkit-user-drag: none; }
 
+/* hidden gilt immer — auch für Elemente, deren Klasse ein display setzt (z. B. .knopf). */
+[hidden] { display: none !important; }
+
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { font-weight: 700; line-height: 1.15; }
 img, svg { display: block; max-width: 100%; }

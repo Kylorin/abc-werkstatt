@@ -64,6 +64,7 @@ export function referenzierteDateien(p: TierPaketDatei): Map<string, DateiArt> {
     m.set(t.bild, 'bild');
     if (t.audio?.name) m.set(t.audio.name, 'audio');
     for (const f of t.audio?.freude ?? []) m.set(f, 'audio');
+    if (t.audio?.kann) m.set(t.audio.kann, 'audio');
   }
   return m;
 }
@@ -82,25 +83,25 @@ export function pruefePaketJson(roh: unknown): TierPaketDatei {
 
   if (roh['format'] !== TIERPAKET_FORMAT) {
     throw new PaketFehler(
-      `Unbekanntes Paketformat „${String(roh['format'] ?? 'fehlt')}". Erwartet wird „${TIERPAKET_FORMAT}".`,
+      `Unbekanntes Paketformat „${String(roh['format'] ?? 'fehlt')}“. Erwartet wird „${TIERPAKET_FORMAT}“.`,
     );
   }
-  if (roh['sprache'] !== 'de-DE') f(`„sprache" muss „de-DE" sein.`);
+  if (roh['sprache'] !== 'de-DE') f(`„sprache“ muss „de-DE“ sein.`);
 
   const id = roh['id'];
   if (typeof id !== 'string' || !ID_MUSTER.test(id) || id.length > MAX_ID) {
-    f(`Die Paket-„id" muss aus 1–${MAX_ID} Zeichen a–z, 0–9 und - bestehen.`);
+    f(`Die Paket-„id“ muss aus 1–${MAX_ID} Zeichen a–z, 0–9 und - bestehen.`);
   }
   const titel = typeof roh['titel'] === 'string' ? roh['titel'].trim() : undefined;
-  if (!titel || titel.length > MAX_TITEL) f(`Der „titel" fehlt oder ist länger als ${MAX_TITEL} Zeichen.`);
+  if (!titel || titel.length > MAX_TITEL) f(`Der „titel“ fehlt oder ist länger als ${MAX_TITEL} Zeichen.`);
 
-  const untertitel = pruefeOptionalText(roh['untertitel'], '„untertitel"', f);
-  const cover = pruefeOptionalPfad(roh['cover'], '„cover"', f);
+  const untertitel = pruefeOptionalText(roh['untertitel'], '„untertitel“', f);
+  const cover = pruefeOptionalPfad(roh['cover'], '„cover“', f);
 
   const tiereRoh = roh['tiere'];
   const tiere: Tier[] = [];
   if (!Array.isArray(tiereRoh)) {
-    f(`„tiere" fehlt oder ist keine Liste.`);
+    f(`„tiere“ fehlt oder ist keine Liste.`);
   } else if (tiereRoh.length === 0) {
     f('Das Paket enthält kein Tier.');
   } else if (tiereRoh.length > MAX_TIERE) {
@@ -111,11 +112,11 @@ export function pruefePaketJson(roh: unknown): TierPaketDatei {
     tiereRoh.forEach((t, i) => {
       const tier = pruefeTier(t, i, f);
       if (!tier) return;
-      if (ids.has(tier.id)) f(`Die Tier-id „${tier.id}" kommt mehrfach vor.`);
+      if (ids.has(tier.id)) f(`Die Tier-id „${tier.id}“ kommt mehrfach vor.`);
       ids.add(tier.id);
       const wort = kanonischesWort(tier.name);
       const schon = woerter.get(wort);
-      if (schon !== undefined) f(`„${tier.name}" und „${schon}" ergeben dasselbe Schreibwort „${wort}".`);
+      if (schon !== undefined) f(`„${tier.name}“ und „${schon}“ ergeben dasselbe Schreibwort „${wort}“.`);
       else woerter.set(wort, tier.name);
       tiere.push(tier);
     });
@@ -152,7 +153,7 @@ function pruefeOptionalText(w: unknown, feld: string, f: (t: string) => void): s
   return w.trim();
 }
 
-/** Pfad im Zip: relativ, mit „/", ohne „..", ohne Laufwerk. */
+/** Pfad im Zip: relativ, mit „/“, ohne „..“, ohne Laufwerk. */
 function pruefePfad(w: unknown, feld: string, f: (t: string) => void): string | undefined {
   if (typeof w !== 'string' || w.length === 0) {
     f(`${feld} muss ein Dateipfad sein.`);
@@ -160,7 +161,7 @@ function pruefePfad(w: unknown, feld: string, f: (t: string) => void): string | 
   }
   const teile = w.split('/');
   if (w.startsWith('/') || w.includes('\\') || /^[a-zA-Z]:/.test(w) || teile.some((t) => t === '..' || t === '')) {
-    f(`${feld}: „${w}" ist kein erlaubter Pfad (relativ, ohne „..", mit „/" getrennt).`);
+    f(`${feld}: „${w}“ ist kein erlaubter Pfad (relativ, ohne „..“, mit „/“ getrennt).`);
     return undefined;
   }
   return w;
@@ -184,12 +185,12 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
 
   const id = roh['id'];
   if (typeof id !== 'string' || !ID_MUSTER.test(id) || id.length > MAX_ID) {
-    g(`${wo}: „id" muss aus 1–${MAX_ID} Zeichen a–z, 0–9 und - bestehen.`);
+    g(`${wo}: „id“ muss aus 1–${MAX_ID} Zeichen a–z, 0–9 und - bestehen.`);
   }
   const name = typeof roh['name'] === 'string' ? roh['name'].trim() : undefined;
-  const benannt = name ? `${wo} („${name}")` : wo;
+  const benannt = name ? `${wo} („${name}“)` : wo;
   if (!name) {
-    g(`${wo}: „name" fehlt.`);
+    g(`${wo}: „name“ fehlt.`);
   } else {
     const wort = kanonischesWort(name);
     const zeichen = Array.from(wort);
@@ -203,28 +204,30 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
   }
   const artikel = roh['artikel'];
   if (artikel !== 'der' && artikel !== 'die' && artikel !== 'das') {
-    g(`${benannt}: „artikel" muss der, die oder das sein.`);
+    g(`${benannt}: „artikel“ muss der, die oder das sein.`);
   }
-  const bild = pruefePfad(roh['bild'], `${benannt}: „bild"`, g);
-  const kann = pruefeOptionalText(roh['kann'], `${benannt}: „kann"`, g);
-  const freude = pruefeOptionalText(roh['freude'], `${benannt}: „freude"`, g);
+  const bild = pruefePfad(roh['bild'], `${benannt}: „bild“`, g);
+  const kann = pruefeOptionalText(roh['kann'], `${benannt}: „kann“`, g);
+  const freude = pruefeOptionalText(roh['freude'], `${benannt}: „freude“`, g);
 
   let audio: Tier['audio'];
   const audioRoh = roh['audio'];
   if (audioRoh !== undefined) {
     if (!istObjekt(audioRoh)) {
-      g(`${benannt}: „audio" muss ein Objekt sein.`);
+      g(`${benannt}: „audio“ muss ein Objekt sein.`);
     } else {
       audio = {};
-      const audioName = pruefeOptionalPfad(audioRoh['name'], `${benannt}: „audio.name"`, g);
+      const audioName = pruefeOptionalPfad(audioRoh['name'], `${benannt}: „audio.name“`, g);
       if (audioName !== undefined) audio.name = audioName;
+      const audioKann = pruefeOptionalPfad(audioRoh['kann'], `${benannt}: „audio.kann“`, g);
+      if (audioKann !== undefined) audio.kann = audioKann;
       const freudeRoh = audioRoh['freude'];
       if (freudeRoh !== undefined) {
         if (!Array.isArray(freudeRoh)) {
-          g(`${benannt}: „audio.freude" muss eine Liste von Dateipfaden sein.`);
+          g(`${benannt}: „audio.freude“ muss eine Liste von Dateipfaden sein.`);
         } else {
           const liste = freudeRoh
-            .map((p, j) => pruefePfad(p, `${benannt}: „audio.freude[${j + 1}]"`, g))
+            .map((p, j) => pruefePfad(p, `${benannt}: „audio.freude[${j + 1}]“`, g))
             .filter((p): p is string => p !== undefined);
           if (liste.length) audio.freude = liste;
         }
@@ -241,7 +244,7 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
   };
   if (kann !== undefined) tier.kann = kann;
   if (freude !== undefined) tier.freude = freude;
-  if (audio && (audio.name || audio.freude)) tier.audio = audio;
+  if (audio && (audio.name || audio.freude || audio.kann)) tier.audio = audio;
   return tier;
 }
 
@@ -285,7 +288,7 @@ export function pruefeZip(daten: Uint8Array): GeprueftesPaket {
     const verschachtelt = [...namen].find((n) => n.endsWith('/paket.json'));
     throw new PaketFehler(
       verschachtelt
-        ? `paket.json liegt im Ordner „${verschachtelt.slice(0, -'/paket.json'.length)}". Bitte den INHALT des Ordners zippen, sodass paket.json ganz oben liegt.`
+        ? `paket.json liegt im Ordner „${verschachtelt.slice(0, -'/paket.json'.length)}“. Bitte den INHALT des Ordners zippen, sodass paket.json ganz oben liegt.`
         : 'Im Zip fehlt die Datei paket.json an oberster Stelle.',
     );
   }
@@ -303,12 +306,12 @@ export function pruefeZip(daten: Uint8Array): GeprueftesPaket {
   const fehler: string[] = [];
   for (const [pfad, art] of benoetigt) {
     if (!namen.has(pfad)) {
-      fehler.push(`Die Datei „${pfad}" fehlt im Zip.`);
+      fehler.push(`Die Datei „${pfad}“ fehlt im Zip.`);
     } else if (!mimeTyp(pfad, art)) {
       fehler.push(
         art === 'bild'
-          ? `„${pfad}" ist kein erlaubtes Bild (webp, png, jpg, svg).`
-          : `„${pfad}" ist keine mp3-Datei.`,
+          ? `„${pfad}“ ist kein erlaubtes Bild (webp, png, jpg, svg).`
+          : `„${pfad}“ ist keine mp3-Datei.`,
       );
     }
   }
@@ -317,7 +320,7 @@ export function pruefeZip(daten: Uint8Array): GeprueftesPaket {
   const zweiteStufe = entpacke(daten, (info) => {
     if (!benoetigt.has(info.name)) return false;
     if (info.originalSize > MAX_DATEI_BYTES) {
-      throw new PaketFehler(`„${info.name}" ist ${mb(info.originalSize)} groß – erlaubt sind höchstens 2 MB je Datei.`);
+      throw new PaketFehler(`„${info.name}“ ist ${mb(info.originalSize)} groß – erlaubt sind höchstens 2 MB je Datei.`);
     }
     return true;
   });
@@ -326,10 +329,10 @@ export function pruefeZip(daten: Uint8Array): GeprueftesPaket {
   let tatsaechlich = jsonBytes.length;
   for (const [pfad, art] of benoetigt) {
     const inhalt = zweiteStufe[pfad];
-    if (!inhalt) throw new PaketFehler(`Die Datei „${pfad}" konnte nicht entpackt werden.`);
+    if (!inhalt) throw new PaketFehler(`Die Datei „${pfad}“ konnte nicht entpackt werden.`);
     // Die Größe im Zip-Verzeichnis kann falsch sein – die echte Größe zählt.
     if (inhalt.length > MAX_DATEI_BYTES) {
-      throw new PaketFehler(`„${pfad}" ist ${mb(inhalt.length)} groß – erlaubt sind höchstens 2 MB je Datei.`);
+      throw new PaketFehler(`„${pfad}“ ist ${mb(inhalt.length)} groß – erlaubt sind höchstens 2 MB je Datei.`);
     }
     tatsaechlich += inhalt.length;
     dateien.push({ pfad, art, typ: mimeTyp(pfad, art) as string, daten: inhalt });

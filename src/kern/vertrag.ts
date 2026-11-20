@@ -39,15 +39,15 @@ export type BuchstabenArt = 'vokal' | 'konsonant';
 
 /** Alles, was Eltern einstellen können. Persistiert lokal im Gerät. */
 export interface Einstellungen {
-  /** true = Buchstabennamen („em") statt Laute („mmm"). Montessori-Standard: false. */
+  /** true = Buchstabennamen („em“) statt Laute („mmm“). Montessori-Standard: false. */
   namenStattLaute: boolean;
   /** true = Großbuchstaben anzeigen. Montessori-Standard: false (Kleinbuchstaben). */
   grossbuchstaben: boolean;
   /** Eigener Azure-Speech-Schlüssel für Live-Vertonung neuer Wörter (nur im Gerät gespeichert). */
   azureSchluessel?: string;
-  /** Azure-Region, z. B. „westeurope". */
+  /** Azure-Region, z. B. „westeurope“. */
   azureRegion?: string;
-  /** Azure-Stimmenname, z. B. „de-DE-KatjaNeural". */
+  /** Azure-Stimmenname, z. B. „de-DE-KatjaNeural“. */
   stimme: string;
   /** Optional: Name des Kindes (nur lokal, nie im Repo), z. B. für Begrüßung im Tier-Modus. */
   kindName?: string;
@@ -55,6 +55,11 @@ export interface Einstellungen {
   tierModusMitVorlage: boolean;
   /** Im Laut-Studio gewählte Variante je Buchstabe: Buchstabe → URL der Audiodatei (oder `aufnahme:<b>` / `azure:<b>`). */
   gewaehlteLautVarianten: Partial<Record<Buchstabe, string>>;
+  /**
+   * Elternsperre: in der INSTALLIERTEN App (Startbildschirm) öffnen sich Wörterbuch und
+   * Einstellungen erst nach langem Drücken. Im normalen Browser-Tab gilt sie nicht. Standard: true.
+   */
+  elternsperre: boolean;
 }
 
 /** Reaktiver Einstellungs-Store (src/kern/einstellungen.ts). */
@@ -72,8 +77,8 @@ export interface EinstellungenStore {
 // ---------------------------------------------------------------------------
 
 /**
- * public/audio/manifest.json — vom Bau „audio" (tools/vertonen.py) erzeugt.
- * Alle Pfade RELATIV zur App-Basis (z. B. „audio/laute/m.mp3"), damit sie unter
+ * public/audio/manifest.json — vom Bau „audio“ (tools/vertonen.py) erzeugt.
+ * Alle Pfade RELATIV zur App-Basis (z. B. „audio/laute/m.mp3“), damit sie unter
  * /abc-werkstatt/ und im Test (request.get) funktionieren.
  */
 export interface AudioManifest {
@@ -83,7 +88,7 @@ export interface AudioManifest {
   namen: Record<Buchstabe, string>;
   /** Wort (kanonisch klein) → Datei, z. B. { igel: "audio/woerter/igel.mp3" }. */
   woerter: Record<string, string>;
-  /** Kurze Sätze/Floskeln (Schlüssel frei, z. B. „geschafft", „nochmal"). */
+  /** Kurze Sätze/Floskeln (Schlüssel frei, z. B. „geschafft“, „nochmal“). */
   saetze?: Record<string, string>;
   /** Laut-Varianten je Buchstabe fürs Laut-Studio (mind. 2 für b, d, k, m). */
   varianten?: Partial<Record<Buchstabe, LautVariante[]>>;
@@ -91,14 +96,14 @@ export interface AudioManifest {
 
 /** Eine auswählbare Aussprache-Variante eines Lauts. */
 export interface LautVariante {
-  /** Stabile ID innerhalb des Buchstabens, z. B. „1", „kurz", „katja". Landet in data-testid `variante-<b>-<id>`. */
+  /** Stabile ID innerhalb des Buchstabens, z. B. „1“, „kurz“, „katja“. Landet in data-testid `variante-<b>-<id>`. */
   id: string;
   /**
    * Relativer Pfad, Blob-URL oder eine der Sonderformen `aufnahme:<b>` (Elternaufnahme) bzw.
    * `azure:<b>` (live über den eigenen Azure-Schlüssel) — `AudioDienst.datei()` spielt alle ab.
    */
   url: string;
-  /** Anzeige für Eltern, z. B. „kurz, stimmlos". */
+  /** Anzeige für Eltern, z. B. „kurz, stimmlos“. */
   beschreibung?: string;
   /** Herkunft: vorab vertont, live über Azure erzeugt oder von Eltern aufgenommen. */
   quelle: 'vorab' | 'azure' | 'aufnahme';
@@ -126,7 +131,7 @@ export interface LaufendeAufnahme {
 export type Ausgang = 'fertig' | 'abgebrochen';
 
 /**
- * Audio-Dienst (Bau „audio", src/audio). Reihenfolge der Quellen je Ausgabe:
+ * Audio-Dienst (Bau „audio“, src/audio). Reihenfolge der Quellen je Ausgabe:
  * Elternaufnahme → gewählte Laut-Variante → vorab vertont (manifest) → Cache live → Azure live
  * (nur mit eigenem Schlüssel) → Browserstimme (speechSynthesis) als letzte Stufe.
  *
@@ -138,9 +143,9 @@ export type Ausgang = 'fertig' | 'abgebrochen';
 export interface AudioDienst {
   /** Lädt manifest.json (einmalig, idempotent). Muss vor der ersten Ausgabe nicht abgewartet werden. */
   vorab(): Promise<void>;
-  /** Spielt den LAUT („mmm"). Erzeugt bei vorab vertonten Lauten einen Request auf audio/laute/<b>….mp3. */
+  /** Spielt den LAUT („mmm“). Erzeugt bei vorab vertonten Lauten einen Request auf audio/laute/<b>….mp3. */
   laut(b: Buchstabe): Promise<Ausgang>;
-  /** Spielt den Buchstaben-NAMEN („em"). */
+  /** Spielt den Buchstaben-NAMEN („em“). */
   name(b: Buchstabe): Promise<Ausgang>;
   /** Laut ODER Name je nach Einstellung `namenStattLaute` — das, was Tasten benutzen. */
   buchstabe(b: Buchstabe): Promise<Ausgang>;
@@ -175,7 +180,7 @@ export const TIERPAKET_FORMAT = 'abc-werkstatt-tierpaket/1' as const;
 export interface Tier {
   /** Eindeutig im Paket, [a-z0-9-]+. */
   id: string;
-  /** Anzeigename mit Großbuchstaben/Umlauten, z. B. „Bär". Schreibwort = schreibwort(name). */
+  /** Anzeigename mit Großbuchstaben/Umlauten, z. B. „Bär“. Schreibwort = schreibwort(name). */
   name: string;
   artikel: 'der' | 'die' | 'das';
   /** Bildpfad im Zip (webp, png, jpg, svg). */
@@ -189,6 +194,8 @@ export interface Tier {
     name?: string;
     /** mp3s der Freude (eines wird zufällig gespielt). */
     freude?: string[];
+    /** mp3 mit dem „kann“-Satz — dieselbe Stimme wie Name und Freude statt der Gerätestimme. */
+    kann?: string;
   };
 }
 
@@ -218,7 +225,7 @@ export interface TierTreffer {
 }
 
 /**
- * Paket-Dienst (Bau „paket", src/paket). Speichert in IndexedDB (idb-keyval, eigener Store).
+ * Paket-Dienst (Bau „paket“, src/paket). Speichert in IndexedDB (idb-keyval, eigener Store).
  * Alle Methoden werfen `PaketFehler` mit verständlicher deutscher Meldung für Eltern.
  */
 export interface PaketDienst {
@@ -315,7 +322,7 @@ export interface Modus {
 }
 
 // ---------------------------------------------------------------------------
-// Bildschirm-Alphabet (src/ui/alphabet.ts, Bau „schreiben")
+// Bildschirm-Alphabet (src/ui/alphabet.ts, Bau „schreiben“)
 // ---------------------------------------------------------------------------
 
 export interface AlphabetOptionen {

@@ -42,6 +42,6 @@
 }
 .frei__besuch-knopf {
   pointer-events: auto;
-  padding: var(--abstand-2); border: 0; border-radius: var(--radius-l);
-  background: color-mix(in srgb, var(--karte) 88%, transparent); box-shadow: var(--schatten);
+  padding: 0; border: 0; border-radius: 50%;
+  background: transparent;
 }

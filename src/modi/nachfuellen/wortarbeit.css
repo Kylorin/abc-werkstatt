@@ -12,10 +12,19 @@
 @media (hover: hover) and (pointer: fine) { .zielwort:hover { background: var(--papier-tief); } }
 .zielwort__artikel { font-size: var(--gr-l); color: var(--tinte-leise); line-height: 1; }
 
-.zielwort .felder { max-width: 100%; }
+/* Lautsprecher über dem Wort: zeigt dem Kind, dass man das Wort antippen und hören kann. */
+.zielwort__hoeren {
+  display: grid; place-items: center;
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--vokal-hell); color: var(--vokal);
+}
+
+/* Felder so groß, wie das Wort es zulässt (--n = Anzahl Buchstaben, mindestens 3), höchstens --slot-max. */
+.zielwort .felder { max-width: 100%; --slot-max: 96px; }
 .zielwort .feld-slot {
-  width: clamp(40px, calc((100vw - 2 * var(--rand) - 7 * var(--abstand-2)) / 8), 88px);
-  font-size: clamp(1.8rem, 10vw, 4.2rem);
+  --slot: clamp(36px, calc((min(100vw, var(--breite)) - 2 * var(--rand) - 2 * var(--abstand-2) - (var(--n, 8) - 1) * var(--abstand-2)) / var(--n, 8)), var(--slot-max));
+  width: var(--slot);
+  font-size: calc(var(--slot) * 0.72);
   background: var(--karte);
 }
 .slot__schatten { color: var(--tinte); opacity: 0.16; }
@@ -54,3 +63,7 @@
   45% { background: var(--sonne-hell); transform: scale(1.06); }
 }
 .slot--hinweis { animation: slot-hinweis 1.2s var(--kurve); }
+
+/* Nachfüllen: Wort und Buchstaben stehen mittig im Bildschirm, mit Luft dazwischen. */
+.nachfuellen { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: var(--abstand-6); }
+.nachfuellen .wortarbeit { gap: var(--abstand-5); }

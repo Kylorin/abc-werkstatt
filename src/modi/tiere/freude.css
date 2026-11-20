@@ -1,4 +1,5 @@
-/* Tier-Freude (Bau „schreiben"). Animationen .huepft/.freut-sich/.herz kommen aus komponenten.css. */
+/* Tier-Freude (Bau „schreiben“). Das Tier freut sich sichtbar: es springt, wackelt und Herzen
+   platzen aus ihm heraus und steigen auf. Fröhlich, aber ohne Punkte, Münzen oder Blinken. */
 
 .tier-freude {
   position: relative;
@@ -6,29 +7,83 @@
   width: var(--buehne, min(62vw, 34dvh, 300px));
   aspect-ratio: 1;
   margin: 0 auto;
+  container-type: inline-size;
 }
 
 .freude__glanz {
-  position: absolute; inset: -12%;
+  position: absolute; inset: -14%;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--sonne-hell) 0%, color-mix(in srgb, var(--sonne-hell) 55%, transparent) 45%, transparent 70%);
-  animation: freude-glanz 1.6s var(--kurve) both;
+  background: radial-gradient(circle, var(--sonne-hell) 0%, color-mix(in srgb, var(--sonne-hell) 60%, transparent) 50%, transparent 70%);
+  animation: freude-glanz 2.4s var(--kurve) both;
 }
 @keyframes freude-glanz {
-  0% { opacity: 0; transform: scale(0.7); }
-  40% { opacity: 1; transform: scale(1.04); }
-  100% { opacity: 0.85; transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.6); }
+  25% { opacity: 1; transform: scale(1.08); }
+  45% { transform: scale(0.98); }
+  65% { transform: scale(1.05); }
+  100% { opacity: 0.9; transform: scale(1); }
 }
 
 .freude__tier {
   position: relative; width: 100%; height: 100%;
+  display: grid; place-items: center;
   transform-origin: 50% 100%;
 }
-.freude__bild {
-  width: 100%; height: 100%; object-fit: contain;
-  transform-origin: 50% 85%;
-  user-select: none; -webkit-user-drag: none;
+.freude__tier .medaillon { width: 100%; height: 100%; transform-origin: 50% 60%; }
+
+/* Drei Freudensprünge mit Squash & Stretch: erst ein großer, dann zwei kleinere. */
+@keyframes freude-springen {
+  0%   { transform: translateY(0) scale(1, 1); }
+  6%   { transform: translateY(0) scale(1.1, 0.88); }
+  16%  { transform: translateY(-22%) scale(0.94, 1.08); }
+  26%  { transform: translateY(0) scale(1.08, 0.92); }
+  32%  { transform: translateY(0) scale(1, 1); }
+  42%  { transform: translateY(-14%) scale(0.96, 1.05); }
+  52%  { transform: translateY(0) scale(1.06, 0.94); }
+  58%  { transform: translateY(0) scale(1, 1); }
+  68%  { transform: translateY(-9%) scale(0.98, 1.03); }
+  78%  { transform: translateY(0) scale(1.04, 0.96); }
+  86%, 100% { transform: translateY(0) scale(1, 1); }
+}
+.freude-springt { animation: freude-springen 2.2s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+
+/* Fröhliches Wackeln von links nach rechts — der Kreis behält dabei seine Form. */
+@keyframes freude-wackeln {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(-12deg); }
+  22% { transform: rotate(11deg); }
+  34% { transform: rotate(-9deg); }
+  46% { transform: rotate(8deg); }
+  58% { transform: rotate(-6deg); }
+  70% { transform: rotate(5deg); }
+  82% { transform: rotate(-3deg); }
+}
+.freude-wackelt { animation: freude-wackeln 2.6s ease-in-out both; }
+
+/* Herzen: kräftiges Rot mit hellem Rand und Schatten, sichtbar auf jedem Stoff. */
+.freude__herzen { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 2; }
+.freude__herzen .herz {
+  opacity: 0;
+  color: var(--herz);
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--tinte) 30%, transparent));
+}
+.freude__herzen .herz svg { fill: currentColor; stroke: var(--karte); paint-order: stroke; }
+
+.freude__herzen .herz--platzt {
+  left: 50%; top: 50%; margin: -18px 0 0 -18px;
+  animation: herz-platzen 1.3s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes herz-platzen {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.2); }
+  20%  { opacity: 1; }
+  55%  { opacity: 1; transform: translate(var(--herz-dx), var(--herz-dy)) scale(1.2); }
+  100% { opacity: 0; transform: translate(var(--herz-dx), calc(var(--herz-dy) - 14cqw)) scale(0.9); }
 }
 
-.freude__herzen { position: absolute; inset: 0; pointer-events: none; }
-.freude__herzen .herz { opacity: 0; }
+.freude__herzen .herz--steigt { animation: herz-steigen-gross 2.2s var(--kurve) forwards; }
+@keyframes herz-steigen-gross {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.5) rotate(-8deg); }
+  15%  { opacity: 1; transform: translate(0, -10%) scale(1.1) rotate(6deg); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--herz-x, 0px), -75cqw) scale(1) rotate(-4deg); }
+}

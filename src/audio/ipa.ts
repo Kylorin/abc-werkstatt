@@ -1,11 +1,11 @@
 /**
  * Aussprache je Buchstabe als IPA — dieselben Werte wie tools/vertonen.py.
  * Gebraucht für die Live-Vertonung über Azure, wenn eine vorab vertonte Datei fehlt
- * (z. B. Laut-Variante „azure" im Laut-Studio).
+ * (z. B. Laut-Variante „azure“ im Laut-Studio).
  */
 import type { Buchstabe } from '../kern/vertrag';
 
-/** Laut („mmm"): Dauerlaute gedehnt, Plosive kurz ohne Schwa. */
+/** Laut („mmm“): Dauerlaute gedehnt, Plosive kurz ohne Schwa. */
 export const LAUT_IPA: Readonly<Record<Buchstabe, string>> = {
   a: 'aː', e: 'eː', i: 'iː', o: 'oː', u: 'uː',
   ä: 'ɛː', ö: 'øː', ü: 'yː', y: 'yː',
@@ -18,7 +18,7 @@ export const LAUT_IPA: Readonly<Record<Buchstabe, string>> = {
 /** Plosive: werden nicht verlangsamt (sonst entsteht ein Schwa). */
 export const PLOSIVE: ReadonlySet<Buchstabe> = new Set<Buchstabe>(['b', 'c', 'd', 'g', 'k', 'p', 't', 'q', 'x', 'z', 'h']);
 
-/** Deutscher Buchstabenname („be", „zett"). */
+/** Deutscher Buchstabenname („be“, „zett“). */
 export const NAME_IPA: Readonly<Record<Buchstabe, string>> = {
   a: 'aː', b: 'beː', c: 'tseː', d: 'deː', e: 'eː', f: 'ɛf', g: 'ɡeː',
   h: 'haː', i: 'iː', j: 'jɔt', k: 'kaː', l: 'ɛl', m: 'ɛm', n: 'ɛn',

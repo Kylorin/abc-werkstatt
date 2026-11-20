@@ -1,21 +1,19 @@
-/* Tier-Modus (Bau „schreiben"). Ein Ding pro Bildschirm: Tier, Wort, Alphabet. */
+/* Tier-Modus (Bau „schreiben“). Ein Ding pro Bildschirm: Tier, Wort, Alphabet.
+   Die Bühne ist so bemessen, dass am Handy (390 × 844) nichts scrollt. */
 
-.flaeche--tiere { gap: var(--abstand-3); --buehne: min(58vw, 30dvh, 300px); }
+.flaeche--tiere { gap: var(--abstand-2); padding-bottom: calc(var(--abstand-3) + env(safe-area-inset-bottom)); --buehne: min(54vw, 24dvh, 280px); }
 
-.tier-buehne { display: grid; place-items: center; min-height: var(--buehne); }
+.tier-buehne { display: grid; place-items: center; min-height: calc(var(--buehne) + 2 * var(--abstand-1)); }
 
 .tier-buehne__knopf {
   display: grid; place-items: center;
-  padding: var(--abstand-2);
-  border: 0; border-radius: var(--radius-l);
+  padding: var(--abstand-1);
+  border: 0; border-radius: 50%;
   background: transparent;
 }
-@media (hover: hover) and (pointer: fine) { .tier-buehne__knopf:hover { background: var(--sonne-hell); } }
 
-.tier-bild {
-  width: var(--buehne); height: var(--buehne);
-  object-fit: contain;
-  user-select: none; -webkit-user-drag: none;
-}
+.tier-bild { width: var(--buehne); height: var(--buehne); }
 
 .flaeche--tiere .zielwort { padding-top: var(--abstand-2); padding-bottom: var(--abstand-2); }
+.flaeche--tiere .rueckmeldung { min-height: 36px; }
+.flaeche--tiere .zielwort .felder { --slot-max: 64px; }

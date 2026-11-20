@@ -13,7 +13,7 @@ interface GespeicherteAufnahme {
   am: number;
 }
 
-/** Stabiler Schlüssel je Art und Text, z. B. „laut:m" oder „wort:igel". */
+/** Stabiler Schlüssel je Art und Text, z. B. „laut:m“ oder „wort:igel“. */
 export function aufnahmeKey(s: AudioSchluessel): string {
   if (!s.text) throw new AudioFehler('Aufnahme ohne Buchstabe oder Wort.');
   return `${s.art}:${s.text}`;

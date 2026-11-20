@@ -1,5 +1,5 @@
 /**
- * Laut-Studio (Bau „verwaltung"): je Buchstabe die Aussprache-Varianten anhören und auswählen,
+ * Laut-Studio (Bau „verwaltung“): je Buchstabe die Aussprache-Varianten anhören und auswählen,
  * dazu eine eigene Aufnahme. Auswahl landet in Einstellungen.gewaehlteLautVarianten (Buchstabe → URL).
  * zurück → Einstellungen.
  */
@@ -107,7 +107,7 @@ export const modus: Modus = {
         el('p', {
           klasse: 'laut-studio__hinweis',
           text:
-            'Nach Montessori lernt ein Kind zuerst den Laut („mmm"), nicht den Namen („em"), denn beim Schreiben ' +
+            'Nach Montessori lernt ein Kind zuerst den Laut („mmm“), nicht den Namen („em“), denn beim Schreiben ' +
             'setzt es Wörter aus dem zusammen, was es hört. Wählen Sie hier die Aussprache, die Ihnen am klarsten ' +
             'klingt, oder sprechen Sie den Laut selbst ein – Ihre Stimme hat dann Vorrang.',
         }),

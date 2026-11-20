@@ -1,5 +1,5 @@
 /**
- * AudioDienst (Bau „audio") — Implementierung von `AudioDienst` aus src/kern/vertrag.ts.
+ * AudioDienst (Bau „audio“) — Implementierung von `AudioDienst` aus src/kern/vertrag.ts.
  *
  * Quellen je Ausgabe, in dieser Reihenfolge:
  *  (a) Elternaufnahme (IndexedDB)
@@ -39,7 +39,7 @@ import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 const AUFNAHME = 'aufnahme:';
 const AZURE = 'azure:';
 
-/** Relativer Pfad (z. B. „audio/laute/m.katja.mp3") → URL unter der App-Basis. */
+/** Relativer Pfad (z. B. „audio/laute/m.katja.mp3“) → URL unter der App-Basis. */
 function aufloesen(pfad: string): string {
   if (/^(blob:|data:|https?:)/.test(pfad)) return pfad;
   return import.meta.env.BASE_URL + pfad.replace(/^\.?\//, '');
@@ -280,7 +280,7 @@ class Dienst implements AudioDienst {
 
   private buchstabeAus(url: string, praefix: string): Buchstabe {
     const b = url.slice(praefix.length);
-    if (!istBuchstabe(b)) throw new AudioFehler(`Unbekannter Buchstabe in „${url}".`);
+    if (!istBuchstabe(b)) throw new AudioFehler(`Unbekannter Buchstabe in „${url}“.`);
     return b;
   }
 

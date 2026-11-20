@@ -35,7 +35,7 @@ export async function ausCache(stimme: string, body: string): Promise<Blob | und
 /** Vertont `body` (SSML innerhalb von <voice>) über Azure und legt es in den Cache. */
 export async function vertone(z: AzureZugang, body: string): Promise<Blob> {
   const region = z.region.trim();
-  if (!/^[a-z0-9-]+$/.test(region)) throw new AudioFehler('Die Azure-Region ist ungültig (z. B. „westeurope").');
+  if (!/^[a-z0-9-]+$/.test(region)) throw new AudioFehler('Die Azure-Region ist ungültig (z. B. „westeurope“).');
   const ssml =
     `<speak version="1.0" xml:lang="de-DE" xmlns="http://www.w3.org/2001/10/synthesis">` +
     `<voice name="${xml(z.stimme)}">${body}</voice></speak>`;

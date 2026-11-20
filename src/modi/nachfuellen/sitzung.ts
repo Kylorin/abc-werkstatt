@@ -1,5 +1,5 @@
 /**
- * Lebensdauer eines Modus-Auftritts (Bau „schreiben"): Timer und Aufräumarbeiten sammeln,
+ * Lebensdauer eines Modus-Auftritts (Bau „schreiben“): Timer und Aufräumarbeiten sammeln,
  * damit unmount() garantiert alles abmeldet — auch nach async-Lücken.
  */
 import { el, fehlerHinweis } from '../../kern/dom';

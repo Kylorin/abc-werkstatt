@@ -1,5 +1,5 @@
 /**
- * Tier-Modus (Bau „schreiben"). Route: navigiere('tiere', paketId) → ctx.param = Paket-ID.
+ * Tier-Modus (Bau „schreiben“). Route: navigiere('tiere', paketId) → ctx.param = Paket-ID.
  *
  * Großes Tierbild (data-testid="tier-bild") über dem Wort, Artikel klein davor (wird nicht
  * geschrieben). Reihenfolge nach Schwierigkeit, der Reihe nach statt zufällig. Mit Vorlage
@@ -19,7 +19,7 @@ import { icon } from '../../kern/ui/icons';
 import type { Kontext, Modus, Tier, TierPaket, TierTreffer } from '../../kern/vertrag';
 import { Sitzung, erzeugeMeldung, warteAufSprache } from '../nachfuellen/sitzung';
 import { erzeugeWortarbeit, type Wortarbeit } from '../nachfuellen/wortarbeit';
-import { erzeugeFreude, sprichFreude, sprichTierName, tierBezeichnung } from './freude';
+import { erzeugeFreude, erzeugeMedaillon, sprichFreude, sprichTierName, tierBezeichnung } from './freude';
 import './tiere.css';
 
 const FREUDE_DAUER_MS = 4600;
@@ -118,7 +118,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       el(
         'button',
         { klasse: 'tier-buehne__knopf', attr: { 'aria-label': `${name} – Namen hören` }, beiKlick: sprichName },
-        el('img', { klasse: 'tier-bild erscheint', testid: 'tier-bild', attr: { src: bildUrl, alt: name, draggable: 'false' } }),
+        erzeugeMedaillon(bildUrl, name, { klasse: 'tier-bild erscheint', testid: 'tier-bild' }),
       ),
     );
 

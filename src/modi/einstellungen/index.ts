@@ -1,5 +1,5 @@
 /**
- * Einstellungen (Bau „verwaltung") — Erwachsenen-Bereich.
+ * Einstellungen (Bau „verwaltung“) — Erwachsenen-Bereich.
  * Laute ↔ Namen, Großbuchstaben, Tier-Modus mit/ohne Vorlage, Stimme + eigener Azure-Schlüssel,
  * Name des Kindes (nur Gerät), Laut-Studio, Tier-Pakete (Import, Liste, Löschen).
  * Jede Änderung wird sofort über den Einstellungs-Store gespeichert.
@@ -7,7 +7,8 @@
 import './einstellungen.css';
 import { el, fehlerHinweis } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
-import { speicherStand } from '../../kern/speicher';
+import { speicherStand, type SpeicherStand } from '../../kern/speicher';
+import { ELTERNSPERRE_SEKUNDEN } from '../../kern/elternsperre';
 import type { Einstellungen, Kontext, Modus } from '../../kern/vertrag';
 
 const STANDARD_REGION = 'germanywestcentral';
@@ -35,7 +36,7 @@ const STIMMEN: readonly [string, string][] = [
 let abmelden: (() => void)[] = [];
 let aktiv = false;
 
-type SchalterFeld = 'namenStattLaute' | 'grossbuchstaben' | 'tierModusMitVorlage';
+type SchalterFeld = 'namenStattLaute' | 'grossbuchstaben' | 'tierModusMitVorlage' | 'elternsperre';
 
 function schalter(ctx: Kontext, feld: SchalterFeld, testid: string, text: string, erklaerung: string): HTMLElement {
   const kasten = el('input', { testid, attr: { type: 'checkbox', role: 'switch' } });
@@ -120,21 +121,40 @@ function stimmeUndAzure(ctx: Kontext): HTMLElement {
 }
 
 /** Zeigt, ob der Browser die Daten dauerhaft hält — sonst darf er Paket und Aufnahmen bei Platzmangel räumen. */
-function speicher(): HTMLElement {
+function speicher(ctx: Kontext): HTMLElement {
   const zeile = el('p', { klasse: 'einstellungen__hinweis', testid: 'speicher-stand', text: 'Speicher wird geprüft …' });
-  speicherStand().then(
-    (st) => {
-      const mb = st.belegt !== undefined ? `, belegt ${(st.belegt / 1_000_000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} MB` : '';
-      if (st.dauerhaft === true) zeile.textContent = `Speicher dauerhaft: ja${mb}.`;
-      else if (st.dauerhaft === false) {
-        zeile.textContent =
-          `Speicher dauerhaft: nein${mb}. Der Browser darf Tier-Pakete und eigene Aufnahmen bei Platzmangel löschen. ` +
-          'Tipp: die App zum Startbildschirm hinzufügen und ein Paket importieren – dann fragt sie erneut.';
-      } else zeile.textContent = `Dieses Gerät sagt nicht, ob der Speicher dauerhaft ist${mb}.`;
-    },
-    (f: unknown) => zeile.replaceWith(fehlerHinweis(f)),
-  );
-  return abschnitt('Speicher', zeile);
+  const fehlerPlatz = el('div', { klasse: 'einstellungen__meldung' });
+  let lauf = 0;
+  // Nach Import oder Löschen eines Pakets neu messen — sonst bleibt die alte Zahl stehen.
+  abmelden.push(ctx.pakete.abonniere(() => {
+    if (aktiv) messe();
+  }));
+  messe();
+  return abschnitt('Speicher', zeile, fehlerPlatz);
+
+  function messe(): void {
+    const nr = ++lauf;
+    speicherStand().then(
+      (st) => {
+        if (!aktiv || nr !== lauf) return;
+        fehlerPlatz.replaceChildren();
+        zeigeStand(st);
+      },
+      (f: unknown) => {
+        if (aktiv && nr === lauf) fehlerPlatz.replaceChildren(fehlerHinweis(f));
+      },
+    );
+  }
+
+  function zeigeStand(st: SpeicherStand): void {
+    const mb = st.belegt !== undefined ? `, belegt ${(st.belegt / 1_000_000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} MB` : '';
+    if (st.dauerhaft === true) zeile.textContent = `Speicher dauerhaft: ja${mb}.`;
+    else if (st.dauerhaft === false) {
+      zeile.textContent =
+        `Speicher dauerhaft: nein${mb}. Der Browser darf Tier-Pakete und eigene Aufnahmen bei Platzmangel löschen. ` +
+        'Tipp: die App zum Startbildschirm hinzufügen und ein Paket importieren – dann fragt sie erneut.';
+    } else zeile.textContent = `Dieses Gerät sagt nicht, ob der Speicher dauerhaft ist${mb}.`;
+  }
 }
 
 function kind(ctx: Kontext): HTMLElement {
@@ -189,7 +209,7 @@ function pakete(ctx: Kontext): HTMLElement {
     });
   }
 
-  /** Löschen ist rückholbar (Papierkorb im Paket-Dienst): danach steht hier „zurückholen". */
+  /** Löschen ist rückholbar (Papierkorb im Paket-Dienst): danach steht hier „zurückholen“. */
   async function loeschen(id: string): Promise<void> {
     meldung.replaceChildren();
     const titel = (await ctx.pakete.hole(id))?.titel ?? id;
@@ -239,7 +259,7 @@ function pakete(ctx: Kontext): HTMLElement {
       for (const d of dateien) {
         try {
           const p = await ctx.pakete.importiereZip(d);
-          erfolge.push(el('p', { klasse: 'einstellungen__erfolg', text: `„${p.titel}" ist installiert (${p.tiere.length} Tiere).` }));
+          erfolge.push(el('p', { klasse: 'einstellungen__erfolg', text: `„${p.titel}“ ist installiert (${p.tiere.length} Tiere).` }));
         } catch (f) {
           fehler.push(fehlerHinweis(f));
         }
@@ -281,7 +301,7 @@ export const modus: Modus = {
     flaeche.append(
       abschnitt('Lesen und Schreiben',
         schalter(ctx, 'namenStattLaute', 'einstellung-namen', 'Buchstabennamen statt Laute',
-          'Aus: „mmm" wie im Wort (Montessori). An: „em".'),
+          'Aus: „mmm“ wie im Wort (Montessori). An: „em“.'),
         schalter(ctx, 'grossbuchstaben', 'einstellung-gross', 'Großbuchstaben',
           'Aus: kleine Buchstaben, wie sie in Büchern meist stehen.'),
         schalter(ctx, 'tierModusMitVorlage', 'einstellung-tier-vorlage', 'Tiere mit Vorlage',
@@ -292,9 +312,13 @@ export const modus: Modus = {
           beiKlick: () => ctx.navigiere('laut-studio'),
         }, icon('welle'), el('span', { text: 'Laut-Studio: Aussprache wählen' }), icon('weiter', { groesse: 20 })),
       ),
+      abschnitt('Elternbereich',
+        schalter(ctx, 'elternsperre', 'einstellung-elternsperre', 'Elternsperre',
+          `In der installierten App öffnen sich Wörterbuch und Einstellungen erst, wenn man den Knopf ${ELTERNSPERRE_SEKUNDEN} Sekunden gedrückt hält. Ein kurzer Tipp des Kindes tut nichts.`),
+      ),
       stimmeUndAzure(ctx),
       pakete(ctx),
-      speicher(),
+      speicher(ctx),
       kind(ctx),
     );
   },

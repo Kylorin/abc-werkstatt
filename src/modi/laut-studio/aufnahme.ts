@@ -1,7 +1,7 @@
 /**
- * Elternaufnahme als kleine Knopfgruppe (Bau „verwaltung") — genutzt im Laut-Studio (art 'laut')
- * und im Wörterbuch (art 'wort'). Ablauf: „selbst aufnehmen" → „fertig" → gespeichert;
- * danach „Aufnahme anhören" ist die normale Ausgabe (die Aufnahme hat Vorrang) und „Aufnahme löschen".
+ * Elternaufnahme als kleine Knopfgruppe (Bau „verwaltung“) — genutzt im Laut-Studio (art 'laut')
+ * und im Wörterbuch (art 'wort'). Ablauf: „selbst aufnehmen“ → „fertig“ → gespeichert;
+ * danach „Aufnahme anhören“ ist die normale Ausgabe (die Aufnahme hat Vorrang) und „Aufnahme löschen“.
  */
 import { el, fehlerHinweis } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
@@ -14,7 +14,7 @@ export interface AufnahmeKnoepfe {
 }
 
 export interface AufnahmeOptionen {
-  /** Präfix für data-testid, z. B. „aufnahme-m" → „aufnahme-m", „aufnahme-m-loeschen". */
+  /** Präfix für data-testid, z. B. „aufnahme-m“ → „aufnahme-m“, „aufnahme-m-loeschen“. */
   testid: string;
   /** Wird nach Speichern/Löschen aufgerufen (z. B. um Varianten neu zu laden). */
   beiAenderung?: () => void;

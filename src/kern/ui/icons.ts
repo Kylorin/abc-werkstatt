@@ -6,8 +6,8 @@
 const PFADE = {
   /** Freies Schreiben: Stift mit Linie */
   frei: '<path d="M14.6 4.6a2.2 2.2 0 0 1 3.1 0l1.7 1.7a2.2 2.2 0 0 1 0 3.1L9 19.8l-4.9 1.1 1.1-4.9z"/><path d="M13 6.4l4.6 4.6"/><path d="M14 20.5h6.5"/>',
-  /** Nachfüllen: zwei gelegte Felder, ein leeres, Buchstabe fällt hinein */
-  nachfuellen: '<rect x="2.5" y="13.5" width="5.5" height="7" rx="1.6"/><rect x="9.25" y="13.5" width="5.5" height="7" rx="1.6"/><rect x="16" y="13.5" width="5.5" height="7" rx="1.6" stroke-dasharray="2.2 2"/><path d="M18.75 3.5v6"/><path d="M16.4 7.4l2.35 2.35 2.35-2.35"/>',
+  /** Nachfüllen: ein Buchstaben-Plättchen („a“) liegt über seinem leeren Feld, daneben zwei gefüllte Felder */
+  nachfuellen: '<rect x="14.6" y="1.8" width="8.6" height="8.6" rx="2.2"/><circle cx="18.3" cy="6.4" r="1.7"/><path d="M20 4.5v3.9"/><rect x="2" y="14" width="5.8" height="7.5" rx="1.6" fill="currentColor" fill-opacity="0.18"/><rect x="9.1" y="14" width="5.8" height="7.5" rx="1.6" fill="currentColor" fill-opacity="0.18"/><rect x="16.2" y="14" width="5.8" height="7.5" rx="1.6" stroke-dasharray="2 1.8"/>',
   /** Wörterbuch: offenes Buch */
   woerterbuch: '<path d="M12 6.5C10 5 7 4.4 3.5 4.8v13.9c3.5-.4 6.5.2 8.5 1.8 2-1.6 5-2.2 8.5-1.8V4.8C17 4.4 14 5 12 6.5z"/><path d="M12 6.5v14"/><path d="M6.5 9.2c1.3-.1 2.4.1 3.2.5"/><path d="M14.3 9.7c.8-.4 1.9-.6 3.2-.5"/>',
   /** Einstellungen: zwei Schieberegler */

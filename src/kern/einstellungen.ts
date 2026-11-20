@@ -11,6 +11,7 @@ export const STANDARD_EINSTELLUNGEN: Readonly<Einstellungen> = Object.freeze({
   stimme: 'de-DE-KatjaNeural',
   tierModusMitVorlage: true,
   gewaehlteLautVarianten: {},
+  elternsperre: true,
 });
 
 function laden(speicher: Storage): Einstellungen {

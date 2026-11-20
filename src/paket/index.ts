@@ -1,5 +1,5 @@
 /**
- * Tier-Paket-Dienst (Bau „paket"). Format: docs/tier-paket.md, Vertrag: PaketDienst.
+ * Tier-Paket-Dienst (Bau „paket“). Format: docs/tier-paket.md, Vertrag: PaketDienst.
  *
  * Speicher: ein eigener IndexedDB-Store (idb-keyval) mit
  * - `pakete`                    → Record<id, TierPaket> (alle Metadaten in einem Wert)
@@ -101,10 +101,10 @@ export function erzeugePaketDienst(): PaketDienst {
 
   async function url(paketId: string, pfad: string, art: DateiArt): Promise<string> {
     const paket = (await verzeichnis())[paketId];
-    if (!paket) throw new PaketFehler(`Das Tier-Paket „${paketId}" ist nicht installiert.`);
+    if (!paket) throw new PaketFehler(`Das Tier-Paket „${paketId}“ ist nicht installiert.`);
     const erwartet = referenzierteDateien(paket).get(pfad);
     if (erwartet !== art) {
-      throw new PaketFehler(`„${pfad}" ist ${art === 'bild' ? 'kein Bild' : 'keine Audiodatei'} im Paket „${paket.titel}".`);
+      throw new PaketFehler(`„${pfad}“ ist ${art === 'bild' ? 'kein Bild' : 'keine Audiodatei'} im Paket „${paket.titel}“.`);
     }
     let je = urls.get(paketId);
     if (!je) urls.set(paketId, (je = new Map()));
@@ -116,9 +116,9 @@ export function erzeugePaketDienst(): PaketDienst {
       try {
         blob = await get<Blob>(dateiSchluessel(paketId, pfad), store);
       } catch (e) {
-        throw new PaketFehler(`„${pfad}" konnte nicht gelesen werden.`, { cause: e });
+        throw new PaketFehler(`„${pfad}“ konnte nicht gelesen werden.`, { cause: e });
       }
-      if (!blob) throw new PaketFehler(`„${pfad}" fehlt im gespeicherten Paket „${paket.titel}". Bitte das Paket neu importieren.`);
+      if (!blob) throw new PaketFehler(`„${pfad}“ fehlt im gespeicherten Paket „${paket.titel}“. Bitte das Paket neu importieren.`);
       return URL.createObjectURL(blob);
     })();
     je.set(pfad, versprechen);
@@ -194,7 +194,7 @@ export function erzeugePaketDienst(): PaketDienst {
         throw new PaketFehler('Dieses Tier-Paket lässt sich nicht mehr zurückholen. Bitte die Zip-Datei neu importieren.');
       }
       const alt = await verzeichnis();
-      if (alt[id]) throw new PaketFehler(`Ein Paket „${alt[id].titel}" ist schon installiert.`);
+      if (alt[id]) throw new PaketFehler(`Ein Paket „${alt[id].titel}“ ist schon installiert.`);
       await schreibe({ ...alt, [id]: korb }, [], [], undefined);
       melde();
       return korb;

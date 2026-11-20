@@ -15,14 +15,14 @@ export function artVon(b: Buchstabe): BuchstabenArt {
 
 /**
  * Anzeige eines Buchstabens. Großbuchstaben nur als Einstellung;
- * ß bleibt ß (toUpperCase würde „SS" liefern).
+ * ß bleibt ß (toUpperCase würde „SS“ liefern).
  */
 export function anzeigeZeichen(b: Buchstabe, gross: boolean): string {
   if (!gross || b === 'ß') return b;
   return b.toLocaleUpperCase('de-DE');
 }
 
-/** Kanonisches Schreibwort, z. B. „Bär" → „bär". Gilt für Tiernamen und Wörterbuch. */
+/** Kanonisches Schreibwort, z. B. „Bär“ → „bär“. Gilt für Tiernamen und Wörterbuch. */
 export function schreibwort(text: string): string {
   return text.trim().toLocaleLowerCase('de-DE');
 }
@@ -30,7 +30,7 @@ export function schreibwort(text: string): string {
 /** Zerlegt ein kanonisches Wort in Buchstaben; wirft, wenn ein Zeichen nicht im Alphabet ist. */
 export function buchstabenVon(wort: string): Buchstabe[] {
   return Array.from(wort).map((z) => {
-    if (!istBuchstabe(z)) throw new Error(`Zeichen „${z}" gehört nicht zum Alphabet`);
+    if (!istBuchstabe(z)) throw new Error(`Zeichen „${z}“ gehört nicht zum Alphabet`);
     return z;
   });
 }

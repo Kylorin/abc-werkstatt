@@ -1,5 +1,5 @@
 /**
- * Nachfüllen (Bau „schreiben"): ein Wort aus dem Wörterbuch als Schattenvorlage,
+ * Nachfüllen (Bau „schreiben“): ein Wort aus dem Wörterbuch als Schattenvorlage,
  * das Kind legt die Buchstaben der Reihe nach hinein. Fertig → Wort wird ganz vorgelesen,
  * ruhige Hervorhebung. Das nächste Wort kommt erst, wenn das Wort zu Ende gesprochen ist
  * (mindestens ~3 s Verweilen; die Obergrenze greift nur bei hängender Sprachausgabe).
@@ -53,6 +53,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       wort,
       vorlage: true,
       vollesAlphabet: false,
+      hoerZeichen: true,
       melde: meldung.melde,
       beiGeschafft(letzterLaut) {
         const gesprochen = letzterLaut.then((a) => {

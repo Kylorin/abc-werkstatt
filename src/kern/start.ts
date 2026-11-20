@@ -6,6 +6,7 @@
  * wie eine weitere Arbeit — dort kann man aber Wörter löschen.
  */
 import { el, fehlerHinweis } from './dom';
+import { erzeugeSperrHinweis, mitElternsperre, sperreAktiv } from './elternsperre';
 import { icon } from './ui/icons';
 import type { Dienste } from './router';
 import type { Modus, ModusId, TierPaket } from './vertrag';
@@ -36,18 +37,26 @@ export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly
   }
 
   const fuss = el('footer', { klasse: 'start__fuss', attr: { 'aria-label': 'Für Eltern' } });
+  const gesperrt = sperreAktiv(dienste.einstellungen);
+  const sperrHinweis = erzeugeSperrHinweis();
   for (const id of ELTERN) {
     const m = nachId.get(id);
     if (!m) continue;
-    fuss.append(
-      el(
-        'button',
-        { klasse: 'knopf knopf--leise', testid: id === 'einstellungen' ? 'einstellungen' : `modus-${id}`, beiKlick: () => navigiere(id) },
-        icon(m.icon, { groesse: 24 }),
-        el('span', { text: m.titel }),
-      ),
+    const knopf = el(
+      'button',
+      {
+        klasse: 'knopf knopf--leise',
+        testid: id === 'einstellungen' ? 'einstellungen' : `modus-${id}`,
+        beiKlick: gesperrt ? undefined : () => navigiere(id),
+      },
+      icon(m.icon, { groesse: 24 }),
+      el('span', { text: m.titel }),
     );
+    // Installierte App: Elternbereich nur nach langem Drücken (siehe kern/elternsperre.ts).
+    if (gesperrt) mitElternsperre(knopf, sperrHinweis, () => navigiere(id));
+    fuss.append(knopf);
   }
+  fuss.append(sperrHinweis);
 
   const seite = el(
     'div',

@@ -4,7 +4,7 @@ import { istBuchstabe, schreibwort } from './alphabet';
 import { WortFehler, type WoerterDienst } from './vertrag';
 
 /**
- * Startwörter beim allerersten Start. Bau „audio" vertont diese Liste vorab
+ * Startwörter beim allerersten Start. Bau „audio“ vertont diese Liste vorab
  * (public/audio/woerter/<wort>.mp3, Schlüssel in manifest.woerter = Wort).
  *
  * LAUTGETREU (Montessori): Die Laute der einzelnen Buchstaben ergeben zusammen das Wort —
