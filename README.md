@@ -65,6 +65,7 @@ npm run build        # Typprüfung + Produktionsbuild nach dist/
 npm run preview      # gebauten Stand unter http://localhost:4173/abc-werkstatt/ ansehen
 npm run testpaket    # tests/fixtures/testpaket.zip neu bauen
 bash tools/vertonen.sh [--neu | --nur laute/m. | --nur-manifest]   # Audio-Bestand in public/audio vertonen (Azure-Schlüssel aus tools/.lokal/, gitignored)
+python tools/laute_ki.py alles [--lauf haupt] [--nur m,b,k,a]   # Laute per Sprachmodell erzeugen + von Hör-Modellen bewerten (OpenRouter-Schlüssel aus .env, gitignored; Rohdaten + Hörseite unter tools/.lokal/laute-roh/)
 ```
 
 Vite + TypeScript (strict), ohne Framework. **Richter ist die GitHub-CI:** Jeder Push auf
