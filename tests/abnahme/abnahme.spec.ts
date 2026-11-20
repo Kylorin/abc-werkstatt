@@ -196,8 +196,11 @@ test.describe('Audio-Bestand', () => {
 
 test.describe('Datenschutz im Repo', () => {
   test('kein Kindername und kein Schlüssel im Code', () => {
-    // Name zusammengesetzt, damit diese Datei sich nicht selbst meldet
-    const verboten = new RegExp(['phil', 'eas'].join('') + '|Ocp-Apim-Subscription-Key:\\s*[0-9a-zA-Z]{20,}', 'i');
+    // Name und Serienwort zusammengesetzt, damit diese Datei sich nicht selbst meldet
+    const verboten = new RegExp(
+      ['phil', 'eas'].join('') + '|' + ['schmuse', '[\\s_-]?', 'decke'].join('') + '|Ocp-Apim-Subscription-Key:\\s*[0-9a-zA-Z]{20,}',
+      'i',
+    );
     const treffer: string[] = [];
     const lauf = (dir: string) => {
       for (const n of readdirSync(dir)) {
@@ -209,5 +212,67 @@ test.describe('Datenschutz im Repo', () => {
     };
     lauf(process.cwd());
     expect(treffer).toEqual([]);
+  });
+});
+
+test.describe('Tier-Paket', () => {
+  const TESTPAKET = join(process.cwd(), 'tests', 'fixtures', 'testpaket.zip');
+  const TIERE = ['igel', 'maus', 'hase'];
+
+  async function importiere(page: Page) {
+    await start(page);
+    await page.getByTestId('einstellungen').click();
+    await page.getByTestId('paket-import').setInputFiles(TESTPAKET);
+    await expect(page.getByTestId('paketliste')).toContainText('Testtiere', { timeout: 10_000 });
+    await page.goto('/');
+    await expect(page.getByTestId('modus-tiere')).toContainText('Testtiere');
+  }
+
+  test('Import: Paket erscheint in der Liste und als Kachel auf dem Start, bleibt nach Neuladen', async ({ page }) => {
+    await importiere(page);
+    await page.reload();
+    await expect(page.getByTestId('start')).toBeVisible();
+    await expect(page.getByTestId('modus-tiere')).toContainText('Testtiere');
+    await page.getByTestId('einstellungen').click();
+    await expect(page.getByTestId('paketliste')).toContainText('Testtiere');
+  });
+
+  test('Tiere schreiben: falsch wackelt, richtig geschafft, Tier freut sich, nächstes Tier kommt', async ({ page }) => {
+    await importiere(page);
+    await page.getByTestId('modus-tiere').first().click();
+    await expect(page.getByTestId('tier-bild')).toBeVisible();
+    const ziel = page.getByTestId('zielwort');
+    await expect(ziel).toBeVisible();
+    const wort = (await ziel.getAttribute('data-wort'))!;
+    expect(TIERE).toContain(wort);
+    const zeichen = Array.from(wort);
+
+    const falsch = LAUTE.find(b => b !== zeichen[0])!;
+    await page.getByTestId(`taste-${falsch}`).click();
+    await expect(page.getByTestId('rueckmeldung')).toHaveAttribute('data-art', 'falsch');
+
+    for (const z of zeichen) await page.getByTestId(`taste-${z}`).first().click();
+    await expect(page.getByTestId('rueckmeldung')).toHaveAttribute('data-art', 'geschafft');
+    await expect(page.getByTestId('tier-freude')).toBeVisible();
+    await expect
+      .poll(async () => ziel.getAttribute('data-wort'), { timeout: 10_000 })
+      .not.toBe(wort);
+  });
+
+  test('Freies Schreiben erkennt Tiernamen', async ({ page }) => {
+    await importiere(page);
+    await page.getByTestId('modus-frei').click();
+    for (const z of ['i', 'g', 'e', 'l']) await page.getByTestId(`taste-${z}`).click();
+    await expect(page.getByTestId('tier-freude')).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('Paket löschen: Kachel verschwindet vom Start', async ({ page }) => {
+    await importiere(page);
+    await page.getByTestId('einstellungen').click();
+    await page.getByTestId('paket-loeschen-testtiere').click();
+    await expect(page.getByTestId('paketliste')).not.toContainText('Testtiere');
+    await page.goto('/');
+    await expect(page.getByTestId('start')).toBeVisible();
+    await expect(page.getByTestId('modus-tiere')).toHaveCount(0);
   });
 });

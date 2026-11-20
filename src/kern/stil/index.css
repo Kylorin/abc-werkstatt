@@ -1,0 +1,5 @@
+/* Einstieg aller Fundament-Stile (in src/main.ts importiert). */
+@import './schrift.css';
+@import './tokens.css';
+@import './basis.css';
+@import './komponenten.css';

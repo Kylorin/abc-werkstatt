@@ -1,0 +1,186 @@
+/* Gemeinsame Komponenten (Fundament). Modus-spezifisches CSS liegt beim jeweiligen Bau
+   (z. B. src/modi/frei/frei.css, im Modus per `import './frei.css'`). */
+
+/* ---------- Rahmen eines Modus (vom Router gebaut) ---------- */
+.rahmen { min-height: 100dvh; display: flex; flex-direction: column; }
+.kopf {
+  position: sticky; top: 0; z-index: 5;
+  display: grid; grid-template-columns: var(--touch) 1fr var(--touch); align-items: center;
+  gap: var(--abstand-2);
+  padding: var(--abstand-2) calc(var(--rand) - var(--abstand-2));
+  padding-top: max(var(--abstand-2), env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--papier) 92%, transparent);
+  backdrop-filter: blur(6px);
+}
+.kopf__titel {
+  font-size: var(--gr-l); text-align: center; color: var(--tinte-sanft);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kopf__platz { width: var(--touch); }
+.flaeche {
+  flex: 1; width: 100%; max-width: var(--breite); margin: 0 auto;
+  padding: var(--abstand-2) var(--rand) calc(var(--abstand-6) + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: var(--abstand-5);
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--abstand-2);
+  min-height: var(--touch); min-width: var(--touch); padding: 0 var(--abstand-5);
+  border: 1px solid var(--linie); border-radius: var(--radius-rund);
+  background: var(--karte); color: var(--tinte); box-shadow: var(--schatten-s);
+  font-size: var(--gr-m); font-weight: 700;
+  transition: transform var(--dauer) var(--kurve), background var(--dauer), box-shadow var(--dauer);
+}
+.knopf:active { transform: translateY(1px) scale(0.98); box-shadow: none; }
+.knopf:disabled { opacity: 0.45; cursor: default; }
+.knopf--primaer { background: var(--tinte); color: var(--papier); border-color: var(--tinte); }
+.knopf--leise { background: transparent; border-color: transparent; box-shadow: none; color: var(--tinte-sanft); }
+.knopf--leise:hover { background: var(--papier-tief); }
+.knopf--icon { padding: 0; width: var(--touch); border-radius: var(--radius-rund); }
+.knopf--gross { min-height: var(--touch-gross); font-size: var(--gr-l); }
+.knopf--gefahr { color: var(--konsonant); }
+.knopf[aria-pressed='true'] { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen); }
+
+/* ---------- Startseite ---------- */
+.start {
+  max-width: var(--breite); margin: 0 auto; min-height: 100dvh;
+  padding: max(var(--abstand-5), env(safe-area-inset-top)) var(--rand) calc(var(--abstand-5) + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: var(--abstand-5);
+}
+.start__kopf { padding: var(--abstand-3) var(--abstand-1) 0; }
+.start__titel { font-size: var(--gr-xl); letter-spacing: 0.01em; display: flex; align-items: baseline; gap: 0.04em; }
+.start__titel > span { font-size: 1.25em; }
+.start__tiere { display: flex; flex-direction: column; gap: var(--abstand-4); }
+.start__tiere:empty { display: none; }
+.start__arbeiten { display: grid; grid-template-columns: 1fr; gap: var(--abstand-4); }
+@media (min-width: 560px) { .start__arbeiten { grid-template-columns: repeat(3, 1fr); } }
+.start__fuss { margin-top: auto; display: flex; justify-content: center; padding-top: var(--abstand-5); }
+
+/* ---------- Kacheln (Start) ---------- */
+.kachel {
+  display: flex; align-items: center; gap: var(--abstand-4);
+  min-height: 96px; padding: var(--abstand-4) var(--abstand-5);
+  border: 1px solid var(--linie); border-radius: var(--radius-l);
+  background: var(--karte); box-shadow: var(--schatten);
+  text-align: left; font-size: var(--gr-l); font-weight: 700;
+  transition: transform var(--dauer) var(--kurve), box-shadow var(--dauer);
+}
+.kachel:active { transform: scale(0.985); box-shadow: var(--schatten-s); }
+@media (min-width: 560px) {
+  .start__arbeiten .kachel { flex-direction: column; justify-content: center; text-align: center; min-height: 168px; }
+}
+.kachel__icon {
+  flex: none; display: grid; place-items: center;
+  width: 68px; height: 68px; border-radius: var(--radius);
+  background: var(--papier-tief); color: var(--tinte-sanft);
+}
+.kachel--frei .kachel__icon { background: var(--vokal-hell); color: var(--vokal); }
+.kachel--nachfuellen .kachel__icon { background: var(--konsonant-hell); color: var(--konsonant); }
+.kachel--woerterbuch .kachel__icon { background: var(--gruen-hell); color: var(--gruen); }
+.kachel__titel { display: block; }
+.kachel__untertitel { display: block; font-size: var(--gr-s); font-weight: 400; color: var(--tinte-leise); }
+.kachel--tiere { min-height: 132px; padding: var(--abstand-3); background: var(--sonne-hell); border-color: color-mix(in srgb, var(--sonne) 35%, var(--linie)); }
+.kachel--tiere .kachel__titel { font-size: var(--gr-xl); }
+.kachel__bild {
+  flex: none; width: 108px; height: 108px; border-radius: var(--radius);
+  overflow: hidden; background: var(--karte); display: grid; place-items: center; color: var(--sonne);
+}
+.kachel__bild img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Bildschirm-Alphabet (Grundfassung, Bau „schreiben" darf verfeinern) ---------- */
+.alphabet { display: flex; flex-direction: column; gap: var(--abstand-2); }
+.alphabet__raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: var(--abstand-2); }
+.alphabet__leiste { display: flex; gap: var(--abstand-2); }
+.taste {
+  min-width: 44px; min-height: var(--touch); aspect-ratio: 1 / 1.05;
+  display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--linie); border-radius: var(--radius-s);
+  background: var(--karte); box-shadow: var(--schatten-s);
+  font-size: var(--gr-taste); font-weight: 700; line-height: 1;
+  transition: transform var(--dauer) var(--kurve);
+}
+.taste[data-art='vokal'] { color: var(--vokal); }
+.taste[data-art='konsonant'] { color: var(--konsonant); }
+.taste:active { transform: scale(0.94); }
+.taste--leer { flex: 1; aspect-ratio: auto; color: var(--tinte-leise); }
+.taste--zurueck { width: 96px; aspect-ratio: auto; color: var(--tinte-leise); }
+
+/* ---------- Wort, Felder, Rückmeldung ---------- */
+.wort { font-size: var(--gr-wort); font-weight: 700; line-height: 1.1; letter-spacing: 0.02em; word-break: break-word; }
+.felder { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-2); }
+.feld-slot {
+  display: grid; place-items: center;
+  width: clamp(48px, 15vw, 88px); aspect-ratio: 1 / 1.15;
+  border: 2px dashed var(--linie-stark); border-radius: var(--radius-s);
+  font-size: var(--gr-wort); font-weight: 700; line-height: 1;
+}
+.feld-slot[data-gefuellt='ja'] { border-style: solid; border-color: var(--linie); background: var(--karte); box-shadow: var(--schatten-s); }
+.rueckmeldung { min-height: 1.5em; text-align: center; color: var(--tinte-sanft); font-size: var(--gr-l); }
+.rueckmeldung[data-art='geschafft'] { color: var(--gruen); }
+
+/* ---------- Formulare (Eltern) ---------- */
+.feld {
+  width: 100%; min-height: var(--touch); padding: 0 var(--abstand-4);
+  border: 1px solid var(--linie-stark); border-radius: var(--radius-s);
+  background: var(--karte); font-size: var(--gr-m);
+}
+.feld:focus-visible { box-shadow: var(--fokus); }
+.beschriftung { display: block; font-size: var(--gr-s); color: var(--tinte-sanft); margin-bottom: var(--abstand-1); }
+.schalter {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--abstand-4);
+  min-height: var(--touch); padding: var(--abstand-2) var(--abstand-4);
+  border: 1px solid var(--linie); border-radius: var(--radius); background: var(--karte); cursor: pointer;
+}
+.schalter input { appearance: none; flex: none; width: 52px; height: 32px; margin: 0; border-radius: var(--radius-rund); background: var(--linie-stark); position: relative; cursor: pointer; transition: background var(--dauer); }
+.schalter input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--karte); box-shadow: var(--schatten-s); transition: transform var(--dauer) var(--kurve); }
+.schalter input:checked { background: var(--gruen); }
+.schalter input:checked::after { transform: translateX(20px); }
+.abschnitt { display: flex; flex-direction: column; gap: var(--abstand-3); }
+.abschnitt__titel { font-size: var(--gr-m); color: var(--tinte-sanft); }
+.karte { padding: var(--abstand-4); border: 1px solid var(--linie); border-radius: var(--radius); background: var(--karte); box-shadow: var(--schatten-s); }
+
+/* ---------- Listen ---------- */
+.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--abstand-2); }
+.liste__eintrag {
+  display: flex; align-items: center; gap: var(--abstand-3);
+  min-height: var(--touch); padding: var(--abstand-1) var(--abstand-1) var(--abstand-1) var(--abstand-4);
+  border: 1px solid var(--linie); border-radius: var(--radius); background: var(--karte);
+}
+.liste__eintrag > :first-child { flex: 1; min-width: 0; }
+
+/* ---------- Hinweise ---------- */
+.hinweis { color: var(--tinte-sanft); text-align: center; padding: var(--abstand-4); }
+.hinweis--fehler { color: var(--tinte); background: var(--konsonant-hell); border-radius: var(--radius); text-align: left; }
+
+/* ---------- Bewegung ---------- */
+/* Fehlerkontrolle: sanftes Wackeln und Zurückspringen (kein Rot, kein Ton) */
+@keyframes wackeln {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-5px) rotate(-3deg); }
+  40% { transform: translateX(5px) rotate(3deg); }
+  60% { transform: translateX(-3px) rotate(-1.5deg); }
+  80% { transform: translateX(2px) rotate(1deg); }
+}
+.wackelt { animation: wackeln var(--dauer-lang) var(--kurve); }
+
+@keyframes erscheinen { from { opacity: 0; transform: translateY(6px) scale(0.96); } to { opacity: 1; transform: none; } }
+.erscheint { animation: erscheinen var(--dauer-lang) var(--kurve-feder) both; }
+
+/* Tier-Freude (bewusst fröhlich, aber ruhig): hüpfen, wackeln, Herzen steigen auf */
+@keyframes huepfen {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-18%) scale(1.04, 0.97); }
+  50% { transform: translateY(0) scale(0.97, 1.03); }
+  70% { transform: translateY(-8%) scale(1.02); }
+}
+.huepft { animation: huepfen 900ms var(--kurve) 2; }
+@keyframes freudewackeln { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.freut-sich { animation: freudewackeln 600ms ease-in-out 3; }
+@keyframes herz-steigen {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--herz-x, 0px), -140px) scale(1.1); }
+}
+.herz { position: absolute; color: var(--herz); pointer-events: none; animation: herz-steigen 1.8s var(--kurve) forwards; }
+.herz svg { fill: currentColor; }

@@ -1,9 +1,12 @@
 node_modules/
 dist/
+dev-dist/
 test-results/
 playwright-report/
+abnahme-ergebnis/
 tools/.lokal/
 .env
 .claude/settings.local.json
-.claude/carpe-noctem/*
-!.claude/carpe-noctem/mission.md
+.claude/carpe-noctem/
+# Worktrees der Bau-Agenten (node_modules wird von oben gefunden)
+.wt/

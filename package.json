@@ -1,0 +1,24 @@
+{
+  "name": "abc-werkstatt",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Schreib-App für Kleinkinder nach Montessori (PWA)",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "testpaket": "node tools/testpaket_bauen.mjs"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "idb-keyval": "^6.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

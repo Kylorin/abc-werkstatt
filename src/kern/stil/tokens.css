@@ -1,0 +1,65 @@
+/* Design-Tokens (Fundament). Bau-Agenten benutzen NUR diese Variablen, keine eigenen Farbwerte. */
+:root {
+  /* Papier und Tinte */
+  --papier: #fbf7f0;
+  --papier-tief: #f3ece1;
+  --karte: #fffdf9;
+  --linie: #e7ddce;
+  --linie-stark: #d6c8b4;
+  --tinte: #2b2723;
+  --tinte-sanft: #5e5750;
+  --tinte-leise: #8f857a;
+
+  /* Bewegliches Alphabet (Montessori): Vokale blau, Konsonanten rot — gedämpft */
+  --vokal: #2f5d9e;
+  --vokal-hell: #e8eef7;
+  --konsonant: #c0473b;
+  --konsonant-hell: #f8e8e5;
+
+  /* Ruhige Akzente */
+  --gruen: #4d7c5f;        /* geschafft, gewählt */
+  --gruen-hell: #e6efe8;
+  --sonne: #d99a3d;        /* Wärme, Hervorhebung */
+  --sonne-hell: #f8eedd;
+  --herz: #d9646e;         /* nur für die Tier-Freude */
+
+  /* Schrift */
+  --schrift: 'Andika', 'Segoe UI', system-ui, sans-serif;
+  --gr-s: 0.9375rem;
+  --gr-m: 1.125rem;
+  --gr-l: 1.375rem;
+  --gr-xl: 1.75rem;
+  --gr-taste: clamp(1.6rem, 6.5vw, 2.4rem);
+  --gr-wort: clamp(2.6rem, 13vw, 5.5rem);
+  --gr-riesig: clamp(5rem, 30vw, 12rem);
+
+  /* Maße */
+  --touch: 56px;           /* Mindestgröße jedes Bedienelements */
+  --touch-gross: 72px;
+  --abstand-1: 4px;
+  --abstand-2: 8px;
+  --abstand-3: 12px;
+  --abstand-4: 16px;
+  --abstand-5: 24px;
+  --abstand-6: 32px;
+  --abstand-7: 48px;
+  --rand: 16px;            /* seitlicher Rand am Handy */
+  --breite: 880px;         /* maximale Inhaltsbreite */
+  --radius-s: 12px;
+  --radius: 18px;
+  --radius-l: 26px;
+  --radius-rund: 999px;
+
+  /* Tiefe */
+  --schatten-s: 0 1px 0 rgba(43, 39, 35, 0.05), 0 2px 6px -2px rgba(43, 39, 35, 0.12);
+  --schatten: 0 1px 0 rgba(43, 39, 35, 0.05), 0 8px 22px -12px rgba(43, 39, 35, 0.28);
+  --fokus: 0 0 0 3px var(--papier), 0 0 0 6px rgba(47, 93, 158, 0.45);
+
+  /* Bewegung — sanft, nie hektisch */
+  --dauer: 220ms;
+  --dauer-lang: 480ms;
+  --kurve: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --kurve-feder: cubic-bezier(0.3, 1.5, 0.5, 1);
+
+  color-scheme: light;
+}
