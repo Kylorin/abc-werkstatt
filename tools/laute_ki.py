@@ -31,6 +31,8 @@ Aufruf (Python 3.10+, numpy, ffmpeg/ffprobe im PATH):
   python tools/laute_ki.py nachbearbeiten --lauf probe
   python tools/laute_ki.py bewerten --lauf probe
   python tools/laute_ki.py auswaehlen --lauf probe
+  python tools/laute_ki.py namen [--nur b,c]   # Buchstabennamen (A, Be, Ze …): je 3 Kandidaten, Lauf „namen“,
+                                               # Auswahl auswahl/<slug>.name1.mp3 und .name2.mp3
 """
 
 from __future__ import annotations
@@ -296,14 +298,15 @@ def anweisung(v: Vorgabe, k: int, zusatz: str) -> str:
     return text
 
 
-def erzeuge_kandidat(ziel: Path, v: Vorgabe, stimme: str, text: str) -> None:
+def erzeuge_kandidat(ziel: Path, v: Vorgabe, stimme: str, text: str, system: str | None = None) -> None:
+    system = system or SYSTEM_ERZEUGEN
     body = {
         "model": ERZEUGER,
         "modalities": ["text", "audio"],
         "audio": {"voice": stimme, "format": "pcm16"},
         "stream": True,
         "usage": {"include": True},
-        "messages": [{"role": "system", "content": SYSTEM_ERZEUGEN}, {"role": "user", "content": text}],
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": text}],
     }
     pcm, transkript, ereignisse, usage = bytearray(), [], [], None
     with oeffnen(body) as r:
@@ -327,7 +330,7 @@ def erzeuge_kandidat(ziel: Path, v: Vorgabe, stimme: str, text: str) -> None:
             ereignisse.append(d)
     if not pcm:
         raise ApiFehler(f"{ziel.name}: kein Audio in der Antwort (Transkript {''.join(transkript)!r})")
-    meta = {"vorgabe": asdict(v), "stimme": stimme, "anweisung": text, "system": SYSTEM_ERZEUGEN,
+    meta = {"vorgabe": asdict(v), "stimme": stimme, "anweisung": text, "system": system,
             "modell": ERZEUGER, "transkript": "".join(transkript), "usage": usage,
             "sekunden_roh": len(pcm) / 2 / RATE, "ereignisse": ereignisse}
     with wave.open(str(ziel.with_suffix(".wav")), "wb") as w:
@@ -414,8 +417,8 @@ def lies_wav(pfad: Path) -> np.ndarray:
         return np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(np.float64) / 32768.0
 
 
-def segmente(x: np.ndarray) -> list[tuple[float, float]]:
-    """Hörbare Abschnitte (start_s, ende_s); Pausen unter LUECKE_S werden überbrückt."""
+def segmente(x: np.ndarray, luecke: float = LUECKE_S) -> list[tuple[float, float]]:
+    """Hörbare Abschnitte (start_s, ende_s); Pausen unter `luecke` werden überbrückt."""
     n = int(RATE * FENSTER_S)
     fenster = len(x) // n
     if fenster == 0:
@@ -426,7 +429,7 @@ def segmente(x: np.ndarray) -> list[tuple[float, float]]:
     aus: list[list[float]] = []
     for i in aktiv:
         t = i * FENSTER_S
-        if aus and t - aus[-1][1] < LUECKE_S:
+        if aus and t - aus[-1][1] < luecke:
             aus[-1][1] = t + FENSTER_S
         else:
             aus.append([t, t + FENSTER_S])
@@ -842,6 +845,381 @@ def alles(lauf: str, nur: list[str] | None, anzahl: int, bewerter: list[str], au
         offen = schwach
 
 
+# ---------------------------------------------------------------- Buchstabennamen
+# Eigener Ablauf für die Einstellung „Buchstabennamen“ (A, Be, Ze …); die Laut-Logik oben bleibt unberührt.
+# Gleicher Erzeuger und dieselben Bewerter, aber eigene Anweisung, eigene Bewertungsfragen (richtiger
+# deutscher Name, natürlich, nicht englisch) und ein eigener Lauf-Ordner (Standard tools/.lokal/laute-roh/namen/).
+# Auch Namen werden dreimal mit Pause gesprochen (einzelne kurze Vokale wie „A“ bleiben sonst oft stumm);
+# genommen wird der energiereichste Abschnitt.
+
+NAMEN_STIMMEN = ["shimmer", "coral", "marin"]  # die Stimmen der bisher gewählten Laute
+NAMEN_MIN_S, NAMEN_MAX_S = 0.15, 1.6
+NAMEN_LUECKE_S = 0.20  # Verschluss in „Zett“, „Üpsilon“, „Eszett“ gehört zum selben Namen
+NAMEN_SCHWELLE = 7.0
+NAMEN_RUNDEN = 2
+
+# Wie der Name klingt – in Worten, ohne IPA (IPA im Anweisungstext macht gpt-audio stumm, s. o.).
+NAMEN_HINWEIS = {
+    "a": "langes a wie in „Aal“", "b": "wie „Beet“ ohne t", "c": "„Ze“, gesprochen wie „Zeh“",
+    "d": "wie „Deck“ mit langem e, ohne ck", "e": "langes e wie in „See“", "f": "„Ef“, kurzes e, dann f",
+    "g": "„Ge“ mit hartem g und langem e", "h": "„Ha“ mit langem a", "i": "langes i wie in „Igel“",
+    "j": "„Jot“, kurzes o, reimt sich auf „Gott“", "k": "„Ka“ mit langem a", "l": "„El“, kurzes e, dann l",
+    "m": "„Em“, kurzes e, dann m", "n": "„En“, kurzes e, dann n", "o": "langes o wie in „Oma“",
+    "p": "„Pe“ mit langem e", "q": "„Ku“ mit langem u wie „Kuh“", "r": "„Er“, kurzes e, deutsches r",
+    "s": "„Es“, kurzes e, scharfes s", "t": "„Te“ mit langem e wie „Tee“", "u": "langes u wie in „Uhu“",
+    "v": "„Fau“, reimt sich auf „Frau“", "w": "„We“ mit w wie „Wal“ und langem e, nicht englisch",
+    "x": "„Ix“, kurzes i, dann ks", "y": "„Üpsilon“, Betonung auf der ersten Silbe",
+    "z": "„Zett“, kurzes e, reimt sich auf „Bett“", "ä": "langes ä wie in „Käse“",
+    "ö": "langes ö wie in „Öl“", "ü": "langes ü wie in „über“", "ß": "„Eszett“, Betonung auf „zett“",
+}
+NAMEN_IPA = {
+    "a": "aː", "b": "beː", "c": "t͡seː", "d": "deː", "e": "eː", "f": "ɛf", "g": "ɡeː", "h": "haː", "i": "iː",
+    "j": "jɔt", "k": "kaː", "l": "ɛl", "m": "ɛm", "n": "ɛn", "o": "oː", "p": "peː", "q": "kuː", "r": "ɛʁ",
+    "s": "ɛs", "t": "teː", "u": "uː", "v": "faʊ̯", "w": "veː", "x": "ɪks", "y": "ˈʏpsilɔn", "z": "t͡sɛt",
+    "ä": "ɛː", "ö": "øː", "ü": "yː", "ß": "ɛsˈt͡sɛt",
+}
+assert set(NAMEN_HINWEIS) == set(NAMEN_IPA) == set(NAMEN)
+
+SYSTEM_NAMEN = (
+    "Du bist eine warme, ruhige Montessori-Erzieherin und sprichst Hochdeutsch. Du nennst einem kleinen Kind "
+    "(knapp drei Jahre) den deutschen Namen eines Buchstabens, so wie beim Aufsagen des Alphabets: "
+    "freundlich, deutlich, natürlich, entspannt, ohne Flüstern. Immer deutsche Aussprache, niemals englisch. "
+    "Nur der Buchstabenname – kein Artikel, kein Wort, kein Satz, keine Begrüßung."
+)
+
+NAMEN_ANWEISUNGEN = [
+    "Sag den deutschen Namen des Buchstabens {b}: {hinweis}. Dein Text ist genau „{sf}“ – nichts davor, "
+    "nichts danach.",
+    "Wie heißt der Buchstabe {b} im deutschen Alphabet? Sprich nur den Namen ({hinweis}), geschrieben „{sf}“.",
+    "Bitte nur den Buchstabennamen zu {b}, deutsch ausgesprochen: {hinweis}. Sprich und schreib nur „{sf}“.",
+]
+
+
+def namen_sprechform(b: str) -> str:
+    return f"{NAMEN[b]} … {NAMEN[b]} … {NAMEN[b]}"
+
+
+def namen_anweisung(b: str, k: int, zusatz: str) -> str:
+    text = NAMEN_ANWEISUNGEN[k % len(NAMEN_ANWEISUNGEN)].format(b=b.upper() if b != "ß" else b,
+                                                                 hinweis=NAMEN_HINWEIS[b], sf=namen_sprechform(b))
+    text += " Sprich den Namen dreimal, mit kurzer Pause dazwischen, jedes Mal gleich."
+    if zusatz:
+        text += " Wichtig nach dem letzten Versuch: " + zusatz
+    return text
+
+
+def namen_vorgabe(b: str) -> Vorgabe:
+    """Vorgabe-Datensatz für die Metadaten (klasse „name“ ist keine Laut-Klasse)."""
+    return Vorgabe(b, "name", NAMEN_IPA[b], NAMEN[b], NAMEN_HINWEIS[b], "name")
+
+
+def namen_erzeugen(lauf: str, buchstaben: list[str], anzahl: int, runde: int, zusaetze: dict[str, str],
+                   parallel_max: int) -> None:
+    aufgaben = []
+    for b in buchstaben:
+        v = namen_vorgabe(b)
+        ordner = lauf_dir(lauf) / slug(b)
+        ordner.mkdir(parents=True, exist_ok=True)
+        for k in range(anzahl):
+            stimme = NAMEN_STIMMEN[k % len(NAMEN_STIMMEN)]
+            ziel = ordner / kandidat_id(v, runde, k, stimme)
+            if ziel.with_suffix(".wav").exists():
+                continue
+            text = namen_anweisung(b, k + runde - 1, zusaetze.get(b, ""))
+            aufgaben.append((ziel, v, stimme, text))
+    print(f"namen erzeugen: {len(aufgaben)} neue Kandidaten (Runde {runde})")
+
+    parallel([(*a, SYSTEM_NAMEN) for a in aufgaben], erzeuge_kandidat, parallel_max)
+
+
+def namen_bearbeite(wav: Path) -> None:
+    x = lies_wav(wav)
+    seg = segmente(x, NAMEN_LUECKE_S)
+    if seg:
+        def energie(ab: tuple[float, float]) -> float:
+            t = x[int(ab[0] * RATE): int(ab[1] * RATE)]
+            return float(np.sum(t ** 2))
+        seg = [max(seg, key=energie)]  # dreimal gesprochen: der energiereichste Abschnitt
+    start, ende = (seg[0][0], seg[0][1]) if seg else (0.0, 0.0)
+    spitze = 20 * np.log10(np.abs(x).max() + 1e-12)
+    info: dict = {"roh_s": len(x) / RATE, "rohspitze_db": round(spitze, 1),
+                  "segmente": segmente(x, NAMEN_LUECKE_S), "hoerbar_von": start, "hoerbar_bis": ende,
+                  "lautdauer": round(ende - start, 3)}
+    if ende <= start or spitze < MIN_ROHSPITZE_DB:
+        info["fehler"] = f"kein hörbarer Name (Spitze {spitze:.0f} dBFS)"
+        wav.with_suffix(".bearbeitet.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
+        return
+    a = max(0.0, start - VORLAUF_S)
+    b = min(len(x) / RATE, ende + NACHLAUF_S + 0.04)
+    laenge = b - a
+    lufs, tp = lautheit(wav, a, laenge)
+    gain = min(ZIEL_LUFS - lufs, MAX_SPITZE_DB - tp)
+    aus_fade = min(0.060, laenge / 3)
+    mp3 = wav.with_suffix(".mp3")
+    ffmpeg("-i", str(wav), "-af",
+           f"atrim=start={a:.3f}:duration={laenge:.3f},asetpts=PTS-STARTPTS,volume={gain:.2f}dB,"
+           f"afade=t=in:st=0:d={min(0.015, laenge / 4):.3f},afade=t=out:st={laenge - aus_fade:.3f}:d={aus_fade:.3f}",
+           "-ac", "1", "-ar", str(RATE), "-c:a", "libmp3lame", "-b:a", "64k", str(mp3))
+    info.update({"datei_s": laenge, "lufs_vorher": lufs, "tp_vorher": tp, "gain_db": gain,
+                 "lufs_ziel_erreicht": abs(lufs + gain - ZIEL_LUFS) < 0.5})
+    wav.with_suffix(".bearbeitet.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
+
+
+NAMEN_STUFE1 = (
+    "Du bist eine erfahrene Phonetikerin für Deutsch. In der Aufnahme spricht eine Person einen einzelnen "
+    "Buchstabennamen oder ein sehr kurzes Wort. Schreib genau auf, was akustisch zu hören ist – nicht, was "
+    "vermutlich gemeint ist: Lautschrift, Schreibweise, und ob die Aussprache deutsch, englisch oder anders "
+    "klingt. Antworte nur mit JSON: "
+    '{"gehoert": "<IPA in eckigen Klammern>", "wort": "<Schreibweise>", "sprache": "<deutsch/englisch/…>", '
+    '"beschreibung": "<ein Satz>"}'
+)
+NAMEN_SCHEMA1 = {
+    "type": "object",
+    "properties": {"gehoert": {"type": "string"}, "wort": {"type": "string"}, "sprache": {"type": "string"},
+                   "beschreibung": {"type": "string"}},
+    "required": ["gehoert", "wort", "sprache", "beschreibung"],
+    "additionalProperties": False,
+}
+NAMEN_SCHEMA2 = {
+    "type": "object",
+    "properties": {
+        "gehoert": {"type": "string"},
+        "korrekt": {"type": "boolean"},
+        "deutsch": {"type": "boolean"},
+        "nurName": {"type": "boolean"},
+        "natuerlich": {"type": "integer"},
+        "klarheit": {"type": "integer"},
+        "waerme": {"type": "integer"},
+        "note": {"type": "integer"},
+        "begruendung": {"type": "string"},
+    },
+    "required": ["gehoert", "korrekt", "deutsch", "nurName", "natuerlich", "klarheit", "waerme", "note",
+                 "begruendung"],
+    "additionalProperties": False,
+}
+
+
+def namen_stufe2(b: str, dauer: float) -> str:
+    return (
+        "Jetzt die Vorgabe. Die Aufnahme soll für eine Montessori-Lern-App (Kind knapp drei Jahre) den "
+        f"deutschen Namen des Buchstabens „{b}“ sprechen: „{NAMEN[b]}“ [{NAMEN_IPA[b]}] – {NAMEN_HINWEIS[b]}. "
+        f"Gemessene Dauer: {dauer:.2f} s.\n"
+        "Bewerte die Aufnahme gegen die Vorgabe. Bleib bei dem, was du gehört hast – ändere „gehoert“ nicht, "
+        "nur weil die Vorgabe anders lautet. Felder: gehoert (IPA, was zu hören ist), korrekt (true, wenn der "
+        "richtige deutsche Buchstabenname zu hören ist; kleine Abweichungen der Vokallänge sind kein Fehler), "
+        "deutsch (true, wenn deutsch ausgesprochen; false bei englischer Aussprache wie „bee“, „zee“, „double-u“, "
+        "„why“, „zed“), nurName (true, wenn nur der Name und kein weiteres Wort/kein Satz), natuerlich 1–10 "
+        "(klingt wie eine Person, die das Alphabet aufsagt, nicht künstlich gedehnt oder abgehackt), klarheit "
+        "1–10, waerme 1–10 (freundlich, ruhig, kindgerecht), note 1–10 (Gesamteignung für die App; 10 = genau so "
+        "sollte es klingen), begruendung (höchstens zwei Sätze, konkret). Nur JSON."
+    )
+
+
+def namen_bewerte(ziel: Path, mp3: Path, modell: str) -> None:
+    meta = json.loads(mp3.with_suffix(".erzeugt.json").read_text(encoding="utf-8"))
+    b = meta["vorgabe"]["buchstabe"]
+    info = json.loads(mp3.with_suffix(".bearbeitet.json").read_text(encoding="utf-8"))
+    audio = {"type": "input_audio", "input_audio": {"data": hoer_wav(mp3), "format": "wav"}}
+    n1 = [{"role": "user", "content": [{"type": "text", "text": NAMEN_STUFE1}, audio]}]
+    a1, j1 = chat(modell, n1, NAMEN_SCHEMA1)
+    n2 = n1 + [{"role": "assistant", "content": json.dumps(j1, ensure_ascii=False)},
+               {"role": "user", "content": namen_stufe2(b, info["lautdauer"])}]
+    a2, j2 = chat(modell, n2, NAMEN_SCHEMA2)
+    for feld in ("natuerlich", "klarheit", "waerme", "note"):
+        if not isinstance(j2.get(feld), int) or not 1 <= j2[feld] <= 10:
+            raise ValueError(f"{modell}: Feld {feld} ungültig: {j2.get(feld)!r}")
+    kosten = sum(float((a.get("usage") or {}).get("cost") or 0) for a in (a1, a2))
+    ziel.write_text(json.dumps({"modell": modell, "blind": j1, "bewertung": j2, "kosten": kosten,
+                                "antworten": [a1, a2]}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def namen_kandidaten(lauf: str, bewerter: list[str], ausschluss_anteil: float) -> list[dict]:
+    zeilen = []
+    for meta_pfad in dateien(lauf, "*.erzeugt.json"):
+        stamm = meta_pfad.name[: -len(".erzeugt.json")]
+        basis = meta_pfad.parent / stamm
+        meta = json.loads(meta_pfad.read_text(encoding="utf-8"))
+        b = meta["vorgabe"]["buchstabe"]
+        z: dict = {"id": stamm, "buchstabe": b, "name": NAMEN[b], "stimme": meta["stimme"],
+                   "runde": int(re.search(r"-r(\d+)-k\d+-", stamm).group(1)), "transkript": meta["transkript"],
+                   "kosten": float((meta.get("usage") or {}).get("cost") or 0), "gruende": [], "noten": {}}
+        bp = basis.with_suffix(".bearbeitet.json")
+        info = json.loads(bp.read_text(encoding="utf-8")) if bp.exists() else {}
+        z["lautdauer"] = round(info.get("lautdauer", 0.0), 3)
+        z["mp3"] = f"{slug(b)}/{stamm}.mp3" if basis.with_suffix(".mp3").exists() else ""
+        erlaubt = set(NAMEN[b].lower()) | set(" .…!,?\n-")
+        if not set(meta["transkript"].lower()) <= erlaubt:
+            z["gruende"].append("Transkript weicht ab")
+        if info.get("fehler"):
+            z["gruende"].append(info["fehler"])
+        elif info and not (NAMEN_MIN_S <= info["lautdauer"] <= NAMEN_MAX_S):
+            z["gruende"].append(f"Dauer {info['lautdauer']:.2f} s außerhalb {NAMEN_MIN_S}–{NAMEN_MAX_S} s")
+        bew = []
+        for m in bewerter:
+            p = basis.with_suffix(f".bewertung.{bewerter_slug(m)}.json")
+            if p.exists():
+                e = json.loads(p.read_text(encoding="utf-8"))
+                z["kosten"] += e["kosten"]
+                bew.append(e)
+                z["noten"][m] = {**e["bewertung"], "blind": f"{e['blind'].get('gehoert', '')} "
+                                 f"„{e['blind'].get('wort', '')}“ ({e['blind'].get('sprache', '')})"}
+        z["vollstaendig"] = len(bew) >= min(MIN_BEWERTER, len(bewerter)) and bool(info)
+        if bew:
+            n = len(bew)
+            for feld in ("note", "natuerlich", "klarheit", "waerme"):
+                z[feld] = round(sum(e["bewertung"][feld] for e in bew) / n, 2)
+
+            def anteil(fn) -> float:
+                return sum(1 for e in bew if fn(e["bewertung"])) / n
+
+            if anteil(lambda x: not x["korrekt"]) > ausschluss_anteil:
+                z["gruende"].append("falscher Name")
+            if anteil(lambda x: not x["deutsch"]) > ausschluss_anteil:
+                z["gruende"].append("nicht deutsch")
+            if anteil(lambda x: not x["nurName"]) > ausschluss_anteil:
+                z["gruende"].append("nicht nur der Name")
+        else:
+            z["note"] = z["natuerlich"] = z["klarheit"] = z["waerme"] = 0.0
+        z["gueltig"] = z["vollstaendig"] and not z["gruende"]
+        zeilen.append(z)
+    return zeilen
+
+
+def namen_auswaehlen(lauf: str, bewerter: list[str], ausschluss_anteil: float, je: int = 2) -> dict[str, dict]:
+    """Wählt je Buchstabe die besten `je` gültigen Kandidaten (auswahl/<slug>.name1.mp3, name2.mp3)."""
+    zeilen = namen_kandidaten(lauf, bewerter, ausschluss_anteil)
+    ordner = lauf_dir(lauf)
+    auswahl_dir = ordner / "auswahl"
+    shutil.rmtree(auswahl_dir, ignore_errors=True)
+    auswahl_dir.mkdir(parents=True)
+    stand: dict[str, dict] = {}
+    for b in BUCHSTABEN:
+        eigene = [z for z in zeilen if z["buchstabe"] == b]
+        if not eigene:
+            continue
+        gueltig = sorted((z for z in eigene if z["gueltig"]),
+                         key=lambda z: (-z["note"], -z["natuerlich"], -z["klarheit"], z["id"]))
+        gewaehlt = gueltig[:je]
+        for i, z in enumerate(gewaehlt, 1):
+            z["gewaehlt"] = i
+            z["auswahl_datei"] = f"{slug(b)}.name{i}.mp3"
+            shutil.copyfile(ordner / z["mp3"], auswahl_dir / z["auswahl_datei"])
+        letzte = max(z["runde"] for z in eigene)
+        stand[b] = {"name": NAMEN[b], "beste_note": gewaehlt[0]["note"] if gewaehlt else 0.0,
+                    "zweite_note": gewaehlt[1]["note"] if len(gewaehlt) > 1 else 0.0,
+                    "auswahl": [z["id"] for z in gewaehlt], "letzte_runde": letzte,
+                    "begruendungen": [n["begruendung"] for z in eigene if z["runde"] == letzte
+                                      for n in z["noten"].values()],
+                    "gruende": [g for z in eigene if z["runde"] == letzte for g in z["gruende"]]}
+    (ordner / "bewertung.json").write_text(json.dumps(zeilen, ensure_ascii=False, indent=1), encoding="utf-8")
+    (ordner / "auswahl.json").write_text(json.dumps(stand, ensure_ascii=False, indent=1), encoding="utf-8")
+    with open(ordner / "bewertung.csv", "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f, delimiter=";")
+        kopf = ["id", "buchstabe", "name", "stimme", "runde", "dauer", "note", "natuerlich", "klarheit", "waerme",
+                "gueltig", "gewaehlt", "ausschluss", "kosten_usd", "transkript"]
+        for m in bewerter:
+            kopf += [f"{m} blind", f"{m} gehoert", f"{m} note", f"{m} begruendung"]
+        w.writerow(kopf)
+        for z in zeilen:
+            reihe = [z["id"], z["buchstabe"], z["name"], z["stimme"], z["runde"], z["lautdauer"], z["note"],
+                     z["natuerlich"], z["klarheit"], z["waerme"], z["gueltig"], z.get("gewaehlt", ""),
+                     " | ".join(z["gruende"]), round(z["kosten"], 5), z["transkript"]]
+            for m in bewerter:
+                n = z["noten"].get(m, {})
+                reihe += [n.get("blind", ""), n.get("gehoert", ""), n.get("note", ""), n.get("begruendung", "")]
+            w.writerow(reihe)
+    namen_hoerseite(ordner, zeilen, stand)
+    print(f"namen auswaehlen: {len(zeilen)} Kandidaten, Kosten bisher {sum(z['kosten'] for z in zeilen):.4f} USD")
+    for b, st in stand.items():
+        print(f"  {b} {st['name']:8s} beste Note {st['beste_note']:4.1f}  Auswahl {', '.join(st['auswahl']) or '–'}")
+    return stand
+
+
+def namen_hoerseite(ordner: Path, zeilen: list[dict], stand: dict) -> None:
+    e = html.escape
+    teile = [
+        "<!doctype html><html lang='de'><head><meta charset='utf-8'><meta name='viewport' "
+        "content='width=device-width,initial-scale=1'><title>Buchstabennamen nachhören</title><style>"
+        ":root{--bg:#fbf8f2;--fg:#2b2622;--mut:#7a6f66;--weg:#b3472f;--rand:#e4ddd2}"
+        "@media (prefers-color-scheme:dark){:root{--bg:#1e1b18;--fg:#eee6dc;--mut:#a89c90;--weg:#e58a72;"
+        "--rand:#3a342e}}body{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif;"
+        "margin:0 auto;max-width:1100px;padding:16px}h2{margin:28px 0 6px;font-size:28px}table{border-collapse:"
+        "collapse;width:100%}td,th{border-bottom:1px solid var(--rand);padding:6px 8px;vertical-align:top;"
+        "text-align:left}th{font-size:12px;color:var(--mut)}.gew{background:rgba(47,125,79,.12)}"
+        ".weg{color:var(--weg)}.mut{color:var(--mut);font-size:13px}.note{font-weight:700;font-size:18px}"
+        "audio{width:190px;height:34px}.wrap{overflow-x:auto}</style></head><body>",
+        "<h1>Buchstabennamen nachhören</h1><p class='mut'>Grün = ausgewählt. Note = Mittel der Bewerter.</p>",
+    ]
+    for b in BUCHSTABEN:
+        eigene = sorted((z for z in zeilen if z["buchstabe"] == b), key=lambda z: (-z["gueltig"], -z["note"]))
+        if not eigene:
+            continue
+        teile.append(f"<h2>{e(b)} <span class='mut'>„{e(NAMEN[b])}“ [{e(NAMEN_IPA[b])}] · beste Note "
+                     f"{stand.get(b, {}).get('beste_note', 0):.1f}</span></h2><div class='wrap'><table><tr>"
+                     "<th>Hören</th><th>Note</th><th>Stimme / Runde</th><th>Dauer</th><th>Bewerter</th>"
+                     "<th>Ausschluss</th></tr>")
+        for z in eigene:
+            bew = "<br>".join(
+                f"<b>{e(m.split('/')[-1])}</b> {n.get('note', '')}: blind {e(str(n.get('blind', '')))} – "
+                f"<span class='mut'>{e(str(n.get('begruendung', '')))}</span>" for m, n in z["noten"].items())
+            hoeren = f"<audio controls preload='none' src='{e(z['mp3'])}'></audio>" if z["mp3"] else "–"
+            gew = f" ✓ {e(z.get('auswahl_datei', ''))}" if z.get("gewaehlt") else ""
+            teile.append(f"<tr{' class=gew' if z.get('gewaehlt') else ''}><td>{hoeren}<div class='mut'>"
+                         f"{e(z['id'])}{gew}</div></td><td class='note'>{z['note']:.1f}</td><td>{e(z['stimme'])} / "
+                         f"{z['runde']}</td><td>{z['lautdauer']:.2f} s</td><td>{bew}</td>"
+                         f"<td class='weg'>{e(' · '.join(z['gruende']))}</td></tr>")
+        teile.append("</table></div>")
+    teile.append("</body></html>")
+    (ordner / "hoeren.html").write_text("".join(teile), encoding="utf-8")
+
+
+def namen_schaerfung(st: dict) -> str:
+    teile = []
+    if any("deutsch" in g for g in st["gruende"]):
+        teile.append("Sprich den Namen deutsch aus, nicht englisch.")
+    if any("nur der Name" in g for g in st["gruende"]):
+        teile.append("Sag nur den Buchstabennamen, kein weiteres Wort.")
+    hinweise = " ".join(dict.fromkeys(b.strip() for b in st["begruendungen"] if b.strip()))
+    if hinweise:
+        teile.append("Hörer-Rückmeldungen zum letzten Versuch: " + hinweise[:700])
+    return " ".join(teile)
+
+
+def namen(lauf: str, nur: list[str] | None, anzahl: int, bewerter: list[str], ausschluss_anteil: float,
+          schwelle: float, runden: int, parallel_max: int) -> None:
+    """Buchstabennamen: erzeugen → nachbearbeiten → bewerten → auswählen, Nachlauf für schwache Namen."""
+    buchstaben = nur or list(BUCHSTABEN)
+    unbekannt = set(buchstaben) - set(BUCHSTABEN)
+    if unbekannt:
+        raise SystemExit(f"Unbekannte Buchstaben: {sorted(unbekannt)}")
+    offen = buchstaben
+    zusatz_pfad = lauf_dir(lauf) / "nachlauf.json"
+    zusaetze: dict[str, dict[str, str]] = (json.loads(zusatz_pfad.read_text(encoding="utf-8"))
+                                           if zusatz_pfad.exists() else {})
+    for runde in range(1, runden + 1):
+        namen_erzeugen(lauf, offen, anzahl, runde, zusaetze.get(str(runde), {}), parallel_max)
+        offen_wav = [(w,) for w in dateien(lauf, "*.wav") if not w.with_suffix(".bearbeitet.json").exists()]
+        print(f"namen nachbearbeiten: {len(offen_wav)} Dateien")
+        parallel(offen_wav, namen_bearbeite, parallel_max)
+        aufgaben = [(mp3.with_suffix(f".bewertung.{bewerter_slug(m)}.json"), mp3, m)
+                    for mp3 in dateien(lauf, "*.mp3") for m in bewerter
+                    if not mp3.with_suffix(f".bewertung.{bewerter_slug(m)}.json").exists()]
+        print(f"namen bewerten: {len(aufgaben)} Bewertungen")
+        parallel(aufgaben, namen_bewerte, parallel_max)
+        stand = namen_auswaehlen(lauf, bewerter, ausschluss_anteil)
+        schwach = [b for b in buchstaben if stand[b]["beste_note"] < schwelle]
+        if not schwach or runde == runden:
+            if schwach:
+                print("unter Schwelle nach letzter Runde: " + ", ".join(schwach))
+            return
+        neu = {b: namen_schaerfung(stand[b]) for b in schwach}
+        zusaetze.setdefault(str(runde + 1), {}).update({k: w for k, w in neu.items()
+                                                         if k not in zusaetze.get(str(runde + 1), {})})
+        zusatz_pfad.write_text(json.dumps(zusaetze, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"Nachlauf Runde {runde + 1}: " + ", ".join(schwach))
+        offen = schwach
+
+
 # ---------------------------------------------------------------- CLI
 
 
@@ -850,19 +1228,23 @@ def main() -> None:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("befehl", choices=["erzeugen", "nachbearbeiten", "bewerten", "auswaehlen", "alles"])
-    p.add_argument("--lauf", default="haupt", help="Name des Laufs (Ordner unter tools/.lokal/laute-roh/)")
+    p.add_argument("befehl", choices=["erzeugen", "nachbearbeiten", "bewerten", "auswaehlen", "alles", "namen"])
+    p.add_argument("--lauf", help="Name des Laufs (Ordner unter tools/.lokal/laute-roh/; Standard haupt, bei namen: namen)")
     p.add_argument("--nur", help="Buchstaben, kommagetrennt (z. B. m,b,k,a)")
-    p.add_argument("--anzahl", type=int, default=6, help="Kandidaten je Buchstabe und Runde")
+    p.add_argument("--anzahl", type=int, help="Kandidaten je Buchstabe und Runde (Standard 6, bei namen 3)")
     p.add_argument("--runde", type=int, default=1, help="nur für erzeugen: Rundennummer")
     p.add_argument("--bewerter", default=",".join(BEWERTER))
     p.add_argument("--ausschluss-anteil", type=float, default=0.5,
                    help="ein Befund (Vokal, falscher Laut, nicht nur Laut) schließt aus, wenn MEHR als dieser Anteil der Bewerter ihn meldet (0,5 = Mehrheit)")
     p.add_argument("--schwelle", type=float, default=SCHWELLE)
-    p.add_argument("--runden", type=int, default=MAX_RUNDEN)
+    p.add_argument("--runden", type=int, help=f"höchstens so viele Runden (Standard {MAX_RUNDEN}, bei namen {NAMEN_RUNDEN})")
     p.add_argument("--parallel", type=int, default=6)
     a = p.parse_args()
     nur = [b.strip() for b in a.nur.split(",") if b.strip()] if a.nur else None
+    ist_namen = a.befehl == "namen"
+    a.lauf = a.lauf or ("namen" if ist_namen else "haupt")
+    a.anzahl = a.anzahl or (3 if ist_namen else 6)
+    a.runden = a.runden or (NAMEN_RUNDEN if ist_namen else MAX_RUNDEN)
     bewerter = [m.strip() for m in a.bewerter.split(",") if m.strip()]
     if shutil.which("ffmpeg") is None:
         raise SystemExit("ffmpeg fehlt im PATH")
@@ -874,6 +1256,8 @@ def main() -> None:
         bewerten(a.lauf, bewerter, a.parallel)
     elif a.befehl == "auswaehlen":
         auswaehlen(a.lauf, bewerter, a.ausschluss_anteil)
+    elif ist_namen:
+        namen(a.lauf, nur, a.anzahl, bewerter, a.ausschluss_anteil, a.schwelle, a.runden, a.parallel)
     else:
         alles(a.lauf, nur, a.anzahl, bewerter, a.ausschluss_anteil, a.schwelle, a.runden, a.parallel)
     if FEHLER:
