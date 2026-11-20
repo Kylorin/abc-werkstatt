@@ -1,0 +1,36 @@
+/* Laut ruft Tier (F2): Blatt oben, kleiner Kasten mit 4–6 großen Tasten darunter, Gucker am Blattrand. */
+
+.flaeche--lrt { position: relative; gap: var(--abstand-5); }
+
+.lrt__blatt {
+  position: relative;
+  min-height: calc(var(--gr-wort) * 1.6);
+  margin-top: var(--abstand-5);
+  padding: var(--abstand-4) var(--abstand-5);
+  padding-right: calc(var(--medaillon-klein) + var(--abstand-5));
+  border: 1px solid var(--linie); border-radius: var(--radius-l);
+  background: var(--karte); box-shadow: var(--schatten-s);
+  display: flex; align-items: center;
+}
+.lrt__text {
+  font-size: var(--gr-wort); font-weight: 700; line-height: 1.15; letter-spacing: 0.03em;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+.lrt__kasten { display: grid; place-items: center; }
+
+/* Tier-Besuch: groß über dem Blatt, belegt keinen Platz im Fluss. */
+.lrt__besuch[data-offen='nein'] { display: none; }
+.lrt__besuch {
+  position: absolute; z-index: 10; top: 0; left: 0; right: 0;
+  display: grid; place-items: center;
+  pointer-events: none;
+  --buehne: min(56vw, 28dvh, 260px);
+  animation: erscheinen var(--dauer-lang) var(--kurve-feder) both;
+}
+.lrt__besuch-knopf { pointer-events: auto; padding: 0; border: 0; border-radius: 50%; background: transparent; }
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .flaeche--lrt { gap: var(--abstand-3); --taste-gross: min(96px, 24dvh); }
+  .lrt__blatt { min-height: 0; margin-top: var(--abstand-4); }
+}

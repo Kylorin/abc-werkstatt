@@ -1,0 +1,43 @@
+/* Gute Nacht (B9): warm gedimmtes Licht, eine Patchwork-Decke, die Tiere der Sitzung schlafen darauf.
+   Keine Zahl, keine Sammlung — nur ein ruhiges Bild. Ein Tipp weckt sie. */
+
+.gute-nacht {
+  position: relative;
+  display: grid; place-items: center;
+  width: 100%; min-height: min(70dvh, 520px);
+  padding: var(--abstand-5);
+  border: 0; border-radius: var(--radius-l);
+  background: radial-gradient(circle at 70% 18%, color-mix(in srgb, var(--nacht-licht) 45%, transparent) 0, transparent 38%), var(--nacht);
+  color: var(--nacht-licht);
+  overflow: hidden;
+  animation: gute-nacht-dimmen 1.6s var(--kurve) both;
+}
+@keyframes gute-nacht-dimmen { from { filter: brightness(1.6) saturate(0.6); } to { filter: none; } }
+
+.gute-nacht__mond { position: absolute; top: var(--abstand-5); right: var(--abstand-6); color: var(--nacht-licht); }
+
+.gute-nacht__decke {
+  position: absolute; left: 8%; right: 8%; bottom: 12%; height: 34%;
+  border-radius: 40% 40% var(--radius-l) var(--radius-l);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(33.3% - 2px), var(--decke-naht) calc(33.3% - 2px) 33.3%),
+    linear-gradient(90deg, var(--decke-1) 0 33.3%, var(--decke-2) 33.3% 66.6%, var(--decke-3) 66.6%);
+  opacity: 0.92;
+}
+
+.gute-nacht__tiere {
+  position: absolute; left: 10%; right: 10%; bottom: 30%;
+  display: flex; justify-content: center; align-items: flex-end;
+}
+.gute-nacht__tier {
+  width: var(--medaillon-klein); height: var(--medaillon-klein);
+  margin: 0 -6px;
+  filter: brightness(0.8) saturate(0.85);
+  animation: gute-nacht-atmen 3.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.5s);
+}
+@keyframes gute-nacht-atmen { 0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); } 50% { transform: translateY(2px) rotate(-6deg) scale(1.03); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .gute-nacht, .gute-nacht__tier { animation: none; }
+}
