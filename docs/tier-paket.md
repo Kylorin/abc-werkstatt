@@ -51,7 +51,7 @@ mein-paket.zip
 | `format` | ja | genau `abc-werkstatt-tierpaket/1` |
 | `id` | ja | `[a-z0-9-]+`, 1–40 Zeichen. Ein erneuter Import mit gleicher `id` **ersetzt** das Paket. |
 | `titel` | ja | Name des Pakets, steht groß auf der Startseite (1–40 Zeichen) |
-| `untertitel` | nein | kleine Zeile unter dem Titel |
+| `untertitel` | nein | kleine Zeile unter dem Titel (1–300 Zeichen) |
 | `cover` | nein | Coverbild für die Startkachel (Pfad im Zip) |
 | `sprache` | ja | `de-DE` |
 | `tiere` | ja | 1 bis 200 Tiere |
@@ -60,12 +60,12 @@ Je Tier:
 
 | Feld | Pflicht | Bedeutung |
 |---|---|---|
-| `id` | ja | `[a-z0-9-]+`, eindeutig im Paket |
+| `id` | ja | `[a-z0-9-]+`, 1–40 Zeichen, eindeutig im Paket |
 | `name` | ja | Anzeigename mit Großbuchstaben und Umlauten, z. B. `Bär` |
 | `artikel` | ja | `der`, `die` oder `das` |
 | `bild` | ja | Bild im Zip |
-| `kann` | nein | Satz, was das Tier kann (wird vorgelesen) |
-| `freude` | nein | Satz, den das Tier sagt, wenn sein Name geschrieben ist |
+| `kann` | nein | Satz, was das Tier kann (wird vorgelesen, 1–300 Zeichen) |
+| `freude` | nein | Satz, den das Tier sagt, wenn sein Name geschrieben ist (1–300 Zeichen) |
 | `audio.name` | nein | mp3 mit dem gesprochenen Namen |
 | `audio.freude` | nein | Liste von mp3s; bei Erfolg wird eine zufällig gespielt (sonst wird `freude` vorgelesen) |
 
