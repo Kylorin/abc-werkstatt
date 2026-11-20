@@ -1,0 +1,43 @@
+/* F6 Wer hilft? (Bau „spiele“). Ein Ding pro Bildschirm: Problemtier, zwei Helfer, dann das Wort. */
+
+.flaeche--geschichten { gap: var(--abstand-3); }
+.geschichten { flex: 1; display: flex; flex-direction: column; }
+.geschichte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-4); }
+
+.geschichte__buehne { display: flex; align-items: center; justify-content: center; gap: var(--abstand-5); min-height: var(--medaillon); }
+.geschichte__problemtier { filter: saturate(0.45); animation: geschichte-wackeln 2.8s ease-in-out infinite; transition: filter var(--dauer-lang); }
+.geschichte__problemtier--getroest { filter: none; animation: none; }
+.geschichte__helfer { display: flex; justify-content: center; gap: var(--abstand-6); min-height: var(--medaillon); }
+.geschichte__helfer:empty { min-height: 0; }
+.geschichte__wahl { animation: geschichte-erscheint var(--dauer-lang) var(--kurve) both; }
+.geschichte__helfer-da { animation: geschichte-fliegt 700ms var(--kurve-feder) both; }
+
+.geschichte__arbeit { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--abstand-4); }
+.geschichte__arbeit:empty { display: none; }
+.geschichte__schreiben { width: 100%; }
+.geschichte__loesung { display: flex; justify-content: center; gap: var(--abstand-4); }
+.geschichte__freude { width: min(40vw, 200px); }
+
+.geschichte-ende {
+  flex: 1; position: relative; width: 100%; min-height: 60dvh;
+  border: 0; border-radius: var(--radius-l);
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--nacht-licht) 35%, var(--nacht)), var(--nacht) 75%);
+  display: grid; place-items: center; overflow: hidden;
+}
+.geschichte-ende__decke {
+  position: absolute; left: 8%; right: 8%; bottom: 14%; height: 34%;
+  border-radius: var(--radius-l);
+  background: repeating-conic-gradient(var(--decke-1) 0 25%, var(--decke-2) 0 50%, var(--decke-3) 0 75%, var(--decke-1) 0 100%) 0 0 / 64px 64px;
+  outline: 2px dashed var(--decke-naht); outline-offset: -8px; opacity: 0.9;
+}
+.geschichte-ende__tiere { position: absolute; bottom: 30%; display: flex; gap: var(--abstand-2); }
+.geschichte-ende__tier { width: var(--medaillon-klein); height: var(--medaillon-klein); border-radius: 50%; object-fit: cover; filter: brightness(0.8); animation: geschichte-atmet 4s ease-in-out infinite; }
+
+@keyframes geschichte-wackeln { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+@keyframes geschichte-erscheint { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: none; } }
+@keyframes geschichte-fliegt { from { opacity: 0; transform: translateX(60vw) translateY(-20%) scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes geschichte-atmet { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .geschichte__problemtier, .geschichte__wahl, .geschichte__helfer-da, .geschichte-ende__tier { animation: none; }
+}

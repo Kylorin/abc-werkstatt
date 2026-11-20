@@ -1,0 +1,20 @@
+/* Legearbeit (Bau „spiele“): nur einige Felder offen (F6, F7). Baut auf wortarbeit.css auf. */
+
+.legearbeit .feld-slot[data-offen='nein'] { border-style: solid; border-color: transparent; background: transparent; }
+.legearbeit .feld-slot--dran { box-shadow: 0 0 0 4px var(--hinweis-ring); animation: lege-dran 2.4s ease-in-out infinite; }
+.legearbeit .feld-slot--klingt { animation: lege-klingt 340ms var(--kurve-feder); }
+
+@keyframes lege-dran {
+  0%, 100% { box-shadow: 0 0 0 2px var(--hinweis-ring); }
+  50% { box-shadow: 0 0 0 6px var(--hinweis-ring); }
+}
+@keyframes lege-klingt {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.18) translateY(-6px); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legearbeit .feld-slot--dran { animation: none; }
+  .legearbeit .feld-slot--klingt { animation: none; }
+}

@@ -1,0 +1,54 @@
+/* F5 Silben-Hüpfen (Bau „spiele“): oben das Tier, darunter je Silbe ein Trommelfleck und der Bogen. */
+
+.flaeche--silben { gap: var(--abstand-3); }
+.silben { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-4); }
+
+.silben__buehne {
+  width: min(100%, calc(var(--n, 2) * 150px), 640px);
+  display: flex; flex-direction: column; gap: var(--abstand-2);
+}
+
+/* Das Tier steht über dem Fleck (--links, sonst Mitte) und gleitet beim Hüpfen hinüber. */
+.silben__huepfer { position: relative; height: calc(var(--medaillon) + var(--abstand-4)); }
+.silben__huepfer[hidden] { display: none; }
+.silben__tier {
+  position: absolute; top: var(--abstand-2);
+  left: var(--links, 50%);
+  transform: translateX(-50%);
+  transition: left 280ms var(--kurve);
+}
+.silben__tier.spiel-huepft { animation: silben-hopp 520ms var(--kurve-feder); }
+@keyframes silben-hopp {
+  0% { transform: translateX(-50%) translateY(0); }
+  45% { transform: translateX(-50%) translateY(-28%); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+.silben__flecken { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: var(--abstand-3); }
+.silbe {
+  aspect-ratio: 1; width: 100%; max-width: 132px; justify-self: center;
+  border: 3px solid color-mix(in srgb, var(--silbe-gespielt) 25%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, var(--karte), var(--silbe) 70%);
+  box-shadow: var(--schatten-s);
+  display: grid; place-items: center;
+  touch-action: manipulation;
+}
+.silbe:active { transform: scale(0.96); }
+.silbe__text { font-size: var(--gr-l); color: var(--tinte-leise); opacity: 0; transition: opacity var(--dauer); }
+.silbe[data-gespielt='ja'] { border-color: var(--silbe-gespielt); background: radial-gradient(circle at 50% 40%, var(--karte), color-mix(in srgb, var(--silbe-gespielt) 30%, var(--silbe)) 75%); }
+.silbe[data-gespielt='ja'] .silbe__text { opacity: 1; color: var(--silbe-gespielt); }
+
+.silben-bogen { height: 40px; }
+.silben-bogen svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.silben-bogen path { fill: none; stroke: var(--silbe-gespielt); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+
+.silben__ende { display: flex; align-items: center; justify-content: center; gap: var(--abstand-5); }
+.silben__ende:empty { display: none; }
+.silben__freude { border: 0; background: transparent; padding: 0; width: min(60vw, 260px); }
+.silben__wiese { align-self: flex-end; }
+
+@media (prefers-reduced-motion: reduce) {
+  .silben__tier { transition: none; }
+  .silben__tier.spiel-huepft { animation: none; }
+}
