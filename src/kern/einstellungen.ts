@@ -7,6 +7,7 @@ const SCHLUESSEL = 'abc-werkstatt:einstellungen:v1';
 export const STANDARD_EINSTELLUNGEN: Readonly<Einstellungen> = Object.freeze({
   namenStattLaute: false,
   grossbuchstaben: false,
+  azureRegion: 'germanywestcentral',
   stimme: 'de-DE-KatjaNeural',
   tierModusMitVorlage: true,
   gewaehlteLautVarianten: {},

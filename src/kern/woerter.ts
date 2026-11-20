@@ -17,6 +17,8 @@ export const STARTWOERTER: readonly string[] = [
 const store = createStore('abc-werkstatt-woerter', 'kv');
 const LISTE = 'liste';
 const ANGELEGT = 'angelegt';
+/** Fürs Üben abgewählte Wörter (string[]). */
+const PAUSIERT = 'pausiert';
 
 /** Normalisiert und prüft ein Wort; wirft WortFehler mit Elternmeldung. */
 export function pruefeWort(eingabe: string): string {
@@ -31,6 +33,11 @@ export function pruefeWort(eingabe: string): string {
 export function erzeugeWoerter(): WoerterDienst {
   const abos = new Set<() => void>();
   let cache: string[] | undefined;
+  let pausiertCache: Set<string> | undefined;
+
+  function melde(): void {
+    for (const fn of abos) fn();
+  }
 
   async function lade(): Promise<string[]> {
     if (cache) return cache;
@@ -45,10 +52,23 @@ export function erzeugeWoerter(): WoerterDienst {
     return cache;
   }
 
+  async function ladePausiert(): Promise<Set<string>> {
+    if (pausiertCache) return pausiertCache;
+    const roh = await get<unknown>(PAUSIERT, store);
+    if (roh !== undefined && !Array.isArray(roh)) throw new Error('Gespeicherte Üben-Auswahl ist beschädigt.');
+    pausiertCache = new Set((roh ?? []).filter((w): w is string => typeof w === 'string'));
+    return pausiertCache;
+  }
+
+  async function speicherePausiert(menge: Set<string>): Promise<void> {
+    pausiertCache = menge;
+    await set(PAUSIERT, [...menge].sort((a, b) => a.localeCompare(b, 'de')), store);
+  }
+
   async function speichere(liste: string[]): Promise<void> {
     cache = [...new Set(liste)].sort((a, b) => a.localeCompare(b, 'de'));
     await set(LISTE, cache, store);
-    for (const fn of abos) fn();
+    melde();
   }
 
   return {
@@ -60,12 +80,31 @@ export function erzeugeWoerter(): WoerterDienst {
     },
     async loeschen(wort) {
       const w = schreibwort(wort);
+      const pausiert = await ladePausiert();
+      if (pausiert.has(w)) {
+        const rest = new Set(pausiert);
+        rest.delete(w);
+        await speicherePausiert(rest);
+      }
       await speichere((await lade()).filter((x) => x !== w));
+    },
+    pausierte: async () => [...(await ladePausiert())].sort((a, b) => a.localeCompare(b, 'de')),
+    async setzeUeben(wort, ueben) {
+      const w = schreibwort(wort);
+      const menge = new Set(await ladePausiert());
+      if (ueben) menge.delete(w);
+      else menge.add(w);
+      await speicherePausiert(menge);
+      melde();
     },
     async zufall(ausser) {
       const alle = await lade();
       if (!alle.length) return undefined;
-      const auswahl = alle.length > 1 && ausser ? alle.filter((w) => w !== ausser) : alle;
+      const pausiert = await ladePausiert();
+      const aktive = alle.filter((w) => !pausiert.has(w));
+      // Alle abgewählt: die Auswahl ist eine Vorliebe, keine Sperre — dann aus allen wählen.
+      const basis = aktive.length ? aktive : alle;
+      const auswahl = basis.length > 1 && ausser ? basis.filter((w) => w !== ausser) : basis;
       return auswahl[Math.floor(Math.random() * auswahl.length)];
     },
     abonniere(fn) {

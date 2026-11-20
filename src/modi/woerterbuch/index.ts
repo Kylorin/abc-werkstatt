@@ -2,9 +2,8 @@
  * Wörterbuch (Bau „verwaltung") — Erwachsenen-Bereich: Wörter hinzufügen, löschen,
  * fürs Üben an-/abwählen, anhören und selbst einsprechen.
  *
- * Speicher: Wörter über den Kern-WoerterDienst (IndexedDB). Die Üben-Auswahl liegt in
- * localStorage unter PAUSIERT_SCHLUESSEL (Liste der abgewählten Wörter), bis der Kern sie
- * übernimmt (Kernwunsch: WoerterDienst.zufall() soll pausierte Wörter überspringen).
+ * Speicher: Wörter und Üben-Auswahl über den Kern-WoerterDienst (IndexedDB);
+ * `zufall()` überspringt abgewählte Wörter.
  */
 import './woerterbuch.css';
 import { schreibwort } from '../../kern/alphabet';
@@ -13,21 +12,6 @@ import { icon } from '../../kern/ui/icons';
 import { WortFehler, type Kontext, type Modus } from '../../kern/vertrag';
 import { pruefeWort } from '../../kern/woerter';
 import { aufnahmeKnoepfe, type AufnahmeKnoepfe } from '../laut-studio/aufnahme';
-
-/** localStorage-Schlüssel der fürs Üben abgewählten Wörter (JSON string[]). */
-export const PAUSIERT_SCHLUESSEL = 'abc-werkstatt:woerter-pausiert:v1';
-
-function lesePausiert(): Set<string> {
-  const roh = localStorage.getItem(PAUSIERT_SCHLUESSEL);
-  if (!roh) return new Set();
-  const wert: unknown = JSON.parse(roh);
-  if (!Array.isArray(wert)) throw new Error('Gespeicherte Üben-Auswahl ist beschädigt.');
-  return new Set(wert.filter((w): w is string => typeof w === 'string'));
-}
-
-function speicherePausiert(menge: Set<string>): void {
-  localStorage.setItem(PAUSIERT_SCHLUESSEL, JSON.stringify([...menge].sort((a, b) => a.localeCompare(b, 'de'))));
-}
 
 let aufnahmen = new Map<string, AufnahmeKnoepfe>();
 let aktiv = false;
@@ -38,7 +22,7 @@ export const modus: Modus = {
   icon: 'woerterbuch',
   async mount(flaeche, ctx: Kontext) {
     aktiv = true;
-    const pausiert = lesePausiert();
+    let pausiert = new Set<string>();
     const meldung = el('div', { klasse: 'woerterbuch__meldung' });
     const liste = el('ul', { klasse: 'liste woerterbuch__liste', testid: 'wortliste' });
     const leer = el('p', { klasse: 'hinweis', text: 'Noch keine Wörter. Oben ein Wort eintragen.' });
@@ -63,11 +47,13 @@ export const modus: Modus = {
           title: 'beim Üben verwenden',
         },
         beiKlick: () => {
-          if (pausiert.has(wort)) pausiert.delete(wort);
+          const wirdGeuebt = pausiert.has(wort);
+          if (wirdGeuebt) pausiert.delete(wort);
           else pausiert.add(wort);
-          speicherePausiert(pausiert);
-          ueben.setAttribute('aria-pressed', String(!pausiert.has(wort)));
-          li.dataset.pausiert = pausiert.has(wort) ? 'ja' : 'nein';
+          ueben.setAttribute('aria-pressed', String(wirdGeuebt));
+          li.dataset.pausiert = wirdGeuebt ? 'nein' : 'ja';
+          meldung.replaceChildren();
+          ctx.woerter.setzeUeben(wort, wirdGeuebt).catch(zeigeFehler);
         },
       }, icon('haken', { groesse: 20 }));
 
@@ -124,7 +110,7 @@ export const modus: Modus = {
       zeilen.delete(wort);
       aufnahmen.get(wort)?.zerstoere();
       aufnahmen.delete(wort);
-      if (pausiert.delete(wort)) speicherePausiert(pausiert);
+      pausiert.delete(wort);
       // Gelöschte Zeile wird bis zum nächsten Öffnen zu einem leeren, versteckten Platzhalter:
       // so verschiebt sich die Position der übrigen Löschknöpfe nicht (Serienlöschen per Index,
       // wie im Abnahmetest), und das Wort taucht im Text der Liste nicht mehr auf.
@@ -191,8 +177,9 @@ export const modus: Modus = {
       ),
     );
 
-    const woerter = await ctx.woerter.liste();
+    const [woerter, abgewaehlt] = await Promise.all([ctx.woerter.liste(), ctx.woerter.pausierte()]);
     if (!aktiv) return;
+    pausiert = new Set(abgewaehlt);
     for (const w of woerter) {
       const li = zeile(w);
       zeilen.set(w, li);

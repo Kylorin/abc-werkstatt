@@ -53,7 +53,7 @@ export interface Einstellungen {
   kindName?: string;
   /** Tier-Modus: true = Wort als Vorlage mit Feldern (wie Nachfüllen), false = frei aus dem Kopf. */
   tierModusMitVorlage: boolean;
-  /** Im Laut-Studio gewählte Variante je Buchstabe: Buchstabe → URL der Audiodatei (oder `aufnahme:<b>`). */
+  /** Im Laut-Studio gewählte Variante je Buchstabe: Buchstabe → URL der Audiodatei (oder `aufnahme:<b>` / `azure:<b>`). */
   gewaehlteLautVarianten: Partial<Record<Buchstabe, string>>;
 }
 
@@ -93,7 +93,10 @@ export interface AudioManifest {
 export interface LautVariante {
   /** Stabile ID innerhalb des Buchstabens, z. B. „1", „kurz", „katja". Landet in data-testid `variante-<b>-<id>`. */
   id: string;
-  /** Relativer Pfad oder Blob-URL. */
+  /**
+   * Relativer Pfad, Blob-URL oder eine der Sonderformen `aufnahme:<b>` (Elternaufnahme) bzw.
+   * `azure:<b>` (live über den eigenen Azure-Schlüssel) — `AudioDienst.datei()` spielt alle ab.
+   */
   url: string;
   /** Anzeige für Eltern, z. B. „kurz, stimmlos". */
   beschreibung?: string;
@@ -244,7 +247,15 @@ export interface WoerterDienst {
   hinzufuegen(wort: string): Promise<string>;
   /** Entfernt ein Wort (kein Fehler, wenn es fehlt). */
   loeschen(wort: string): Promise<void>;
-  /** Zufälliges Wort, möglichst ungleich `ausser`; undefined bei leerer Liste. */
+  /** Fürs Üben abgewählte Wörter (kanonisch klein, alphabetisch). */
+  pausierte(): Promise<string[]>;
+  /** Wort fürs Üben an- (`true`) oder abwählen (`false`). Benachrichtigt Abonnenten. */
+  setzeUeben(wort: string, ueben: boolean): Promise<void>;
+  /**
+   * Zufälliges Übungswort, möglichst ungleich `ausser`; pausierte Wörter werden übersprungen.
+   * Sind ALLE Wörter pausiert, wird unter allen gewählt (die Auswahl ist eine Vorliebe, keine Sperre).
+   * undefined nur bei leerer Liste.
+   */
   zufall(ausser?: string): Promise<string | undefined>;
   /** Benachrichtigt nach Änderungen. Rückgabe = Abmelden. */
   abonniere(fn: () => void): () => void;
@@ -304,6 +315,8 @@ export interface AlphabetOptionen {
   beiLeertaste?(): void;
   /** Echte Tastatur auf document abhören (Standard true). Wird in zerstoere() abgemeldet. */
   tastatur?: boolean;
+  /** Nur diese Buchstaben zeigen (in Alphabet-Reihenfolge). Standard: alle aus LAUTE. */
+  buchstaben?: readonly Buchstabe[];
 }
 
 /** Instanz des Bildschirm-Alphabets. */

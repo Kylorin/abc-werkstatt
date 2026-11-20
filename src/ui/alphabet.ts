@@ -6,7 +6,7 @@
  *   <button class="taste" data-testid="taste-<b>" data-art="vokal|konsonant" data-buchstabe="<b>">
  * Die Anzeige folgt der Großbuchstaben-Einstellung, data-testid bleibt immer klein.
  *
- * Erweiterung gegenüber dem Vertrag (lokal, kein Kernwunsch): `buchstaben` zeigt nur eine
+ * Option `buchstaben` (seit der Integration im Vertrag) zeigt nur eine
  * Auswahl (Nachfüllen: Buchstaben des Worts + Ablenker). Die echte Tastatur meldet trotzdem
  * jeden Buchstaben, damit auch ein nicht gezeigter Buchstabe sanft abgewiesen werden kann.
  */
@@ -16,10 +16,8 @@ import { animiere, el } from '../kern/dom';
 import { icon } from '../kern/ui/icons';
 import './alphabet.css';
 
-export interface AlphabetOptionenPlus extends AlphabetOptionen {
-  /** Nur diese Buchstaben als Kacheln zeigen (in Alphabet-Reihenfolge). Standard: alle 30. */
-  buchstaben?: readonly Buchstabe[];
-}
+/** Früherer lokaler Name; `buchstaben` steht jetzt im Vertrag (AlphabetOptionen). */
+export type AlphabetOptionenPlus = AlphabetOptionen;
 
 export const erzeugeAlphabet = ((opt: AlphabetOptionenPlus): AlphabetKomponente => {
   const tasten = new Map<Buchstabe, HTMLButtonElement>();

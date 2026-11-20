@@ -44,7 +44,7 @@ abc-werkstatt/
 │   ├── kern/               # Fundament: vertrag.ts (Typen), Router, Start, Stores, DOM-Helfer, Icons, Stile
 │   ├── audio/              # Wiedergabe, vorab vertonte Laute/Wörter, Azure-TTS, Elternaufnahmen
 │   ├── paket/              # Tier-Paket-Import und -Speicher (IndexedDB)
-│   ├── ui/alphabet.ts      # Bildschirm-Alphabet
+│   ├── ui/alphabet.{ts,css} # Bildschirm-Alphabet (bewegliches Alphabet)
 │   └── modi/               # je Bildschirm ein Ordner (frei, nachfuellen, tiere, woerterbuch, einstellungen, laut-studio)
 ├── public/                 # Schrift (Andika), App-Icons, vorab vertonter Audio-Bestand
 ├── tests/
@@ -63,6 +63,7 @@ npm run dev          # Entwicklungsserver
 npm run build        # Typprüfung + Produktionsbuild nach dist/
 npm run preview      # gebauten Stand unter http://localhost:4173/abc-werkstatt/ ansehen
 npm run testpaket    # tests/fixtures/testpaket.zip neu bauen
+bash tools/vertonen.sh [--neu | --nur laute/m. | --nur-manifest]   # Audio-Bestand in public/audio vertonen (Azure-Schlüssel aus tools/.lokal/, gitignored)
 ```
 
 Vite + TypeScript (strict), ohne Framework. **Richter ist die GitHub-CI:** Jeder Push auf
