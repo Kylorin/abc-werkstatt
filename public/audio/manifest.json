@@ -1,35 +1,35 @@
 {
   "laute": {
-    "a": "audio/laute/a-ki1.mp3",
-    "b": "audio/laute/b-ki1.mp3",
-    "c": "audio/laute/c-ki1.mp3",
-    "d": "audio/laute/d-ki1.mp3",
-    "e": "audio/laute/e-ki1.mp3",
-    "f": "audio/laute/f-ki1.mp3",
-    "g": "audio/laute/g-ki1.mp3",
-    "h": "audio/laute/h-ki1.mp3",
-    "i": "audio/laute/i-ki1.mp3",
-    "j": "audio/laute/j-ki1.mp3",
-    "k": "audio/laute/k-ki1.mp3",
-    "l": "audio/laute/l-ki1.mp3",
-    "m": "audio/laute/m-ki1.mp3",
-    "n": "audio/laute/n-ki1.mp3",
-    "o": "audio/laute/o-ki1.mp3",
-    "p": "audio/laute/p-ki1.mp3",
-    "q": "audio/laute/q-ki1.mp3",
-    "r": "audio/laute/r-ki1.mp3",
-    "s": "audio/laute/s-ki1.mp3",
-    "t": "audio/laute/t-ki1.mp3",
-    "u": "audio/laute/u-ki1.mp3",
-    "v": "audio/laute/v-ki1.mp3",
-    "w": "audio/laute/w-ki1.mp3",
-    "x": "audio/laute/x-ki1.mp3",
-    "y": "audio/laute/y-ki1.mp3",
-    "z": "audio/laute/z-ki1.mp3",
-    "ä": "audio/laute/ae-ki1.mp3",
-    "ö": "audio/laute/oe-ki1.mp3",
-    "ü": "audio/laute/ue-ki1.mp3",
-    "ß": "audio/laute/sz-ki1.mp3"
+    "a": "audio/laute/a.ki1.mp3",
+    "b": "audio/laute/b.ki1.mp3",
+    "c": "audio/laute/c.ki1.mp3",
+    "d": "audio/laute/d.ki1.mp3",
+    "e": "audio/laute/e.ki1.mp3",
+    "f": "audio/laute/f.ki1.mp3",
+    "g": "audio/laute/g.ki1.mp3",
+    "h": "audio/laute/h.ki1.mp3",
+    "i": "audio/laute/i.ki1.mp3",
+    "j": "audio/laute/j.ki1.mp3",
+    "k": "audio/laute/k.ki1.mp3",
+    "l": "audio/laute/l.ki1.mp3",
+    "m": "audio/laute/m.ki1.mp3",
+    "n": "audio/laute/n.ki1.mp3",
+    "o": "audio/laute/o.ki1.mp3",
+    "p": "audio/laute/p.ki1.mp3",
+    "q": "audio/laute/q.ki1.mp3",
+    "r": "audio/laute/r.ki1.mp3",
+    "s": "audio/laute/s.ki1.mp3",
+    "t": "audio/laute/t.ki1.mp3",
+    "u": "audio/laute/u.ki1.mp3",
+    "v": "audio/laute/v.ki1.mp3",
+    "w": "audio/laute/w.ki1.mp3",
+    "x": "audio/laute/x.ki1.mp3",
+    "y": "audio/laute/y.ki1.mp3",
+    "z": "audio/laute/z.ki1.mp3",
+    "ä": "audio/laute/ae.ki1.mp3",
+    "ö": "audio/laute/oe.ki1.mp3",
+    "ü": "audio/laute/ue.ki1.mp3",
+    "ß": "audio/laute/sz.ki1.mp3"
   },
   "namen": {
     "a": "audio/namen/a.mp3",
@@ -120,13 +120,13 @@
     "a": [
       {
         "id": "ki1",
-        "url": "audio/laute/a-ki1.mp3",
+        "url": "audio/laute/a.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/a-ki2.mp3",
+        "url": "audio/laute/a.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -134,13 +134,13 @@
     "b": [
       {
         "id": "ki1",
-        "url": "audio/laute/b-ki1.mp3",
+        "url": "audio/laute/b.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/b-ki2.mp3",
+        "url": "audio/laute/b.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -148,13 +148,13 @@
     "c": [
       {
         "id": "ki1",
-        "url": "audio/laute/c-ki1.mp3",
+        "url": "audio/laute/c.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/c-ki2.mp3",
+        "url": "audio/laute/c.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -162,13 +162,13 @@
     "d": [
       {
         "id": "ki1",
-        "url": "audio/laute/d-ki1.mp3",
+        "url": "audio/laute/d.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/d-ki2.mp3",
+        "url": "audio/laute/d.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -176,13 +176,13 @@
     "e": [
       {
         "id": "ki1",
-        "url": "audio/laute/e-ki1.mp3",
+        "url": "audio/laute/e.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/e-ki2.mp3",
+        "url": "audio/laute/e.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -190,13 +190,13 @@
     "f": [
       {
         "id": "ki1",
-        "url": "audio/laute/f-ki1.mp3",
+        "url": "audio/laute/f.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/f-ki2.mp3",
+        "url": "audio/laute/f.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -204,13 +204,13 @@
     "g": [
       {
         "id": "ki1",
-        "url": "audio/laute/g-ki1.mp3",
+        "url": "audio/laute/g.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/g-ki2.mp3",
+        "url": "audio/laute/g.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -218,13 +218,13 @@
     "h": [
       {
         "id": "ki1",
-        "url": "audio/laute/h-ki1.mp3",
+        "url": "audio/laute/h.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/h-ki2.mp3",
+        "url": "audio/laute/h.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -232,13 +232,13 @@
     "i": [
       {
         "id": "ki1",
-        "url": "audio/laute/i-ki1.mp3",
+        "url": "audio/laute/i.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/i-ki2.mp3",
+        "url": "audio/laute/i.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -246,13 +246,13 @@
     "j": [
       {
         "id": "ki1",
-        "url": "audio/laute/j-ki1.mp3",
+        "url": "audio/laute/j.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/j-ki2.mp3",
+        "url": "audio/laute/j.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -260,13 +260,13 @@
     "k": [
       {
         "id": "ki1",
-        "url": "audio/laute/k-ki1.mp3",
+        "url": "audio/laute/k.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/k-ki2.mp3",
+        "url": "audio/laute/k.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -274,13 +274,13 @@
     "l": [
       {
         "id": "ki1",
-        "url": "audio/laute/l-ki1.mp3",
+        "url": "audio/laute/l.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/l-ki2.mp3",
+        "url": "audio/laute/l.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -288,13 +288,13 @@
     "m": [
       {
         "id": "ki1",
-        "url": "audio/laute/m-ki1.mp3",
+        "url": "audio/laute/m.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/m-ki2.mp3",
+        "url": "audio/laute/m.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -302,13 +302,13 @@
     "n": [
       {
         "id": "ki1",
-        "url": "audio/laute/n-ki1.mp3",
+        "url": "audio/laute/n.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/n-ki2.mp3",
+        "url": "audio/laute/n.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -316,13 +316,13 @@
     "o": [
       {
         "id": "ki1",
-        "url": "audio/laute/o-ki1.mp3",
+        "url": "audio/laute/o.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/o-ki2.mp3",
+        "url": "audio/laute/o.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -330,13 +330,13 @@
     "p": [
       {
         "id": "ki1",
-        "url": "audio/laute/p-ki1.mp3",
+        "url": "audio/laute/p.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/p-ki2.mp3",
+        "url": "audio/laute/p.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -344,13 +344,13 @@
     "q": [
       {
         "id": "ki1",
-        "url": "audio/laute/q-ki1.mp3",
+        "url": "audio/laute/q.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/q-ki2.mp3",
+        "url": "audio/laute/q.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -358,13 +358,13 @@
     "r": [
       {
         "id": "ki1",
-        "url": "audio/laute/r-ki1.mp3",
+        "url": "audio/laute/r.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/r-ki2.mp3",
+        "url": "audio/laute/r.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -372,13 +372,13 @@
     "s": [
       {
         "id": "ki1",
-        "url": "audio/laute/s-ki1.mp3",
+        "url": "audio/laute/s.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/s-ki2.mp3",
+        "url": "audio/laute/s.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -386,13 +386,13 @@
     "t": [
       {
         "id": "ki1",
-        "url": "audio/laute/t-ki1.mp3",
+        "url": "audio/laute/t.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/t-ki2.mp3",
+        "url": "audio/laute/t.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -400,13 +400,13 @@
     "u": [
       {
         "id": "ki1",
-        "url": "audio/laute/u-ki1.mp3",
+        "url": "audio/laute/u.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/u-ki2.mp3",
+        "url": "audio/laute/u.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -414,13 +414,13 @@
     "v": [
       {
         "id": "ki1",
-        "url": "audio/laute/v-ki1.mp3",
+        "url": "audio/laute/v.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/v-ki2.mp3",
+        "url": "audio/laute/v.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -428,13 +428,13 @@
     "w": [
       {
         "id": "ki1",
-        "url": "audio/laute/w-ki1.mp3",
+        "url": "audio/laute/w.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/w-ki2.mp3",
+        "url": "audio/laute/w.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -442,13 +442,13 @@
     "x": [
       {
         "id": "ki1",
-        "url": "audio/laute/x-ki1.mp3",
+        "url": "audio/laute/x.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/x-ki2.mp3",
+        "url": "audio/laute/x.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -456,13 +456,13 @@
     "y": [
       {
         "id": "ki1",
-        "url": "audio/laute/y-ki1.mp3",
+        "url": "audio/laute/y.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/y-ki2.mp3",
+        "url": "audio/laute/y.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -470,13 +470,13 @@
     "z": [
       {
         "id": "ki1",
-        "url": "audio/laute/z-ki1.mp3",
+        "url": "audio/laute/z.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/z-ki2.mp3",
+        "url": "audio/laute/z.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -484,13 +484,13 @@
     "ä": [
       {
         "id": "ki1",
-        "url": "audio/laute/ae-ki1.mp3",
+        "url": "audio/laute/ae.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/ae-ki2.mp3",
+        "url": "audio/laute/ae.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -498,13 +498,13 @@
     "ö": [
       {
         "id": "ki1",
-        "url": "audio/laute/oe-ki1.mp3",
+        "url": "audio/laute/oe.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/oe-ki2.mp3",
+        "url": "audio/laute/oe.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -512,13 +512,13 @@
     "ü": [
       {
         "id": "ki1",
-        "url": "audio/laute/ue-ki1.mp3",
+        "url": "audio/laute/ue.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/ue-ki2.mp3",
+        "url": "audio/laute/ue.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }
@@ -526,13 +526,13 @@
     "ß": [
       {
         "id": "ki1",
-        "url": "audio/laute/sz-ki1.mp3",
+        "url": "audio/laute/sz.ki1.mp3",
         "beschreibung": "Variante 1",
         "quelle": "vorab"
       },
       {
         "id": "ki2",
-        "url": "audio/laute/sz-ki2.mp3",
+        "url": "audio/laute/sz.ki2.mp3",
         "beschreibung": "Variante 2",
         "quelle": "vorab"
       }

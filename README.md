@@ -86,7 +86,7 @@ Der Ton liegt fertig unter `public/audio/` und ist in `public/audio/manifest.jso
 
 | Was | Woher | Werkzeug |
 |---|---|---|
-| **Laute** `laute/<b>-ki1.mp3` (Standard) und `-ki2.mp3` (zweite Variante im Laut-Studio) | Sprachmodell gpt-audio über OpenRouter, bewertet von drei Hör-Modellen | `tools/laute_ki.py` |
+| **Laute** `laute/<b>.ki1.mp3` (Standard) und `.ki2.mp3` (zweite Variante im Laut-Studio) | Sprachmodell gpt-audio über OpenRouter, bewertet von drei Hör-Modellen | `tools/laute_ki.py` |
 | **Buchstabennamen** `namen/<b>.mp3` („Be“, „Zett“) | ebenso | `tools/laute_ki.py namen` |
 | **Wörter und Sätze** `woerter/`, `saetze/` | Azure Speech (Stimme Katja) | `tools/vertonen.sh` |
 

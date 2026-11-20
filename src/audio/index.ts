@@ -39,7 +39,7 @@ import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 const AUFNAHME = 'aufnahme:';
 const AZURE = 'azure:';
 
-/** Relativer Pfad (z. B. „audio/laute/m-ki1.mp3“) → URL unter der App-Basis. */
+/** Relativer Pfad (z. B. „audio/laute/m.ki1.mp3“) → URL unter der App-Basis. */
 function aufloesen(pfad: string): string {
   if (/^(blob:|data:|https?:)/.test(pfad)) return pfad;
   return import.meta.env.BASE_URL + pfad.replace(/^\.?\//, '');

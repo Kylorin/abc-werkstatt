@@ -5,7 +5,7 @@ Erzeugt unter public/audio/:
   saetze/<slug>.mp3             kurze Lob-Sätze ohne Wort
   manifest.json                 Pfade RELATIV zur App-Basis (z. B. "audio/woerter/oma.mp3")
 
-Laute (laute/<slug>-ki1.mp3, -ki2.mp3) und Buchstabennamen (namen/<slug>.mp3) kommen NICHT von hier,
+Laute (laute/<slug>.ki1.mp3, .ki2.mp3) und Buchstabennamen (namen/<slug>.mp3) kommen NICHT von hier,
 sondern aus tools/laute_ki.py (Sprachmodell + Hör-Bewertung). Dieses Skript fasst sie nie an: Es
 übernimmt die Einträge laute/namen/varianten unverändert aus dem vorhandenen manifest.json und prüft
 nur, dass die Dateien da sind.
