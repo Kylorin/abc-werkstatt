@@ -1,0 +1,16 @@
+/* Laut-Studio und Aufnahme-Knöpfe (Bau „verwaltung"). Nur Tokens aus src/kern/stil/tokens.css. */
+.laut-studio__hinweis { margin: 0; color: var(--tinte-sanft); font-size: var(--gr-s); line-height: 1.5; }
+.laut { display: flex; flex-direction: column; gap: var(--abstand-3); }
+.laut__kopf { display: flex; align-items: center; gap: var(--abstand-3); }
+.laut__zeichen { font-size: var(--gr-xl); font-weight: 700; min-width: 1.4em; text-align: center; line-height: 1; }
+.laut__status { flex: 1; margin: 0; font-size: var(--gr-s); }
+.laut__standard { font-size: var(--gr-s); padding: 0 var(--abstand-3); }
+.laut__varianten { display: flex; flex-wrap: wrap; gap: var(--abstand-2); }
+.laut__variante { font-size: var(--gr-s); padding: 0 var(--abstand-4); max-width: 100%; }
+.laut__variante > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.aufnahme { display: flex; flex-wrap: wrap; align-items: center; gap: var(--abstand-2); }
+.aufnahme__knopf { font-size: var(--gr-s); padding: 0 var(--abstand-3); }
+.aufnahme__knopf[data-zustand='laeuft'] { color: var(--konsonant); }
+.aufnahme__meldung { flex-basis: 100%; }
+.aufnahme__meldung:empty { display: none; }

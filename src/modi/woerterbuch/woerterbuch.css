@@ -1,0 +1,13 @@
+/* Wörterbuch (Bau „verwaltung"). Erwachsenen-Bereich: kleinere Schrift erlaubt, Knöpfe bleiben fingergroß. */
+.woerterbuch__hinweis { margin: 0; color: var(--tinte-sanft); font-size: var(--gr-s); line-height: 1.5; }
+.woerterbuch__neu { display: flex; gap: var(--abstand-2); }
+.woerterbuch__neu .feld { flex: 1; min-width: 0; }
+.woerterbuch__neu .knopf { flex: none; padding: 0 var(--abstand-4); }
+.woerterbuch__meldung:empty { display: none; }
+.woerterbuch__liste { min-height: var(--touch); }
+.woerterbuch__eintrag { flex-wrap: wrap; row-gap: var(--abstand-1); }
+.woerterbuch__wort { font-size: var(--gr-l); font-weight: 700; overflow-wrap: anywhere; }
+.woerterbuch__eintrag[data-pausiert='ja'] .woerterbuch__wort { color: var(--tinte-leise); }
+.woerterbuch__knoepfe { display: flex; align-items: center; gap: var(--abstand-1); flex: none; }
+.woerterbuch__ueben { color: var(--tinte-leise); }
+.woerterbuch__eintrag .aufnahme { flex-basis: 100%; }
