@@ -1,19 +1,77 @@
-/* Tier-Modus (Bau „schreiben“). Ein Ding pro Bildschirm: Tier, Wort, Alphabet.
-   Die Bühne ist so bemessen, dass am Handy (390 × 844) nichts scrollt. */
+/* Tier-Modus (Bau „tiere“). Ein Ding pro Bildschirm: Wiese ODER Tier mit Wort ODER Gute Nacht.
+   Handy hochkant (390 × 844): Tier über Wort und Tasten, nichts scrollt.
+   Querformat (B17, 844 × 390): Tier links, Wort und Tasten rechts. */
 
 .flaeche--tiere { gap: var(--abstand-2); padding-bottom: calc(var(--abstand-3) + env(safe-area-inset-bottom)); --buehne: min(54vw, 24dvh, 280px); }
+.tiere__buehne { flex: 1; display: flex; flex-direction: column; }
 
-.tier-buehne { display: grid; place-items: center; min-height: calc(var(--buehne) + 2 * var(--abstand-1)); }
-
-.tier-buehne__knopf {
-  display: grid; place-items: center;
-  padding: var(--abstand-1);
-  border: 0; border-radius: 50%;
+/* ---------- Wiese (F1) ---------- */
+.wiese { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-5); }
+.wiese__tiere { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--abstand-4); }
+/* Drei Medaillons im Dreieck: zwei oben, eins mittig darunter — kein Raster, eine Wiese. */
+.wiese__tiere--3 { display: grid; grid-template-columns: repeat(2, auto); }
+.wiese__tiere--3 > :nth-child(3) { grid-column: 1 / -1; justify-self: center; }
+.wiese__tier {
+  padding: var(--abstand-1); border: 0; border-radius: 50%;
   background: transparent;
+  transition: transform var(--dauer) var(--kurve);
 }
+.wiese__medaillon { width: var(--medaillon); height: var(--medaillon); }
+.wiese__tier[aria-pressed='true'] .wiese__medaillon { border-color: var(--sonne); box-shadow: 0 0 0 6px var(--sonne-hell), var(--schatten); }
+.wiese__start { min-height: var(--touch-gross); display: grid; place-items: center; }
+.wiese__schreiben { background: var(--sonne-hell); border-color: var(--sonne); color: var(--tinte); }
+.wiese__knoepfe { display: flex; gap: var(--abstand-5); justify-content: center; }
+/* „noch mal“: Pfeil im Kreis um das letzte Tier. */
+.wiese__nochmal { position: relative; overflow: visible; }
+.wiese__nochmal-tier { position: absolute; inset: 14px; border-width: 2px; box-shadow: none; }
+.wiese__nochmal-pfeil { position: absolute; inset: 4px; display: grid; place-items: center; color: var(--tinte-sanft); pointer-events: none; }
+.wiese__andere { color: var(--tinte-sanft); }
 
+/* ---------- Runde: Tier + Wort ---------- */
+.tiere__runde { flex: 1; display: flex; flex-direction: column; gap: var(--abstand-2); }
+.tiere__tier { display: flex; flex-direction: column; align-items: center; gap: var(--abstand-3); }
+.tiere__bild-knopf { display: grid; place-items: center; padding: var(--abstand-1); border: 0; border-radius: 50%; background: transparent; }
 .tier-bild { width: var(--buehne); height: var(--buehne); }
+.tiere__arbeit { display: flex; flex-direction: column; }
 
 .flaeche--tiere .zielwort { padding-top: var(--abstand-2); padding-bottom: var(--abstand-2); }
 .flaeche--tiere .rueckmeldung { min-height: 36px; }
 .flaeche--tiere .zielwort .felder { --slot-max: 64px; }
+
+/* Offenes Feld: leuchtet sanft, solange es dran ist (Stufe 1–3). Vorbelegte Felder stehen ruhig da. */
+.feld-slot--offen { border-style: dashed; }
+.feld-slot--dran { border-color: var(--sonne); box-shadow: 0 0 0 4px var(--sonne-hell); animation: feld-dran 2.4s ease-in-out infinite; }
+@keyframes feld-dran { 0%, 100% { box-shadow: 0 0 0 3px var(--sonne-hell); } 50% { box-shadow: 0 0 0 7px var(--sonne-hell); } }
+/* Nachklingen: jeder Buchstabe leuchtet in seiner Farbe auf, während sein Laut klingt. */
+@keyframes slot-klingen {
+  0%, 100% { transform: scale(1); background: var(--karte); }
+  40% { transform: scale(1.14); }
+}
+.slot--klingt { animation: slot-klingen 420ms var(--kurve-feder); }
+.slot--klingt[data-art='vokal'] { background: var(--vokal-hell); }
+.slot--klingt[data-art='konsonant'] { background: var(--konsonant-hell); }
+
+/* Weiter-Knopf: groß, mit Tier-Silhouette, pulsiert langsam — nie automatisch. Der Puls ist ein
+   Lichtring (box-shadow), keine Größenänderung: der Knopf selbst steht still und ist sicher zu treffen. */
+.tiere__weiter-platz { display: grid; place-items: center; }
+.tiere__weiter { gap: var(--abstand-1); padding: 0 var(--abstand-5); background: var(--sonne-hell); border-color: var(--sonne); animation: weiter-atmen 2.8s ease-in-out infinite; }
+@keyframes weiter-atmen { 0%, 100% { box-shadow: 0 0 0 0 var(--hinweis-ring), var(--schatten-s); } 50% { box-shadow: 0 0 0 8px var(--hinweis-ring), var(--schatten-s); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .feld-slot--dran, .tiere__weiter { animation: none; }
+}
+
+/* ---------- Querformat (B17): Bild links, Wort und Tasten rechts ---------- */
+@media (orientation: landscape) and (max-height: 600px) {
+  .flaeche--tiere { --buehne: min(36vw, 52dvh, 240px); --taste-gross: min(84px, 21dvh); padding-top: 0; }
+  .tiere__runde { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--abstand-4); }
+  .tiere__arbeit .wortarbeit { gap: var(--abstand-1); }
+  .tiere__arbeit .zielwort { padding: var(--abstand-1); gap: var(--abstand-1); }
+  .tiere__arbeit .zielwort .felder { --slot-max: 52px; }
+  .tiere__arbeit .rueckmeldung { min-height: 28px; }
+  .tiere__arbeit .alphabet { padding: var(--abstand-2); }
+  .wiese { flex-direction: row; flex-wrap: wrap; gap: var(--abstand-4); }
+  .wiese__tiere--3 { display: flex; }
+  .wiese__medaillon { width: min(var(--medaillon), 38dvh); height: min(var(--medaillon), 38dvh); }
+  .wiese__knoepfe { flex-direction: column; gap: var(--abstand-3); }
+}

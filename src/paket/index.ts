@@ -15,10 +15,13 @@ import { PaketFehler, type PaketDienst, type TierPaket, type TierTreffer } from 
 import { pruefeZip, referenzierteDateien, MAX_ENTPACKT_BYTES, type DateiArt } from './validierung';
 import { kanonischesWort } from './woerter';
 import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
+import { verkleinereBild } from './verkleinern';
 
-export { kanonischesWort, tiereNachSchwierigkeit, istLautgetreu } from './woerter';
+export { kanonischesWort, tiereNachSchwierigkeit, istLautgetreu, hatLautreinenAnfang } from './woerter';
 export { pruefeZip, pruefePaketJson } from './validierung';
 export { anlautBuchstabe, tiereMitAnlaut, kontrastiert, waehleAblenker } from './anlaut';
+export { anlautTiere, lautreineAnlautTiere, silbenTiere, situationen } from './felder';
+export { bewegungVon } from './bewegung';
 
 const PAKETE = 'pakete';
 const PAPIERKORB = 'papierkorb';
@@ -146,10 +149,13 @@ export function erzeugePaketDienst(): PaketDienst {
       const alt = await verzeichnis();
       const paket: TierPaket = { ...inhalt, installiertAm: Date.now() };
       const neu: Verzeichnis = { ...alt, [paket.id]: paket };
-      const setzen: [IDBValidKey, Blob][] = dateien.map((d) => [
-        dateiSchluessel(paket.id, d.pfad),
-        new Blob([d.daten as Uint8Array<ArrayBuffer>], { type: d.typ }),
-      ]);
+      // B15: Rasterbilder auf ≈ 512 px verkleinern, bevor sie gespeichert werden.
+      const setzen: [IDBValidKey, Blob][] = await Promise.all(
+        dateien.map(async (d): Promise<[IDBValidKey, Blob]> => {
+          const blob = new Blob([d.daten as Uint8Array<ArrayBuffer>], { type: d.typ });
+          return [dateiSchluessel(paket.id, d.pfad), d.art === 'bild' ? await verkleinereBild(d.pfad, blob) : blob];
+        }),
+      );
       const neuePfade = new Set(dateien.map((d) => d.pfad));
       const vorher = alt[paket.id];
       const loeschen = vorher
