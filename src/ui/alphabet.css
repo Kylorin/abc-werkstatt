@@ -40,7 +40,8 @@
 
 /* Hilfe (B3): die gesuchte Taste pulsiert sanft (data-hinweis="ja"). Kein Dauerzustand, nur nach Fehlversuchen. */
 .alphabet .taste--hinweis { animation: taste-hinweis 1.4s var(--kurve) infinite; box-shadow: 0 0 0 4px var(--hinweis-ring); }
-@keyframes taste-hinweis { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+/* Puls als wachsender Lichtring statt scale: die Taste bleibt in Größe und Lage stabil (bedienbar, auch für Playwright). */
+@keyframes taste-hinweis { 0%, 100% { box-shadow: 0 0 0 4px var(--hinweis-ring); } 50% { box-shadow: 0 0 0 12px var(--hinweis-ring); } }
 @media (prefers-reduced-motion: reduce) { .alphabet .taste--hinweis { animation: none; } }
 
 /* Große Tasten (2–6 Stück: Stufe 1, kleiner Kasten, Decke Stufe 1). Feinschliff beim Bau F1/F2. */

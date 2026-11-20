@@ -17,6 +17,7 @@ import { el, fehlerHinweis } from './dom';
 import { erzeugeSperrHinweis, mitElternsperre, sperreAktiv } from './elternsperre';
 import { mitHalten } from './halten';
 import { icon } from './ui/icons';
+import { stummHinweisEinmal } from '../audio/stummhinweis';
 import { REGAL_MAX, type Dienste, type Modus, type ModusId, type RegalKachel } from './vertrag';
 
 type Navigiere = (ziel: ModusId | 'start', param?: string) => void;
@@ -81,6 +82,9 @@ export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly
     meldung,
     fuss,
   );
+  // B14: Eltern sehen auf iPhone/iPad beim ersten Start einmal den bildlichen Stummschalter-Hinweis.
+  // Nur dort gibt es den Schalter; auf anderen Geräten steht der Hinweis in den Einstellungen.
+  if (hatStummschalter()) stummHinweisEinmal(fuss);
   wurzel.append(seite);
 
   regalKacheln(dienste, modi).then(
@@ -125,4 +129,10 @@ export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly
       meldung.replaceChildren(fehlerHinweis(f));
     },
   );
+}
+
+/** iPhone/iPad (auch iPadOS, das sich als Mac ausgibt) — Geräte mit Stummschalter bzw. Stummmodus. */
+function hatStummschalter(): boolean {
+  const ua = navigator.userAgent;
+  return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
 }

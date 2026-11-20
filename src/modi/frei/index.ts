@@ -25,6 +25,7 @@ import type { Ausgang, Buchstabe, Kontext, LaufendeAufnahme, Modus, Spracheingab
 import { erzeugeAlphabet } from '../../ui/alphabet';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, sprichFreude, tierBezeichnung } from '../tiere/freude';
+import { erzeugeGucker } from '../laut-ruft-tier/gucker';
 import './frei.css';
 
 const MAX_ZEICHEN = 240;
@@ -110,6 +111,15 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   const blatt = el('div', { klasse: 'frei__blatt' }, el('div', { klasse: 'frei__zeile' }, textEl, cursor));
   const besuch = el('div', { klasse: 'frei__besuch', attr: { 'aria-live': 'polite' } });
 
+  // F2 „Laut ruft Tier“: nach dem Tastenlaut lugt ein Anlaut-Tier am Blattrand hervor.
+  const gucker = erzeugeGucker({
+    ctx,
+    melde: (f) => meldung.melde(f),
+    beiBesuch: (t) => void zeigeBesuch(t, schreibwort(t.tier.name), Promise.resolve(undefined)),
+  });
+  blatt.append(gucker.el);
+  s.nachher(() => gucker.zerstoere());
+
   function zeichne(): void {
     gemerkterText = text;
     textEl.replaceChildren(
@@ -139,12 +149,14 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
 
   // --- Tier-Besuch --------------------------------------------------------
   function schliesseBesuch(): void {
+    gucker.schliesse();
     besuchNr++;
     besuch.replaceChildren();
     besuch.dataset.offen = 'nein';
   }
 
   async function zeigeBesuch(treffer: TierTreffer, wort: string, nachLaut: Promise<Ausgang | undefined>): Promise<void> {
+    gucker.schliesse();
     const nr = ++besuchNr;
     const bildUrl = await ctx.pakete.bildUrl(treffer.paket.id, treffer.tier.bild);
     if (!s.lebt || nr !== besuchNr) return;
@@ -154,7 +166,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
       el(
         'button',
         { klasse: 'frei__besuch-knopf', attr: { 'aria-label': `${name} freut sich – antippen zum Schließen` }, beiKlick: schliesseBesuch },
-        erzeugeFreude({ bildUrl, alt: name }),
+        erzeugeFreude({ bildUrl, alt: name, tier: treffer.tier }),
       ),
     );
     const aktuell = (): boolean => s.lebt && nr === besuchNr;
@@ -200,6 +212,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
     text += b;
     zeichne();
     const laut = spiele(ctx.audio.buchstabe(b), meldung.melde);
+    gucker.rufe(b, laut);
     pruefeTier(laut);
   }
 

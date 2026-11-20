@@ -1,5 +1,5 @@
 /**
- * Abschnitte des Elternbereichs für Regal, Lernpfad, Tonquellen und Kind (Fundament).
+ * Abschnitte des Elternbereichs für Regal, Lernpfad und Kind (Tonquellen: ./ton.ts) (Fundament).
  * Jede Änderung geht sofort in den Einstellungs-Store. Feature-Bauten fügen hier NICHTS ein,
  * sondern liefern `Modus.begleitkarte` bzw. `Modus.elternAbschnitt` (werden unten eingehängt).
  */
@@ -12,8 +12,6 @@ import {
   type Buchstabe,
   type Einstellungen,
   type Kontext,
-  type LiveStimme,
-  type Spracheingabe,
 } from '../../kern/vertrag';
 
 type BoolFeld = Exclude<{ [K in keyof Einstellungen]-?: Einstellungen[K] extends boolean ? K : never }[keyof Einstellungen], undefined>;
@@ -128,62 +126,6 @@ export function lernpfad(ctx: Kontext): HTMLElement {
       'Kleine graue Zeilen für Sie, z. B. „Klatscht mit!“.'),
   );
 }
-
-/** B18: Live-Stimme, Spracheingabe, eigener OpenRouter-Schlüssel. */
-export function tonquellen(ctx: Kontext): HTMLElement {
-  const e = ctx.einstellungen.lese();
-  const meldung = el('div', { klasse: 'einstellungen__meldung', testid: 'tonquellen-meldung', attr: { 'aria-live': 'polite' } });
-
-  const schluessel = el('input', {
-    klasse: 'feld',
-    testid: 'einstellung-openrouter-key',
-    attr: { type: 'password', id: 'einstellung-openrouter-key', autocomplete: 'off', spellcheck: 'false', placeholder: 'Schlüssel einfügen (optional)' },
-  });
-  schluessel.value = e.openrouterSchluessel ?? '';
-  schluessel.addEventListener('input', () => ctx.einstellungen.setze({ openrouterSchluessel: schluessel.value.trim() || undefined }));
-
-  const probe = el('button', {
-    klasse: 'knopf knopf--icon',
-    testid: 'stimme-probe',
-    attr: { 'aria-label': 'Live-Stimme anhören', title: 'Live-Stimme anhören' },
-    beiKlick: () => {
-      meldung.replaceChildren();
-      ctx.audio.live('Hallo! So klinge ich.').catch((f: unknown) => meldung.replaceChildren(fehlerHinweis(f)));
-    },
-  }, icon('lautsprecher'));
-
-  const live = auswahl<LiveStimme>('einstellung-livestimme', 'Live-Stimme für frei Geschriebenes', [
-    ['browser', 'Stimme des Geräts'],
-    ['piper', 'Offline-Stimme (einmal herunterladen)'],
-    ['openrouter', 'OpenRouter (eigener Schlüssel, kostet)'],
-  ], e.liveStimme, (w) => ctx.einstellungen.setze({ liveStimme: w }));
-
-  const eingabe = auswahl<Spracheingabe>('einstellung-spracheingabe', 'Spracheingabe (nur für Eltern)', [
-    ['aus', 'aus'],
-    ['browser', 'über den Browser'],
-    ['openrouter', 'über OpenRouter (eigener Schlüssel, kostet)'],
-  ], e.spracheingabe, (w) => ctx.einstellungen.setze({ spracheingabe: w }));
-
-  return abschnitt('Stimme und Spracheingabe',
-    el('div', { klasse: 'einstellungen__zeile' }, live, probe),
-    eingabe,
-    el('div', {},
-      el('label', { klasse: 'beschriftung', attr: { for: 'einstellung-openrouter-key' }, text: 'Eigener OpenRouter-Schlüssel' }),
-      schluessel,
-    ),
-    el('p', {
-      klasse: 'einstellungen__hinweis',
-      testid: 'openrouter-hinweis',
-      text:
-        'Feste Sätze, Laute und Tierstimmen kommen immer aus Dateien in der App. Live gesprochen wird nur, was frei ' +
-        'geschrieben wurde. Mit OpenRouter geht dieser Text (bzw. Ihre Spracheingabe) an OpenRouter und das Sprachmodell ' +
-        '– jede Anfrage kostet ein paar Cent auf Ihrem Konto. Der Schlüssel bleibt nur auf diesem Gerät. ' +
-        'Die Spracheingabe bewertet nie die Aussprache des Kindes.',
-    }),
-    meldung,
-  );
-}
-
 /** Anfangsbuchstabe des Kindes (B16/F7) und „heute dran“. */
 export function kindUndHeute(ctx: Kontext): HTMLElement {
   const anfang = el('input', {

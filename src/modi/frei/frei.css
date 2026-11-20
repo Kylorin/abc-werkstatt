@@ -3,6 +3,7 @@
 .flaeche--frei { gap: var(--abstand-4); position: relative; }
 
 .frei__blatt {
+  position: relative;
   min-height: calc(var(--gr-wort) * 1.6);
   padding: var(--abstand-4) var(--abstand-5);
   border: 1px solid var(--linie); border-radius: var(--radius-l);
