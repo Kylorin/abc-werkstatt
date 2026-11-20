@@ -1,0 +1,21 @@
+/* Tier-Modus (Bau „schreiben"). Ein Ding pro Bildschirm: Tier, Wort, Alphabet. */
+
+.flaeche--tiere { gap: var(--abstand-3); --buehne: min(58vw, 30dvh, 300px); }
+
+.tier-buehne { display: grid; place-items: center; min-height: var(--buehne); }
+
+.tier-buehne__knopf {
+  display: grid; place-items: center;
+  padding: var(--abstand-2);
+  border: 0; border-radius: var(--radius-l);
+  background: transparent;
+}
+.tier-buehne__knopf:hover { background: var(--sonne-hell); }
+
+.tier-bild {
+  width: var(--buehne); height: var(--buehne);
+  object-fit: contain;
+  user-select: none; -webkit-user-drag: none;
+}
+
+.flaeche--tiere .zielwort { padding-top: var(--abstand-2); padding-bottom: var(--abstand-2); }

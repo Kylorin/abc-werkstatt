@@ -1,0 +1,33 @@
+/* Bewegliches Alphabet (Bau „schreiben") — verfeinert die Grundfassung aus komponenten.css.
+   Handy (390 px): 6 Spalten, 5 Reihen, alle 30 Buchstaben ohne horizontales Scrollen. */
+
+.alphabet {
+  padding: var(--abstand-3);
+  border-radius: var(--radius-l);
+  background: var(--papier-tief);
+}
+
+.alphabet__raster {
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  gap: var(--abstand-2);
+}
+@media (min-width: 560px) {
+  .alphabet__raster { grid-template-columns: repeat(10, minmax(48px, 1fr)); }
+}
+
+/* Auswahl (Nachfüllen): wenige, große Kacheln, mittig */
+.alphabet--auswahl .alphabet__raster {
+  display: flex; flex-wrap: wrap; justify-content: center;
+}
+.alphabet--auswahl .taste {
+  width: clamp(56px, 20vw, 88px);
+  font-size: clamp(2rem, 9vw, 2.8rem);
+}
+
+.alphabet .taste:hover { background: var(--papier); }
+.alphabet .taste--leer { min-height: var(--touch-gross); }
+.alphabet .taste--zurueck { min-height: var(--touch-gross); }
+
+/* Rückmeldung beim Tippen auf der echten Tastatur */
+@keyframes taste-druck { 0%, 100% { transform: none; } 40% { transform: scale(0.92); } }
+.taste--gedrueckt { animation: taste-druck var(--dauer) var(--kurve); }

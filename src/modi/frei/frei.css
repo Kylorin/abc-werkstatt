@@ -1,0 +1,40 @@
+/* Freies Schreiben (Bau „schreiben"). Das Blatt ist der Teppich, auf den die Buchstaben gelegt werden. */
+
+.flaeche--frei { gap: var(--abstand-4); }
+
+.frei__blatt {
+  min-height: calc(var(--gr-wort) * 1.6);
+  padding: var(--abstand-4) var(--abstand-5);
+  border: 1px solid var(--linie); border-radius: var(--radius-l);
+  background: var(--karte); box-shadow: var(--schatten-s);
+  display: flex; align-items: center;
+}
+.frei__zeile { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; }
+.frei__text {
+  display: inline;
+  font-size: var(--gr-wort); font-weight: 700; line-height: 1.15; letter-spacing: 0.03em;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* ruhiger Cursor: langsames Atmen statt hartem Blinken */
+.frei__cursor {
+  display: inline-block; width: 3px; height: calc(var(--gr-wort) * 0.85);
+  margin-left: 2px; border-radius: 2px; background: var(--tinte-leise);
+  align-self: center;
+  animation: cursor-atmen 2.4s ease-in-out infinite;
+}
+@keyframes cursor-atmen { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.7; } }
+
+.frei__knoepfe { display: flex; align-items: center; justify-content: center; gap: var(--abstand-3); }
+.frei__vorlesen { flex: 1; max-width: 320px; }
+.frei__mikro[aria-pressed='true'] { background: var(--vokal-hell); border-color: var(--vokal); color: var(--vokal); }
+@media (max-width: 380px) { .frei__knopftext { display: none; } }
+
+/* Tier-Besuch: erscheint groß über dem Blatt */
+.frei__besuch[data-offen='nein'] { display: none; }
+.frei__besuch {
+  display: grid; place-items: center;
+  --buehne: min(64vw, 34dvh, 300px);
+  animation: erscheinen var(--dauer-lang) var(--kurve-feder) both;
+}
+.frei__besuch-knopf { padding: 0; border: 0; background: transparent; border-radius: var(--radius-l); }
