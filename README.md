@@ -71,7 +71,8 @@ npm run dev          # Entwicklungsserver
 npm run build        # Typprüfung + Produktionsbuild nach dist/
 npm run preview      # gebauten Stand unter http://localhost:4173/abc-werkstatt/ ansehen
 npm run testpaket    # tests/fixtures/testpaket.zip neu bauen
-python tools/vertonen.py …   # feste Wörter und Sätze in public/audio vertonen (wird gerade auf Piper lokal / gpt-audio umgestellt, siehe unten)
+bash tools/vertonen.sh --einrichten   # einmalig: Piper-venv + Stimme de_DE-thorsten-high nach tools/.lokal/piper (gitignored)
+bash tools/vertonen.sh [--neu] [--nur saetze/kachel.]   # feste Sätze, Geräusche, gedehnte Laute, Wörter aus tools/tonliste.json vertonen (Piper, kostenlos); Hörseite tools/.lokal/ton-uebersicht.html
 python tools/laute_ki.py alles [--lauf haupt] [--nur m,b,k,a]   # Laute per Sprachmodell erzeugen + von Hör-Modellen bewerten (OpenRouter-Schlüssel aus .env, gitignored; Rohdaten + Hörseite unter tools/.lokal/laute-roh/)
 python tools/laute_ki.py namen [--nur b,c]   # Buchstabennamen (A, Be, Ze …) ebenso erzeugen + bewerten, Lauf tools/.lokal/laute-roh/namen/
 ```
@@ -104,6 +105,16 @@ werden die zwei besten gültigen Kandidaten; alle Rohdaten und eine Hörseite li
 `tools/.lokal/laute-roh/<lauf>/`. Die Übernahme nach `public/audio/` ist ein bewusster Schritt
 nach dem Anhören. `tools/vertonen.py` fasst Laute und Namen nicht an: Es übernimmt deren
 Manifest-Einträge unverändert und prüft nur, dass die Dateien vorhanden sind.
+
+`tools/vertonen.py` liest die Ton-Gesamtliste aus `tools/tonliste.json` (Schlüssel → Varianten) und
+schreibt `saetze/<schluessel>.<n>.mp3`, `laute_lang/<b>.mp3` und `woerter/<wort>.mp3`, alle auf
+≈ −16 LUFS (Geräusche und der Zurück-Hinweis leiser). `{laut_lang}` in einem Satz wird nie
+gesprochen, sondern der gedehnte Laut eingefügt; die gedehnten Laute selbst werden aus `laute/`
+abgeleitet (Dauerlaute zeitgestreckt auf ≈ 1,7 s, Verschlusslaute 2–3× mit Pause). Geräusche rechnet
+`tools/geraeusche.py` synthetisch. Ein Fingerabdruck je Datei in `tools/vertonung-stand.json`
+macht den Lauf idempotent. Das Backend `openrouter` (gpt-audio) ist eingebaut, kostet aber Geld
+und läuft nur mit `--backend openrouter --kostenpflichtig` (Schlüssel aus der Umgebung
+`OPENROUTER_API_KEY`); ein solcher Lauf ersetzt alle Sprachdateien mit gleichem Format.
 
 Wer im Laut-Studio eine Variante gewählt hat, die es nicht mehr gibt (frühere Dateinamen), fällt
 beim nächsten Start still auf die neue Standard-Aussprache zurück; eigene Aufnahmen bleiben.

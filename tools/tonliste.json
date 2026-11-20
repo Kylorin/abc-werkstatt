@@ -1,0 +1,74 @@
+{
+  "_hinweis": "Ton-Gesamtliste 6a (docs/konzept-spass-und-lernen.md) als Eingabe für tools/vertonen.py. Schlüssel → Varianten. Platzhalter: {laut_lang} = gedehnter Laut aus laute_lang (wird eingefügt, nie von der Stimme gesprochen). „…“ = Sprechpause. Geräusche erzeugt tools/geraeusche.py. Lautheit: Sprache −16 LUFS, Einträge mit eigenem lufs leiser.",
+  "lufs": -16,
+  "saetze": {
+    "frage.wer-unter-decke": ["Wer ist da unter der Decke?", "Da wackelt was! Wer ist das?", "Psst … wer versteckt sich da?"],
+    "frage.wer-hilft": ["Wer kann helfen?", "Oh je – wer hilft da?", "Wer weiß, wer helfen kann?"],
+    "aufforderung.klatschen": ["Klatsch mit!", "Wir klatschen den Namen!", "Hüpf mit!"],
+    "aufforderung.weiter": ["Noch ein Tier?", "Wer kommt als Nächstes?", "Magst du noch eins?"],
+    "lob.allgemein": ["Das hast du geschrieben!", "Hör mal, was du geschrieben hast!", "Du hast den Anfang gefunden!", "Das klingt richtig!"],
+    "lob.anlaut": ["Ja, so fängt es an!", "Genau, das ist der Anfang!", "Den Anfang hast du gehört!"],
+    "lob.leute": ["Das hast du geschrieben!", "Schau mal, wer da ist!", "Da freut sich jemand!"],
+    "freude.allgemein": ["Juhu!", "Hurra!", "Oh, wie schön!"],
+    "geschichte.gemeinsam": ["Zusammen geht's!", "Geschafft – zusammen!", "Jetzt freuen sich beide!"],
+    "geschichte.ende": ["Jetzt kuscheln sich alle auf die Decke.", "Alle sind froh – und jetzt wird gekuschelt.", "Das war eine schöne Geschichte."],
+    "wegraeumen.satz": ["Alles weg – jetzt ist Platz für Neues!", "Schwupp, alles aufgeräumt!", "Das Blatt ist wieder leer.", "Weggewischt! Was schreibst du jetzt?"],
+    "zurueckholen.satz": ["Da ist es wieder!", "Hoppla – alles wieder da!", "Zurückgeholt!"],
+    "hilfe.nochmal": ["Hör noch mal genau hin.", "Wir probieren's noch mal.", "Hör mal …"],
+    "zurueck.halten": {"lufs": -26, "varianten": ["Zum Zurückgehen lange drücken."]},
+    "gutenacht.satz": ["Die Tiere werden müde und kuscheln sich auf die Decke.", "Gähn … alle Tiere gehen schlafen.", "Psst – die Tiere schlafen jetzt."],
+    "gutenacht.wecken": ["Oh, wer ist denn da wach?", "Guten Morgen, ihr Tiere!"],
+    "kachel.tiere": ["Tiere schreiben!", "Zu den Tieren!"],
+    "kachel.laut-ruft-tier": ["Buchstaben rufen Tiere!", "Wer kommt bei welchem Buchstaben?"],
+    "kachel.decke": ["Wer ist unter der Decke?", "Versteckspiel!"],
+    "kachel.silben": ["Silben klatschen!", "Wir hüpfen den Namen!"],
+    "kachel.geschichten": ["Wer hilft?", "Eine Geschichte!"],
+    "kachel.leute": ["Meine Leute!", "Mama, Papa, Oma, Opa!"],
+    "kachel.frei": ["Frei schreiben!", "Schreib, was du willst!"],
+    "kachel.nachfuellen": ["Wörter nachlegen!", "Lücken füllen!"]
+  },
+  "laut_saetze": {
+    "_hinweis": "Je Laut aus ANLAUT_LAUTE (alle Buchstaben außer c, q, x, y, ß) ein Schlüssel <name>.<buchstabe>.",
+    "einladung": ["Hör mal: {laut_lang} …", "{laut_lang} … welcher Buchstabe ist das?", "Wie klingt der Anfang? {laut_lang}"],
+    "frage.wer-faengt-an": ["Wer fängt mit {laut_lang} an?", "Hör mal: {laut_lang}. Wer ist das?", "{laut_lang} … wer fängt so an?"]
+  },
+  "geraeusche": {
+    "geraeusch.wisch": {"varianten": 3, "lufs": -26},
+    "geraeusch.zurueck": {"varianten": 2, "lufs": -26},
+    "geraeusch.schlaflied": {"varianten": 1, "lufs": -24},
+    "geraeusch.decke-wackelt": {"varianten": 2, "lufs": -24},
+    "geraeusch.decke-weg": {"varianten": 2, "lufs": -24},
+    "geraeusch.plopp": {"varianten": 2, "lufs": -22},
+    "geraeusch.trommel": {"varianten": 3, "lufs": -20},
+    "geraeusch.oh-oh": {"varianten": 2, "lufs": -22},
+    "geraeusch.loesung": {"varianten": 2, "lufs": -20},
+    "geraeusch.klack": {"varianten": 3, "lufs": -26},
+    "geraeusch.bewegung.huepft": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.fliegt": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.kriecht": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.schwimmt": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.rollt": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.klettert": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.watschelt": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.schlaengelt": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.stampft": {"varianten": 2, "lufs": -22},
+    "geraeusch.bewegung.tanzt": {"varianten": 2, "lufs": -22}
+  },
+  "woerter": [
+    "mama", "papa", "oma", "opa", "ball", "hund", "katze", "maus", "igel", "hase",
+    "sonne", "mond", "baum", "haus", "auto", "nase", "hand", "fisch", "ente", "kuh",
+    "eis", "ei", "bär", "löwe", "käse", "tür", "apfel", "brot", "milch", "buch",
+    "sofa", "rad", "tomate", "lama", "hut",
+    "limo", "kino", "uhu", "ufo", "mofa", "hose", "rose", "dose", "ofen", "rabe"
+  ],
+  "aussprache": {
+    "_hinweis": "Ersetzungen nur für die Stimme, je Backend (ganze Wörter; Anzeige und Schlüssel bleiben). Piper geprüft an den Phonemen: „Psst“ wird sonst buchstabiert, „Juhu“/„Uhu“ verlieren das h. [[ … ]] = rohe Phoneme.",
+    "piper": {
+      "Psst": "[[ pst ]]",
+      "Juhu": "Ju-hu",
+      "Uhu": "U-hu",
+      "probieren's": "probierens"
+    },
+    "openrouter": {}
+  }
+}
