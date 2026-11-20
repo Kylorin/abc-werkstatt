@@ -1,0 +1,14 @@
+/* Einstellungen (Bau „verwaltung"). Erwachsenen-Bereich, nur Tokens aus src/kern/stil/tokens.css. */
+.einstellungen__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.einstellungen__text small { font-size: var(--gr-s); line-height: 1.35; }
+.einstellungen__hinweis { margin: 0; color: var(--tinte-sanft); font-size: var(--gr-s); line-height: 1.5; }
+.einstellungen__erfolg { margin: 0; color: var(--gruen); font-size: var(--gr-s); }
+.einstellungen__meldung:empty { display: none; }
+.einstellungen__zeile { display: flex; gap: var(--abstand-2); align-items: center; }
+.einstellungen__zeile .feld { flex: 1; min-width: 0; }
+.einstellungen__weiter { justify-content: flex-start; font-size: var(--gr-s); }
+.einstellungen__weiter > span { flex: 1; text-align: left; }
+.einstellungen__paket { display: flex; flex-direction: column; min-width: 0; }
+.einstellungen__paket strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.einstellungen__paket small { font-size: var(--gr-s); }
+.einstellungen__fokus { box-shadow: var(--fokus); }
