@@ -1,0 +1,34 @@
+/* Tier-Freude (Bau „schreiben"). Animationen .huepft/.freut-sich/.herz kommen aus komponenten.css. */
+
+.tier-freude {
+  position: relative;
+  display: grid; place-items: center;
+  width: var(--buehne, min(62vw, 34dvh, 300px));
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.freude__glanz {
+  position: absolute; inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sonne-hell) 0%, color-mix(in srgb, var(--sonne-hell) 55%, transparent) 45%, transparent 70%);
+  animation: freude-glanz 1.6s var(--kurve) both;
+}
+@keyframes freude-glanz {
+  0% { opacity: 0; transform: scale(0.7); }
+  40% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+
+.freude__tier {
+  position: relative; width: 100%; height: 100%;
+  transform-origin: 50% 100%;
+}
+.freude__bild {
+  width: 100%; height: 100%; object-fit: contain;
+  transform-origin: 50% 85%;
+  user-select: none; -webkit-user-drag: none;
+}
+
+.freude__herzen { position: absolute; inset: 0; pointer-events: none; }
+.freude__herzen .herz { opacity: 0; }
