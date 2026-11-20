@@ -18,7 +18,7 @@ Wer ist unter der Decke?, Silben-Hüpfen, Wer hilft?, Meine Leute) beschreibt
 
 | Bereich | Was das Kind tut |
 |---|---|
-| **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. Der Text bleibt beim Verlassen erhalten, „Alles wegräumen" lässt sich zurückholen. |
+| **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. Frei Geschriebenes liest die eingestellte Live-Stimme. Der Text bleibt beim Verlassen erhalten. „Alles wegräumen" geht nur per Halten (mit Wisch-Geräusch und Satz) und lässt sich zurückholen. Gegen die Patschhand zählt nur der erste Finger. Den Knopf für die Spracheingabe gibt es nur, wenn die Eltern sie eingeschaltet haben. |
 | **Nachfüllen** | Ein lautgetreues Wort steht als Vorlage mit leeren Feldern da; das Kind legt die Buchstaben der Reihe nach hinein. Leichte Wörter kommen öfter dran als schwere. |
 | **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Bild eines Tiers, das Kind schreibt seinen Namen, und das Tier freut sich. Es geht beim nächsten Mal beim nächsten Tier weiter. |
 | **Wörterbuch** (Eltern, leise im Fuß des Starts) | Eigene Übungswörter anlegen, fürs Üben an-/abwählen und löschen (das zuletzt gelöschte Wort lässt sich zurückholen). |
