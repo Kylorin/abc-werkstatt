@@ -9,3 +9,4 @@ tools/.lokal/
 .claude/
 # Worktrees der Bau-Agenten (node_modules wird von oben gefunden)
 .wt/
+tools/__pycache__/
