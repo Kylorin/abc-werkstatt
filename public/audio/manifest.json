@@ -110,7 +110,483 @@
     "ofen": "audio/woerter/ofen.mp3",
     "rabe": "audio/woerter/rabe.mp3"
   },
-  "saetze": {},
+  "saetze": {
+    "geraeusch.wisch": [
+      "audio/saetze/geraeusch.wisch.1.mp3",
+      "audio/saetze/geraeusch.wisch.2.mp3",
+      "audio/saetze/geraeusch.wisch.3.mp3"
+    ],
+    "geraeusch.zurueck": [
+      "audio/saetze/geraeusch.zurueck.1.mp3",
+      "audio/saetze/geraeusch.zurueck.2.mp3"
+    ],
+    "geraeusch.schlaflied": [
+      "audio/saetze/geraeusch.schlaflied.1.mp3"
+    ],
+    "geraeusch.decke-wackelt": [
+      "audio/saetze/geraeusch.decke-wackelt.1.mp3",
+      "audio/saetze/geraeusch.decke-wackelt.2.mp3"
+    ],
+    "geraeusch.decke-weg": [
+      "audio/saetze/geraeusch.decke-weg.1.mp3",
+      "audio/saetze/geraeusch.decke-weg.2.mp3"
+    ],
+    "geraeusch.plopp": [
+      "audio/saetze/geraeusch.plopp.1.mp3",
+      "audio/saetze/geraeusch.plopp.2.mp3"
+    ],
+    "geraeusch.trommel": [
+      "audio/saetze/geraeusch.trommel.1.mp3",
+      "audio/saetze/geraeusch.trommel.2.mp3",
+      "audio/saetze/geraeusch.trommel.3.mp3"
+    ],
+    "geraeusch.oh-oh": [
+      "audio/saetze/geraeusch.oh-oh.1.mp3",
+      "audio/saetze/geraeusch.oh-oh.2.mp3"
+    ],
+    "geraeusch.loesung": [
+      "audio/saetze/geraeusch.loesung.1.mp3",
+      "audio/saetze/geraeusch.loesung.2.mp3"
+    ],
+    "geraeusch.klack": [
+      "audio/saetze/geraeusch.klack.1.mp3",
+      "audio/saetze/geraeusch.klack.2.mp3",
+      "audio/saetze/geraeusch.klack.3.mp3"
+    ],
+    "geraeusch.bewegung.huepft": [
+      "audio/saetze/geraeusch.bewegung.huepft.1.mp3",
+      "audio/saetze/geraeusch.bewegung.huepft.2.mp3"
+    ],
+    "geraeusch.bewegung.fliegt": [
+      "audio/saetze/geraeusch.bewegung.fliegt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.fliegt.2.mp3"
+    ],
+    "geraeusch.bewegung.kriecht": [
+      "audio/saetze/geraeusch.bewegung.kriecht.1.mp3",
+      "audio/saetze/geraeusch.bewegung.kriecht.2.mp3"
+    ],
+    "geraeusch.bewegung.schwimmt": [
+      "audio/saetze/geraeusch.bewegung.schwimmt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.schwimmt.2.mp3"
+    ],
+    "geraeusch.bewegung.rollt": [
+      "audio/saetze/geraeusch.bewegung.rollt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.rollt.2.mp3"
+    ],
+    "geraeusch.bewegung.klettert": [
+      "audio/saetze/geraeusch.bewegung.klettert.1.mp3",
+      "audio/saetze/geraeusch.bewegung.klettert.2.mp3"
+    ],
+    "geraeusch.bewegung.watschelt": [
+      "audio/saetze/geraeusch.bewegung.watschelt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.watschelt.2.mp3"
+    ],
+    "geraeusch.bewegung.schlaengelt": [
+      "audio/saetze/geraeusch.bewegung.schlaengelt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.schlaengelt.2.mp3"
+    ],
+    "geraeusch.bewegung.stampft": [
+      "audio/saetze/geraeusch.bewegung.stampft.1.mp3",
+      "audio/saetze/geraeusch.bewegung.stampft.2.mp3"
+    ],
+    "geraeusch.bewegung.tanzt": [
+      "audio/saetze/geraeusch.bewegung.tanzt.1.mp3",
+      "audio/saetze/geraeusch.bewegung.tanzt.2.mp3"
+    ],
+    "frage.wer-unter-decke": [
+      "audio/saetze/frage.wer-unter-decke.1.mp3",
+      "audio/saetze/frage.wer-unter-decke.2.mp3",
+      "audio/saetze/frage.wer-unter-decke.3.mp3"
+    ],
+    "frage.wer-hilft": [
+      "audio/saetze/frage.wer-hilft.1.mp3",
+      "audio/saetze/frage.wer-hilft.2.mp3",
+      "audio/saetze/frage.wer-hilft.3.mp3"
+    ],
+    "aufforderung.klatschen": [
+      "audio/saetze/aufforderung.klatschen.1.mp3",
+      "audio/saetze/aufforderung.klatschen.2.mp3",
+      "audio/saetze/aufforderung.klatschen.3.mp3"
+    ],
+    "aufforderung.weiter": [
+      "audio/saetze/aufforderung.weiter.1.mp3",
+      "audio/saetze/aufforderung.weiter.2.mp3",
+      "audio/saetze/aufforderung.weiter.3.mp3"
+    ],
+    "lob.allgemein": [
+      "audio/saetze/lob.allgemein.1.mp3",
+      "audio/saetze/lob.allgemein.2.mp3",
+      "audio/saetze/lob.allgemein.3.mp3",
+      "audio/saetze/lob.allgemein.4.mp3"
+    ],
+    "lob.anlaut": [
+      "audio/saetze/lob.anlaut.1.mp3",
+      "audio/saetze/lob.anlaut.2.mp3",
+      "audio/saetze/lob.anlaut.3.mp3"
+    ],
+    "lob.leute": [
+      "audio/saetze/lob.leute.1.mp3",
+      "audio/saetze/lob.leute.2.mp3",
+      "audio/saetze/lob.leute.3.mp3"
+    ],
+    "freude.allgemein": [
+      "audio/saetze/freude.allgemein.1.mp3",
+      "audio/saetze/freude.allgemein.2.mp3",
+      "audio/saetze/freude.allgemein.3.mp3"
+    ],
+    "geschichte.gemeinsam": [
+      "audio/saetze/geschichte.gemeinsam.1.mp3",
+      "audio/saetze/geschichte.gemeinsam.2.mp3",
+      "audio/saetze/geschichte.gemeinsam.3.mp3"
+    ],
+    "geschichte.ende": [
+      "audio/saetze/geschichte.ende.1.mp3",
+      "audio/saetze/geschichte.ende.2.mp3",
+      "audio/saetze/geschichte.ende.3.mp3"
+    ],
+    "wegraeumen.satz": [
+      "audio/saetze/wegraeumen.satz.1.mp3",
+      "audio/saetze/wegraeumen.satz.2.mp3",
+      "audio/saetze/wegraeumen.satz.3.mp3",
+      "audio/saetze/wegraeumen.satz.4.mp3"
+    ],
+    "zurueckholen.satz": [
+      "audio/saetze/zurueckholen.satz.1.mp3",
+      "audio/saetze/zurueckholen.satz.2.mp3",
+      "audio/saetze/zurueckholen.satz.3.mp3"
+    ],
+    "hilfe.nochmal": [
+      "audio/saetze/hilfe.nochmal.1.mp3",
+      "audio/saetze/hilfe.nochmal.2.mp3",
+      "audio/saetze/hilfe.nochmal.3.mp3"
+    ],
+    "zurueck.halten": [
+      "audio/saetze/zurueck.halten.1.mp3"
+    ],
+    "gutenacht.satz": [
+      "audio/saetze/gutenacht.satz.1.mp3",
+      "audio/saetze/gutenacht.satz.2.mp3",
+      "audio/saetze/gutenacht.satz.3.mp3"
+    ],
+    "gutenacht.wecken": [
+      "audio/saetze/gutenacht.wecken.1.mp3",
+      "audio/saetze/gutenacht.wecken.2.mp3"
+    ],
+    "kachel.tiere": [
+      "audio/saetze/kachel.tiere.1.mp3",
+      "audio/saetze/kachel.tiere.2.mp3"
+    ],
+    "kachel.laut-ruft-tier": [
+      "audio/saetze/kachel.laut-ruft-tier.1.mp3",
+      "audio/saetze/kachel.laut-ruft-tier.2.mp3"
+    ],
+    "kachel.decke": [
+      "audio/saetze/kachel.decke.1.mp3",
+      "audio/saetze/kachel.decke.2.mp3"
+    ],
+    "kachel.silben": [
+      "audio/saetze/kachel.silben.1.mp3",
+      "audio/saetze/kachel.silben.2.mp3"
+    ],
+    "kachel.geschichten": [
+      "audio/saetze/kachel.geschichten.1.mp3",
+      "audio/saetze/kachel.geschichten.2.mp3"
+    ],
+    "kachel.leute": [
+      "audio/saetze/kachel.leute.1.mp3",
+      "audio/saetze/kachel.leute.2.mp3"
+    ],
+    "kachel.frei": [
+      "audio/saetze/kachel.frei.1.mp3",
+      "audio/saetze/kachel.frei.2.mp3"
+    ],
+    "kachel.nachfuellen": [
+      "audio/saetze/kachel.nachfuellen.1.mp3",
+      "audio/saetze/kachel.nachfuellen.2.mp3"
+    ],
+    "einladung.a": [
+      "audio/saetze/einladung.a.1.mp3",
+      "audio/saetze/einladung.a.2.mp3",
+      "audio/saetze/einladung.a.3.mp3"
+    ],
+    "einladung.b": [
+      "audio/saetze/einladung.b.1.mp3",
+      "audio/saetze/einladung.b.2.mp3",
+      "audio/saetze/einladung.b.3.mp3"
+    ],
+    "einladung.d": [
+      "audio/saetze/einladung.d.1.mp3",
+      "audio/saetze/einladung.d.2.mp3",
+      "audio/saetze/einladung.d.3.mp3"
+    ],
+    "einladung.e": [
+      "audio/saetze/einladung.e.1.mp3",
+      "audio/saetze/einladung.e.2.mp3",
+      "audio/saetze/einladung.e.3.mp3"
+    ],
+    "einladung.f": [
+      "audio/saetze/einladung.f.1.mp3",
+      "audio/saetze/einladung.f.2.mp3",
+      "audio/saetze/einladung.f.3.mp3"
+    ],
+    "einladung.g": [
+      "audio/saetze/einladung.g.1.mp3",
+      "audio/saetze/einladung.g.2.mp3",
+      "audio/saetze/einladung.g.3.mp3"
+    ],
+    "einladung.h": [
+      "audio/saetze/einladung.h.1.mp3",
+      "audio/saetze/einladung.h.2.mp3",
+      "audio/saetze/einladung.h.3.mp3"
+    ],
+    "einladung.i": [
+      "audio/saetze/einladung.i.1.mp3",
+      "audio/saetze/einladung.i.2.mp3",
+      "audio/saetze/einladung.i.3.mp3"
+    ],
+    "einladung.j": [
+      "audio/saetze/einladung.j.1.mp3",
+      "audio/saetze/einladung.j.2.mp3",
+      "audio/saetze/einladung.j.3.mp3"
+    ],
+    "einladung.k": [
+      "audio/saetze/einladung.k.1.mp3",
+      "audio/saetze/einladung.k.2.mp3",
+      "audio/saetze/einladung.k.3.mp3"
+    ],
+    "einladung.l": [
+      "audio/saetze/einladung.l.1.mp3",
+      "audio/saetze/einladung.l.2.mp3",
+      "audio/saetze/einladung.l.3.mp3"
+    ],
+    "einladung.m": [
+      "audio/saetze/einladung.m.1.mp3",
+      "audio/saetze/einladung.m.2.mp3",
+      "audio/saetze/einladung.m.3.mp3"
+    ],
+    "einladung.n": [
+      "audio/saetze/einladung.n.1.mp3",
+      "audio/saetze/einladung.n.2.mp3",
+      "audio/saetze/einladung.n.3.mp3"
+    ],
+    "einladung.o": [
+      "audio/saetze/einladung.o.1.mp3",
+      "audio/saetze/einladung.o.2.mp3",
+      "audio/saetze/einladung.o.3.mp3"
+    ],
+    "einladung.p": [
+      "audio/saetze/einladung.p.1.mp3",
+      "audio/saetze/einladung.p.2.mp3",
+      "audio/saetze/einladung.p.3.mp3"
+    ],
+    "einladung.r": [
+      "audio/saetze/einladung.r.1.mp3",
+      "audio/saetze/einladung.r.2.mp3",
+      "audio/saetze/einladung.r.3.mp3"
+    ],
+    "einladung.s": [
+      "audio/saetze/einladung.s.1.mp3",
+      "audio/saetze/einladung.s.2.mp3",
+      "audio/saetze/einladung.s.3.mp3"
+    ],
+    "einladung.t": [
+      "audio/saetze/einladung.t.1.mp3",
+      "audio/saetze/einladung.t.2.mp3",
+      "audio/saetze/einladung.t.3.mp3"
+    ],
+    "einladung.u": [
+      "audio/saetze/einladung.u.1.mp3",
+      "audio/saetze/einladung.u.2.mp3",
+      "audio/saetze/einladung.u.3.mp3"
+    ],
+    "einladung.v": [
+      "audio/saetze/einladung.v.1.mp3",
+      "audio/saetze/einladung.v.2.mp3",
+      "audio/saetze/einladung.v.3.mp3"
+    ],
+    "einladung.w": [
+      "audio/saetze/einladung.w.1.mp3",
+      "audio/saetze/einladung.w.2.mp3",
+      "audio/saetze/einladung.w.3.mp3"
+    ],
+    "einladung.z": [
+      "audio/saetze/einladung.z.1.mp3",
+      "audio/saetze/einladung.z.2.mp3",
+      "audio/saetze/einladung.z.3.mp3"
+    ],
+    "einladung.ä": [
+      "audio/saetze/einladung.ae.1.mp3",
+      "audio/saetze/einladung.ae.2.mp3",
+      "audio/saetze/einladung.ae.3.mp3"
+    ],
+    "einladung.ö": [
+      "audio/saetze/einladung.oe.1.mp3",
+      "audio/saetze/einladung.oe.2.mp3",
+      "audio/saetze/einladung.oe.3.mp3"
+    ],
+    "einladung.ü": [
+      "audio/saetze/einladung.ue.1.mp3",
+      "audio/saetze/einladung.ue.2.mp3",
+      "audio/saetze/einladung.ue.3.mp3"
+    ],
+    "frage.wer-faengt-an.a": [
+      "audio/saetze/frage.wer-faengt-an.a.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.a.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.a.3.mp3"
+    ],
+    "frage.wer-faengt-an.b": [
+      "audio/saetze/frage.wer-faengt-an.b.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.b.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.b.3.mp3"
+    ],
+    "frage.wer-faengt-an.d": [
+      "audio/saetze/frage.wer-faengt-an.d.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.d.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.d.3.mp3"
+    ],
+    "frage.wer-faengt-an.e": [
+      "audio/saetze/frage.wer-faengt-an.e.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.e.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.e.3.mp3"
+    ],
+    "frage.wer-faengt-an.f": [
+      "audio/saetze/frage.wer-faengt-an.f.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.f.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.f.3.mp3"
+    ],
+    "frage.wer-faengt-an.g": [
+      "audio/saetze/frage.wer-faengt-an.g.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.g.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.g.3.mp3"
+    ],
+    "frage.wer-faengt-an.h": [
+      "audio/saetze/frage.wer-faengt-an.h.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.h.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.h.3.mp3"
+    ],
+    "frage.wer-faengt-an.i": [
+      "audio/saetze/frage.wer-faengt-an.i.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.i.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.i.3.mp3"
+    ],
+    "frage.wer-faengt-an.j": [
+      "audio/saetze/frage.wer-faengt-an.j.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.j.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.j.3.mp3"
+    ],
+    "frage.wer-faengt-an.k": [
+      "audio/saetze/frage.wer-faengt-an.k.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.k.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.k.3.mp3"
+    ],
+    "frage.wer-faengt-an.l": [
+      "audio/saetze/frage.wer-faengt-an.l.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.l.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.l.3.mp3"
+    ],
+    "frage.wer-faengt-an.m": [
+      "audio/saetze/frage.wer-faengt-an.m.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.m.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.m.3.mp3"
+    ],
+    "frage.wer-faengt-an.n": [
+      "audio/saetze/frage.wer-faengt-an.n.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.n.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.n.3.mp3"
+    ],
+    "frage.wer-faengt-an.o": [
+      "audio/saetze/frage.wer-faengt-an.o.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.o.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.o.3.mp3"
+    ],
+    "frage.wer-faengt-an.p": [
+      "audio/saetze/frage.wer-faengt-an.p.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.p.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.p.3.mp3"
+    ],
+    "frage.wer-faengt-an.r": [
+      "audio/saetze/frage.wer-faengt-an.r.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.r.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.r.3.mp3"
+    ],
+    "frage.wer-faengt-an.s": [
+      "audio/saetze/frage.wer-faengt-an.s.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.s.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.s.3.mp3"
+    ],
+    "frage.wer-faengt-an.t": [
+      "audio/saetze/frage.wer-faengt-an.t.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.t.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.t.3.mp3"
+    ],
+    "frage.wer-faengt-an.u": [
+      "audio/saetze/frage.wer-faengt-an.u.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.u.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.u.3.mp3"
+    ],
+    "frage.wer-faengt-an.v": [
+      "audio/saetze/frage.wer-faengt-an.v.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.v.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.v.3.mp3"
+    ],
+    "frage.wer-faengt-an.w": [
+      "audio/saetze/frage.wer-faengt-an.w.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.w.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.w.3.mp3"
+    ],
+    "frage.wer-faengt-an.z": [
+      "audio/saetze/frage.wer-faengt-an.z.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.z.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.z.3.mp3"
+    ],
+    "frage.wer-faengt-an.ä": [
+      "audio/saetze/frage.wer-faengt-an.ae.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.ae.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.ae.3.mp3"
+    ],
+    "frage.wer-faengt-an.ö": [
+      "audio/saetze/frage.wer-faengt-an.oe.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.oe.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.oe.3.mp3"
+    ],
+    "frage.wer-faengt-an.ü": [
+      "audio/saetze/frage.wer-faengt-an.ue.1.mp3",
+      "audio/saetze/frage.wer-faengt-an.ue.2.mp3",
+      "audio/saetze/frage.wer-faengt-an.ue.3.mp3"
+    ]
+  },
+  "laute_lang": {
+    "a": "audio/laute_lang/a.mp3",
+    "b": "audio/laute_lang/b.mp3",
+    "c": "audio/laute_lang/c.mp3",
+    "d": "audio/laute_lang/d.mp3",
+    "e": "audio/laute_lang/e.mp3",
+    "f": "audio/laute_lang/f.mp3",
+    "g": "audio/laute_lang/g.mp3",
+    "h": "audio/laute_lang/h.mp3",
+    "i": "audio/laute_lang/i.mp3",
+    "j": "audio/laute_lang/j.mp3",
+    "k": "audio/laute_lang/k.mp3",
+    "l": "audio/laute_lang/l.mp3",
+    "m": "audio/laute_lang/m.mp3",
+    "n": "audio/laute_lang/n.mp3",
+    "o": "audio/laute_lang/o.mp3",
+    "p": "audio/laute_lang/p.mp3",
+    "q": "audio/laute_lang/q.mp3",
+    "r": "audio/laute_lang/r.mp3",
+    "s": "audio/laute_lang/s.mp3",
+    "t": "audio/laute_lang/t.mp3",
+    "u": "audio/laute_lang/u.mp3",
+    "v": "audio/laute_lang/v.mp3",
+    "w": "audio/laute_lang/w.mp3",
+    "x": "audio/laute_lang/x.mp3",
+    "y": "audio/laute_lang/y.mp3",
+    "z": "audio/laute_lang/z.mp3",
+    "ä": "audio/laute_lang/ae.mp3",
+    "ö": "audio/laute_lang/oe.mp3",
+    "ü": "audio/laute_lang/ue.mp3",
+    "ß": "audio/laute_lang/sz.mp3"
+  },
   "varianten": {
     "a": [
       {
@@ -532,5 +1008,6 @@
         "quelle": "vorab"
       }
     ]
-  }
+  },
+  "stimme": "piper:de_DE-thorsten-high"
 }

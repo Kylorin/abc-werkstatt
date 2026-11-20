@@ -1,0 +1,2312 @@
+{
+ "audio/laute_lang/a.mp3": {
+  "fingerabdruck": "6bd17983aa81b665ce4f",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/ae.mp3": {
+  "fingerabdruck": "00b1c9a280b8afa8e57b",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14252
+ },
+ "audio/laute_lang/b.mp3": {
+  "fingerabdruck": "f1db3857707c29c0a74b",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.1,
+  "bytes": 9452
+ },
+ "audio/laute_lang/c.mp3": {
+  "fingerabdruck": "b448a0d125d48af4346a",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.16,
+  "bytes": 10028
+ },
+ "audio/laute_lang/d.mp3": {
+  "fingerabdruck": "f78ba194eda98d6719fd",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.13,
+  "bytes": 9836
+ },
+ "audio/laute_lang/e.mp3": {
+  "fingerabdruck": "09ef5c43b4d3113f92ad",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/f.mp3": {
+  "fingerabdruck": "07244ac38aedfb7a4889",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/g.mp3": {
+  "fingerabdruck": "d5cd551e24f4353d1971",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.13,
+  "bytes": 9836
+ },
+ "audio/laute_lang/h.mp3": {
+  "fingerabdruck": "953d24a4c03e2f9a6314",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/i.mp3": {
+  "fingerabdruck": "b4d26a114cbe1e492e12",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14252
+ },
+ "audio/laute_lang/j.mp3": {
+  "fingerabdruck": "17ec31878d2b433d7220",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14252
+ },
+ "audio/laute_lang/k.mp3": {
+  "fingerabdruck": "c40cbc39b2e5825edf21",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.1,
+  "bytes": 9452
+ },
+ "audio/laute_lang/l.mp3": {
+  "fingerabdruck": "a4a926bc5d25f5021ce0",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/m.mp3": {
+  "fingerabdruck": "5e4c2d88f4ea23072336",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/n.mp3": {
+  "fingerabdruck": "483b9cc9d28644ea7882",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/o.mp3": {
+  "fingerabdruck": "e49c110a408686580ca5",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14252
+ },
+ "audio/laute_lang/oe.mp3": {
+  "fingerabdruck": "c2c93d57b81e3d01d3bd",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/p.mp3": {
+  "fingerabdruck": "a1d6b3e7f0b48622813a",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.1,
+  "bytes": 9452
+ },
+ "audio/laute_lang/q.mp3": {
+  "fingerabdruck": "6356aec3ff5c0b645cb8",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.18,
+  "bytes": 10220
+ },
+ "audio/laute_lang/r.mp3": {
+  "fingerabdruck": "90b3392ee621606b1736",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/s.mp3": {
+  "fingerabdruck": "63832a769b104c778a02",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/sz.mp3": {
+  "fingerabdruck": "fea7d0379a0aaff08303",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/t.mp3": {
+  "fingerabdruck": "9422d33a3092b5f1b8aa",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.13,
+  "bytes": 9836
+ },
+ "audio/laute_lang/u.mp3": {
+  "fingerabdruck": "10a1634b664b50f061fe",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/ue.mp3": {
+  "fingerabdruck": "67a1e1d8dca65e2710b9",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.69,
+  "bytes": 14252
+ },
+ "audio/laute_lang/v.mp3": {
+  "fingerabdruck": "07244ac38aedfb7a4889",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/w.mp3": {
+  "fingerabdruck": "556afdfcc01e71df8d01",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14252
+ },
+ "audio/laute_lang/x.mp3": {
+  "fingerabdruck": "3b96f612d6403a6464bd",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.18,
+  "bytes": 10220
+ },
+ "audio/laute_lang/y.mp3": {
+  "fingerabdruck": "53e946eab110971f641e",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.68,
+  "bytes": 14060
+ },
+ "audio/laute_lang/z.mp3": {
+  "fingerabdruck": "36c7e80a63fcc91d76e7",
+  "quelle": "abgeleitet aus laute/",
+  "text": "",
+  "dauer_s": 1.91,
+  "bytes": 15980
+ },
+ "audio/saetze/aufforderung.klatschen.1.mp3": {
+  "fingerabdruck": "51b02bc56539e842f79a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Klatsch mit!",
+  "dauer_s": 0.66,
+  "bytes": 5996
+ },
+ "audio/saetze/aufforderung.klatschen.2.mp3": {
+  "fingerabdruck": "5042fe90018f8ef6aa68",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wir klatschen den Namen!",
+  "dauer_s": 1.12,
+  "bytes": 9644
+ },
+ "audio/saetze/aufforderung.klatschen.3.mp3": {
+  "fingerabdruck": "92fdf11a2a18a2cac42c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hüpf mit!",
+  "dauer_s": 0.6,
+  "bytes": 5420
+ },
+ "audio/saetze/aufforderung.weiter.1.mp3": {
+  "fingerabdruck": "0a1fda31a6621d4a2935",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Noch ein Tier?",
+  "dauer_s": 0.79,
+  "bytes": 6956
+ },
+ "audio/saetze/aufforderung.weiter.2.mp3": {
+  "fingerabdruck": "0005bf04e786b1b9e6d2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer kommt als Nächstes?",
+  "dauer_s": 1.13,
+  "bytes": 9836
+ },
+ "audio/saetze/aufforderung.weiter.3.mp3": {
+  "fingerabdruck": "31bbf7c0d06cf1971379",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Magst du noch eins?",
+  "dauer_s": 0.91,
+  "bytes": 7916
+ },
+ "audio/saetze/einladung.a.1.mp3": {
+  "fingerabdruck": "c0ef5e5f085b4dfeed24",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.66,
+  "bytes": 21932
+ },
+ "audio/saetze/einladung.a.2.mp3": {
+  "fingerabdruck": "6de0c3faf6551c836d23",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.64,
+  "bytes": 29804
+ },
+ "audio/saetze/einladung.a.3.mp3": {
+  "fingerabdruck": "48ab5a2b88246124cb23",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.99,
+  "bytes": 24620
+ },
+ "audio/saetze/einladung.ae.1.mp3": {
+  "fingerabdruck": "6d290bad8427b2dbec5e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.65,
+  "bytes": 21932
+ },
+ "audio/saetze/einladung.ae.2.mp3": {
+  "fingerabdruck": "afbef434c65bbc171ffb",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.59,
+  "bytes": 29420
+ },
+ "audio/saetze/einladung.ae.3.mp3": {
+  "fingerabdruck": "2974bb5aeb69f3dcccbc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.b.1.mp3": {
+  "fingerabdruck": "5cf51dcd31b50efb21db",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.05,
+  "bytes": 17132
+ },
+ "audio/saetze/einladung.b.2.mp3": {
+  "fingerabdruck": "b2a085d993c3e628fd27",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.08,
+  "bytes": 25388
+ },
+ "audio/saetze/einladung.b.3.mp3": {
+  "fingerabdruck": "193404fea2ec50a3e3d6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.48,
+  "bytes": 20588
+ },
+ "audio/saetze/einladung.d.1.mp3": {
+  "fingerabdruck": "29391750b4f20936ffdb",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.1,
+  "bytes": 17516
+ },
+ "audio/saetze/einladung.d.2.mp3": {
+  "fingerabdruck": "3a2fc202e4387871e811",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.09,
+  "bytes": 25388
+ },
+ "audio/saetze/einladung.d.3.mp3": {
+  "fingerabdruck": "ee7f391b93fd359cd368",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.49,
+  "bytes": 20588
+ },
+ "audio/saetze/einladung.e.1.mp3": {
+  "fingerabdruck": "878ff6d6c3d593395f11",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.68,
+  "bytes": 22124
+ },
+ "audio/saetze/einladung.e.2.mp3": {
+  "fingerabdruck": "e37c8b82828608e0f88d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.72,
+  "bytes": 30572
+ },
+ "audio/saetze/einladung.e.3.mp3": {
+  "fingerabdruck": "41a41157fda97e3d1c7f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.1,
+  "bytes": 25580
+ },
+ "audio/saetze/einladung.f.1.mp3": {
+  "fingerabdruck": "3ab73d194e8e34a2b93f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.57,
+  "bytes": 21356
+ },
+ "audio/saetze/einladung.f.2.mp3": {
+  "fingerabdruck": "9b0d86b9aa3b9f1e59e2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.57,
+  "bytes": 29228
+ },
+ "audio/saetze/einladung.f.3.mp3": {
+  "fingerabdruck": "8741dce10f738deecd37",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.g.1.mp3": {
+  "fingerabdruck": "1ec1d0853b5b1fc60ca5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.01,
+  "bytes": 16748
+ },
+ "audio/saetze/einladung.g.2.mp3": {
+  "fingerabdruck": "ecd382f2355dbda143c9",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.11,
+  "bytes": 25580
+ },
+ "audio/saetze/einladung.g.3.mp3": {
+  "fingerabdruck": "431375992379a605bc63",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.48,
+  "bytes": 20588
+ },
+ "audio/saetze/einladung.h.1.mp3": {
+  "fingerabdruck": "4448978884bae653f0bc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.63,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.h.2.mp3": {
+  "fingerabdruck": "a1cf34dc9694b23ad03b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.71,
+  "bytes": 30380
+ },
+ "audio/saetze/einladung.h.3.mp3": {
+  "fingerabdruck": "359f89af42fafd41c5ee",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.i.1.mp3": {
+  "fingerabdruck": "c97cd0136d71d45789ec",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.67,
+  "bytes": 22124
+ },
+ "audio/saetze/einladung.i.2.mp3": {
+  "fingerabdruck": "09ddd44b336cdd5cb603",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.63,
+  "bytes": 29804
+ },
+ "audio/saetze/einladung.i.3.mp3": {
+  "fingerabdruck": "e13937b11c8f023cb955",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.05,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.j.1.mp3": {
+  "fingerabdruck": "d9dc2f0cca153e38ca96",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.67,
+  "bytes": 22124
+ },
+ "audio/saetze/einladung.j.2.mp3": {
+  "fingerabdruck": "1e132d366ef91202d8dd",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.64,
+  "bytes": 29804
+ },
+ "audio/saetze/einladung.j.3.mp3": {
+  "fingerabdruck": "0bdc961cd5310904178e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.05,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.k.1.mp3": {
+  "fingerabdruck": "9befce4a7ba7ec778561",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.02,
+  "bytes": 16940
+ },
+ "audio/saetze/einladung.k.2.mp3": {
+  "fingerabdruck": "c7be5a796b7be7078029",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.08,
+  "bytes": 25388
+ },
+ "audio/saetze/einladung.k.3.mp3": {
+  "fingerabdruck": "1e728a6a55a07f75306c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.44,
+  "bytes": 20204
+ },
+ "audio/saetze/einladung.l.1.mp3": {
+  "fingerabdruck": "3cedb95fddca402dae89",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.63,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.l.2.mp3": {
+  "fingerabdruck": "7d7591eeb28d92bb9544",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.68,
+  "bytes": 30188
+ },
+ "audio/saetze/einladung.l.3.mp3": {
+  "fingerabdruck": "38c7287e6e54d06f44d7",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.11,
+  "bytes": 25580
+ },
+ "audio/saetze/einladung.m.1.mp3": {
+  "fingerabdruck": "98bb04f20ab344691cf2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.65,
+  "bytes": 21932
+ },
+ "audio/saetze/einladung.m.2.mp3": {
+  "fingerabdruck": "9a4c82b96ee6a1a85a8e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.78,
+  "bytes": 30956
+ },
+ "audio/saetze/einladung.m.3.mp3": {
+  "fingerabdruck": "d89d25f0b65d7d0911a4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.08,
+  "bytes": 25388
+ },
+ "audio/saetze/einladung.n.1.mp3": {
+  "fingerabdruck": "490107197a4daf256e20",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.64,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.n.2.mp3": {
+  "fingerabdruck": "527d2600180f20924532",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.7,
+  "bytes": 30380
+ },
+ "audio/saetze/einladung.n.3.mp3": {
+  "fingerabdruck": "72863f46e7fdac0a7a5a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.04,
+  "bytes": 25004
+ },
+ "audio/saetze/einladung.o.1.mp3": {
+  "fingerabdruck": "9229f8a81c930b0dbbd2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.63,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.o.2.mp3": {
+  "fingerabdruck": "f330dabd794801ca58b4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.68,
+  "bytes": 30188
+ },
+ "audio/saetze/einladung.o.3.mp3": {
+  "fingerabdruck": "50f7efeb9317dae12694",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.11,
+  "bytes": 25580
+ },
+ "audio/saetze/einladung.oe.1.mp3": {
+  "fingerabdruck": "6408a7bb1a6bf3226ee1",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.61,
+  "bytes": 21548
+ },
+ "audio/saetze/einladung.oe.2.mp3": {
+  "fingerabdruck": "8a7d77f8978737f38805",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.57,
+  "bytes": 29228
+ },
+ "audio/saetze/einladung.oe.3.mp3": {
+  "fingerabdruck": "38a95d67ee3e5595ba73",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.05,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.p.1.mp3": {
+  "fingerabdruck": "467282d35921e7fbebd3",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.01,
+  "bytes": 16748
+ },
+ "audio/saetze/einladung.p.2.mp3": {
+  "fingerabdruck": "30937bae272e8d0ae251",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.09,
+  "bytes": 25388
+ },
+ "audio/saetze/einladung.p.3.mp3": {
+  "fingerabdruck": "1a2616f865e2bfff98f8",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.44,
+  "bytes": 20204
+ },
+ "audio/saetze/einladung.r.1.mp3": {
+  "fingerabdruck": "0b0bb45df13847f593b8",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.64,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.r.2.mp3": {
+  "fingerabdruck": "5ee3099127336228b4e6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.61,
+  "bytes": 29612
+ },
+ "audio/saetze/einladung.r.3.mp3": {
+  "fingerabdruck": "609555fbe7c3ef27762d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.s.1.mp3": {
+  "fingerabdruck": "e3d6db5b0e9e0144c961",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.64,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.s.2.mp3": {
+  "fingerabdruck": "755b254794c3275e8e78",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.6,
+  "bytes": 29420
+ },
+ "audio/saetze/einladung.s.3.mp3": {
+  "fingerabdruck": "206bebad1231aa21d02a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.0,
+  "bytes": 24620
+ },
+ "audio/saetze/einladung.t.1.mp3": {
+  "fingerabdruck": "0926cad644abf59e9153",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.03,
+  "bytes": 16940
+ },
+ "audio/saetze/einladung.t.2.mp3": {
+  "fingerabdruck": "0b567b15635d3d0b3507",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.02,
+  "bytes": 24812
+ },
+ "audio/saetze/einladung.t.3.mp3": {
+  "fingerabdruck": "7bc73b541c700f551ade",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 2.51,
+  "bytes": 20780
+ },
+ "audio/saetze/einladung.u.1.mp3": {
+  "fingerabdruck": "f1bdb76ac5ce30d37565",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.6,
+  "bytes": 21548
+ },
+ "audio/saetze/einladung.u.2.mp3": {
+  "fingerabdruck": "3e31768f158955ebee8f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.75,
+  "bytes": 30764
+ },
+ "audio/saetze/einladung.u.3.mp3": {
+  "fingerabdruck": "2fbfe5e4fa597caeb206",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.04,
+  "bytes": 25004
+ },
+ "audio/saetze/einladung.ue.1.mp3": {
+  "fingerabdruck": "68a548cb8e9f76528764",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.72,
+  "bytes": 22508
+ },
+ "audio/saetze/einladung.ue.2.mp3": {
+  "fingerabdruck": "1bae5227bd6c161da0ee",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.69,
+  "bytes": 30188
+ },
+ "audio/saetze/einladung.ue.3.mp3": {
+  "fingerabdruck": "556871f477425ff55ab6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.05,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.v.1.mp3": {
+  "fingerabdruck": "3ab73d194e8e34a2b93f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.64,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.v.2.mp3": {
+  "fingerabdruck": "9b0d86b9aa3b9f1e59e2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.67,
+  "bytes": 29996
+ },
+ "audio/saetze/einladung.v.3.mp3": {
+  "fingerabdruck": "8741dce10f738deecd37",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/einladung.w.1.mp3": {
+  "fingerabdruck": "a30df45f17e82e9f2d67",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.63,
+  "bytes": 21740
+ },
+ "audio/saetze/einladung.w.2.mp3": {
+  "fingerabdruck": "5147970e5f68d38c3422",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.7,
+  "bytes": 30380
+ },
+ "audio/saetze/einladung.w.3.mp3": {
+  "fingerabdruck": "893999c3ca43080b2265",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.04,
+  "bytes": 25004
+ },
+ "audio/saetze/einladung.z.1.mp3": {
+  "fingerabdruck": "facd9891f47478237d2d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang} …",
+  "dauer_s": 2.82,
+  "bytes": 23276
+ },
+ "audio/saetze/einladung.z.2.mp3": {
+  "fingerabdruck": "ab9fee6242c11203d7ff",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … welcher Buchstabe ist das?",
+  "dauer_s": 3.93,
+  "bytes": 32108
+ },
+ "audio/saetze/einladung.z.3.mp3": {
+  "fingerabdruck": "6605362efaf62b8feb42",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wie klingt der Anfang? {laut_lang}",
+  "dauer_s": 3.27,
+  "bytes": 26924
+ },
+ "audio/saetze/frage.wer-faengt-an.a.1.mp3": {
+  "fingerabdruck": "698389cbdd3fbfde5547",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.51,
+  "bytes": 28844
+ },
+ "audio/saetze/frage.wer-faengt-an.a.2.mp3": {
+  "fingerabdruck": "7f16ab1df2eecfb80da0",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.48,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.a.3.mp3": {
+  "fingerabdruck": "717c3bf3b7329ad3ac1c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.15,
+  "bytes": 25964
+ },
+ "audio/saetze/frage.wer-faengt-an.ae.1.mp3": {
+  "fingerabdruck": "34913970f5018c36243e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.39,
+  "bytes": 27884
+ },
+ "audio/saetze/frage.wer-faengt-an.ae.2.mp3": {
+  "fingerabdruck": "298379e21b525b7adcc8",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.48,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.ae.3.mp3": {
+  "fingerabdruck": "0f52dab181b3ac24c8bb",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.b.1.mp3": {
+  "fingerabdruck": "60d6426e770aa27916be",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.86,
+  "bytes": 23660
+ },
+ "audio/saetze/frage.wer-faengt-an.b.2.mp3": {
+  "fingerabdruck": "f8f4d7111bd6a42b266e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.84,
+  "bytes": 23468
+ },
+ "audio/saetze/frage.wer-faengt-an.b.3.mp3": {
+  "fingerabdruck": "4ce0536d162ebaf5b8f6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.46,
+  "bytes": 20396
+ },
+ "audio/saetze/frage.wer-faengt-an.d.1.mp3": {
+  "fingerabdruck": "1a65ea848a1113e21d2e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.89,
+  "bytes": 23852
+ },
+ "audio/saetze/frage.wer-faengt-an.d.2.mp3": {
+  "fingerabdruck": "748eceb61bbc13bae86f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.91,
+  "bytes": 24044
+ },
+ "audio/saetze/frage.wer-faengt-an.d.3.mp3": {
+  "fingerabdruck": "9177ba0dddf35911f882",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.51,
+  "bytes": 20780
+ },
+ "audio/saetze/frage.wer-faengt-an.e.1.mp3": {
+  "fingerabdruck": "e29c067e9e93516cdef5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.e.2.mp3": {
+  "fingerabdruck": "7c3c87f35011ca127e4a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.52,
+  "bytes": 28844
+ },
+ "audio/saetze/frage.wer-faengt-an.e.3.mp3": {
+  "fingerabdruck": "25a81924ff7a5b8d8d08",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.1,
+  "bytes": 25580
+ },
+ "audio/saetze/frage.wer-faengt-an.f.1.mp3": {
+  "fingerabdruck": "602109d5e46acaa40c0b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.43,
+  "bytes": 28076
+ },
+ "audio/saetze/frage.wer-faengt-an.f.2.mp3": {
+  "fingerabdruck": "3cd852a228b8f2820a5f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.54,
+  "bytes": 29036
+ },
+ "audio/saetze/frage.wer-faengt-an.f.3.mp3": {
+  "fingerabdruck": "b5c370f586ef54acb020",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.02,
+  "bytes": 24812
+ },
+ "audio/saetze/frage.wer-faengt-an.g.1.mp3": {
+  "fingerabdruck": "22d0cf841d0c6930fb37",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.92,
+  "bytes": 24044
+ },
+ "audio/saetze/frage.wer-faengt-an.g.2.mp3": {
+  "fingerabdruck": "e151adc839d78a198b0c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.9,
+  "bytes": 23852
+ },
+ "audio/saetze/frage.wer-faengt-an.g.3.mp3": {
+  "fingerabdruck": "d4d5589bf1230a8b19f7",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.53,
+  "bytes": 20972
+ },
+ "audio/saetze/frage.wer-faengt-an.h.1.mp3": {
+  "fingerabdruck": "1d9260f36a69477b5dd9",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.46,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.h.2.mp3": {
+  "fingerabdruck": "ddd7cbd43a1d3dff383b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.h.3.mp3": {
+  "fingerabdruck": "9363adc133dd184e258d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.12,
+  "bytes": 25772
+ },
+ "audio/saetze/frage.wer-faengt-an.i.1.mp3": {
+  "fingerabdruck": "fa42f7eef0c7f7040077",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.42,
+  "bytes": 28076
+ },
+ "audio/saetze/frage.wer-faengt-an.i.2.mp3": {
+  "fingerabdruck": "7d9fe3bf8fd03bcc3615",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.46,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.i.3.mp3": {
+  "fingerabdruck": "dff5b5b90986bed6866d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.j.1.mp3": {
+  "fingerabdruck": "e26efc84c024066733e3",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.45,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.j.2.mp3": {
+  "fingerabdruck": "bce1a00a25552abfd568",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.45,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.j.3.mp3": {
+  "fingerabdruck": "fc1b8561de3dc71aa7bc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.08,
+  "bytes": 25388
+ },
+ "audio/saetze/frage.wer-faengt-an.k.1.mp3": {
+  "fingerabdruck": "7aad36a0fb9f932678a4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.83,
+  "bytes": 23276
+ },
+ "audio/saetze/frage.wer-faengt-an.k.2.mp3": {
+  "fingerabdruck": "5c8b9f5173cb0d492653",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.94,
+  "bytes": 24236
+ },
+ "audio/saetze/frage.wer-faengt-an.k.3.mp3": {
+  "fingerabdruck": "d04286464673369d5910",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.45,
+  "bytes": 20396
+ },
+ "audio/saetze/frage.wer-faengt-an.l.1.mp3": {
+  "fingerabdruck": "696d0addeb2e0a400bfd",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.46,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.l.2.mp3": {
+  "fingerabdruck": "6fb63c1c0bd3756d2a13",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.l.3.mp3": {
+  "fingerabdruck": "5dbbbc999c77da279e8d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.12,
+  "bytes": 25580
+ },
+ "audio/saetze/frage.wer-faengt-an.m.1.mp3": {
+  "fingerabdruck": "d9fe1e17deec5e65cd38",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.42,
+  "bytes": 28076
+ },
+ "audio/saetze/frage.wer-faengt-an.m.2.mp3": {
+  "fingerabdruck": "e50624f7de142f4bd761",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.m.3.mp3": {
+  "fingerabdruck": "ba6fdce019d94b4859bc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.09,
+  "bytes": 25388
+ },
+ "audio/saetze/frage.wer-faengt-an.n.1.mp3": {
+  "fingerabdruck": "38cb12ad4acaf2488208",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.42,
+  "bytes": 28076
+ },
+ "audio/saetze/frage.wer-faengt-an.n.2.mp3": {
+  "fingerabdruck": "a3aa2e3113eb890a3dcc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.n.3.mp3": {
+  "fingerabdruck": "61529367512337e23c43",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.o.1.mp3": {
+  "fingerabdruck": "0787d9fbfc14cad46872",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.45,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.o.2.mp3": {
+  "fingerabdruck": "8944da5e5122ba94df3a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.o.3.mp3": {
+  "fingerabdruck": "29480ee2ee610f63aac5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.oe.1.mp3": {
+  "fingerabdruck": "4d1158d5dd3b3a49d9a2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.44,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.oe.2.mp3": {
+  "fingerabdruck": "8696cf0d0a2fe784331a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.51,
+  "bytes": 28844
+ },
+ "audio/saetze/frage.wer-faengt-an.oe.3.mp3": {
+  "fingerabdruck": "280d400d14aaeb0226e9",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.07,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.p.1.mp3": {
+  "fingerabdruck": "3708ef33414795bb6a2c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.78,
+  "bytes": 22892
+ },
+ "audio/saetze/frage.wer-faengt-an.p.2.mp3": {
+  "fingerabdruck": "16a71d9dc00f9dfcc6bd",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.95,
+  "bytes": 24236
+ },
+ "audio/saetze/frage.wer-faengt-an.p.3.mp3": {
+  "fingerabdruck": "38c8ac5390ef46295e92",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.53,
+  "bytes": 20972
+ },
+ "audio/saetze/frage.wer-faengt-an.r.1.mp3": {
+  "fingerabdruck": "b3e002e8434c1dfabedf",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.45,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.r.2.mp3": {
+  "fingerabdruck": "3097de0d0bafcff8e30a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.5,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.r.3.mp3": {
+  "fingerabdruck": "bc325395e9bf293997b3",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.08,
+  "bytes": 25388
+ },
+ "audio/saetze/frage.wer-faengt-an.s.1.mp3": {
+  "fingerabdruck": "cdb5981404be7162dbd4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.37,
+  "bytes": 27692
+ },
+ "audio/saetze/frage.wer-faengt-an.s.2.mp3": {
+  "fingerabdruck": "553893508c66f4efd5ee",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.43,
+  "bytes": 28076
+ },
+ "audio/saetze/frage.wer-faengt-an.s.3.mp3": {
+  "fingerabdruck": "aa6536c087153c72b7cc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.09,
+  "bytes": 25388
+ },
+ "audio/saetze/frage.wer-faengt-an.t.1.mp3": {
+  "fingerabdruck": "5188ddbe4afe72c8008c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 2.84,
+  "bytes": 23468
+ },
+ "audio/saetze/frage.wer-faengt-an.t.2.mp3": {
+  "fingerabdruck": "750fe34da04296fa0b3d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 2.85,
+  "bytes": 23468
+ },
+ "audio/saetze/frage.wer-faengt-an.t.3.mp3": {
+  "fingerabdruck": "bc5d18f8d9e4c42ec5e6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 2.57,
+  "bytes": 21356
+ },
+ "audio/saetze/frage.wer-faengt-an.u.1.mp3": {
+  "fingerabdruck": "f94fc5032d87493f1ed5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.39,
+  "bytes": 27884
+ },
+ "audio/saetze/frage.wer-faengt-an.u.2.mp3": {
+  "fingerabdruck": "21b6c5a0ddf1b06b7935",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.49,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.u.3.mp3": {
+  "fingerabdruck": "48e375e2539a181711de",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.ue.1.mp3": {
+  "fingerabdruck": "0c7ad248454c967a3f85",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.45,
+  "bytes": 28268
+ },
+ "audio/saetze/frage.wer-faengt-an.ue.2.mp3": {
+  "fingerabdruck": "ee15f1318e95a084e68f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.51,
+  "bytes": 28844
+ },
+ "audio/saetze/frage.wer-faengt-an.ue.3.mp3": {
+  "fingerabdruck": "991be9b419511052a846",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.06,
+  "bytes": 25196
+ },
+ "audio/saetze/frage.wer-faengt-an.v.1.mp3": {
+  "fingerabdruck": "602109d5e46acaa40c0b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.46,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.v.2.mp3": {
+  "fingerabdruck": "3cd852a228b8f2820a5f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.47,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.v.3.mp3": {
+  "fingerabdruck": "b5c370f586ef54acb020",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.03,
+  "bytes": 25004
+ },
+ "audio/saetze/frage.wer-faengt-an.w.1.mp3": {
+  "fingerabdruck": "ba00c7f42d8129a54b6b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.47,
+  "bytes": 28460
+ },
+ "audio/saetze/frage.wer-faengt-an.w.2.mp3": {
+  "fingerabdruck": "5d512de047e0eb820305",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.48,
+  "bytes": 28652
+ },
+ "audio/saetze/frage.wer-faengt-an.w.3.mp3": {
+  "fingerabdruck": "64f337aaf396787eabdb",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.02,
+  "bytes": 24812
+ },
+ "audio/saetze/frage.wer-faengt-an.z.1.mp3": {
+  "fingerabdruck": "3a79c7d32fa340ce57cd",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer fängt mit {laut_lang} an?",
+  "dauer_s": 3.63,
+  "bytes": 29804
+ },
+ "audio/saetze/frage.wer-faengt-an.z.2.mp3": {
+  "fingerabdruck": "0af14183a8f8feb96568",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal: {laut_lang}. Wer ist das?",
+  "dauer_s": 3.74,
+  "bytes": 30572
+ },
+ "audio/saetze/frage.wer-faengt-an.z.3.mp3": {
+  "fingerabdruck": "d57b200eba12da0de9be",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "{laut_lang} … wer fängt so an?",
+  "dauer_s": 3.28,
+  "bytes": 26924
+ },
+ "audio/saetze/frage.wer-hilft.1.mp3": {
+  "fingerabdruck": "c15b9974c4b1f083c297",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer kann helfen?",
+  "dauer_s": 0.89,
+  "bytes": 7916
+ },
+ "audio/saetze/frage.wer-hilft.2.mp3": {
+  "fingerabdruck": "d6e65e19ffcde660f352",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Oh je – wer hilft da?",
+  "dauer_s": 1.53,
+  "bytes": 12908
+ },
+ "audio/saetze/frage.wer-hilft.3.mp3": {
+  "fingerabdruck": "a8dc199b07cc32efc141",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer weiß, wer helfen kann?",
+  "dauer_s": 1.58,
+  "bytes": 13292
+ },
+ "audio/saetze/frage.wer-unter-decke.1.mp3": {
+  "fingerabdruck": "fc755632eaf4a55caee0",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer ist da unter der Decke?",
+  "dauer_s": 1.11,
+  "bytes": 9644
+ },
+ "audio/saetze/frage.wer-unter-decke.2.mp3": {
+  "fingerabdruck": "e7cd8c8614e7336c2570",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Da wackelt was! Wer ist das?",
+  "dauer_s": 2.05,
+  "bytes": 17132
+ },
+ "audio/saetze/frage.wer-unter-decke.3.mp3": {
+  "fingerabdruck": "a4908098be873800b9dc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Psst … wer versteckt sich da?",
+  "dauer_s": 1.83,
+  "bytes": 15404
+ },
+ "audio/saetze/freude.allgemein.1.mp3": {
+  "fingerabdruck": "8c442d02d746db90bf90",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Juhu!",
+  "dauer_s": 0.57,
+  "bytes": 5228
+ },
+ "audio/saetze/freude.allgemein.2.mp3": {
+  "fingerabdruck": "6540d4a8da2f7a5b47d2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hurra!",
+  "dauer_s": 0.52,
+  "bytes": 4844
+ },
+ "audio/saetze/freude.allgemein.3.mp3": {
+  "fingerabdruck": "6638ae0fd1c61896670d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Oh, wie schön!",
+  "dauer_s": 1.14,
+  "bytes": 9836
+ },
+ "audio/saetze/geraeusch.bewegung.fliegt.1.mp3": {
+  "fingerabdruck": "a105106bc1a6d05f5516",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.7,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.bewegung.fliegt.2.mp3": {
+  "fingerabdruck": "f4ec259fcf779ddafb7a",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.7,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.bewegung.huepft.1.mp3": {
+  "fingerabdruck": "c16fc7783e724525ccac",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.4,
+  "bytes": 3884
+ },
+ "audio/saetze/geraeusch.bewegung.huepft.2.mp3": {
+  "fingerabdruck": "7117cc22fc26b7632601",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.4,
+  "bytes": 3884
+ },
+ "audio/saetze/geraeusch.bewegung.klettert.1.mp3": {
+  "fingerabdruck": "3e31c7d5ff3a51b08e88",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/saetze/geraeusch.bewegung.klettert.2.mp3": {
+  "fingerabdruck": "de079be9ea6a946a91a2",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/saetze/geraeusch.bewegung.kriecht.1.mp3": {
+  "fingerabdruck": "53698655ea3fe33a8590",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.72,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.bewegung.kriecht.2.mp3": {
+  "fingerabdruck": "106a27e298772bf87259",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.92,
+  "bytes": 8108
+ },
+ "audio/saetze/geraeusch.bewegung.rollt.1.mp3": {
+  "fingerabdruck": "73bb6d491e920398af02",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.8,
+  "bytes": 7148
+ },
+ "audio/saetze/geraeusch.bewegung.rollt.2.mp3": {
+  "fingerabdruck": "2683df36cc75192d0228",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.8,
+  "bytes": 7148
+ },
+ "audio/saetze/geraeusch.bewegung.schlaengelt.1.mp3": {
+  "fingerabdruck": "8fc353cb69c04b5773b2",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.9,
+  "bytes": 7916
+ },
+ "audio/saetze/geraeusch.bewegung.schlaengelt.2.mp3": {
+  "fingerabdruck": "12890b2acaa13e5e2f83",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.9,
+  "bytes": 7916
+ },
+ "audio/saetze/geraeusch.bewegung.schwimmt.1.mp3": {
+  "fingerabdruck": "9bef593b2eddbbc9b43d",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.53,
+  "bytes": 4844
+ },
+ "audio/saetze/geraeusch.bewegung.schwimmt.2.mp3": {
+  "fingerabdruck": "becdfaa6dcd3626a5b55",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.54,
+  "bytes": 5036
+ },
+ "audio/saetze/geraeusch.bewegung.stampft.1.mp3": {
+  "fingerabdruck": "75d8f85f513d38a7b7cd",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.88,
+  "bytes": 7724
+ },
+ "audio/saetze/geraeusch.bewegung.stampft.2.mp3": {
+  "fingerabdruck": "0b95d25256c46d75b37f",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.88,
+  "bytes": 7724
+ },
+ "audio/saetze/geraeusch.bewegung.tanzt.1.mp3": {
+  "fingerabdruck": "e139f44b2a40a95cf035",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.83,
+  "bytes": 7340
+ },
+ "audio/saetze/geraeusch.bewegung.tanzt.2.mp3": {
+  "fingerabdruck": "51dea4a39e2c1e0fa605",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.83,
+  "bytes": 7340
+ },
+ "audio/saetze/geraeusch.bewegung.watschelt.1.mp3": {
+  "fingerabdruck": "151c52cb3fa4f828ba27",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.72,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.bewegung.watschelt.2.mp3": {
+  "fingerabdruck": "4a8a061ee99b2059cb1f",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.72,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.decke-wackelt.1.mp3": {
+  "fingerabdruck": "4efe7a5e5ebeb1c01dab",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.7,
+  "bytes": 6380
+ },
+ "audio/saetze/geraeusch.decke-wackelt.2.mp3": {
+  "fingerabdruck": "19cbf7b49fa03dd4c494",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.85,
+  "bytes": 7532
+ },
+ "audio/saetze/geraeusch.decke-weg.1.mp3": {
+  "fingerabdruck": "49fe429802aa383efe02",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.5,
+  "bytes": 4652
+ },
+ "audio/saetze/geraeusch.decke-weg.2.mp3": {
+  "fingerabdruck": "32233190b8b274ed16f4",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.42,
+  "bytes": 4076
+ },
+ "audio/saetze/geraeusch.klack.1.mp3": {
+  "fingerabdruck": "4af92c3677cb0c85f967",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.07,
+  "bytes": 1196
+ },
+ "audio/saetze/geraeusch.klack.2.mp3": {
+  "fingerabdruck": "7e98fb20740f535bd6f4",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.07,
+  "bytes": 1196
+ },
+ "audio/saetze/geraeusch.klack.3.mp3": {
+  "fingerabdruck": "0e216da3ee23f1d5bdfa",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.07,
+  "bytes": 1196
+ },
+ "audio/saetze/geraeusch.loesung.1.mp3": {
+  "fingerabdruck": "4fa15ae7304f29c15e5c",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 1.14,
+  "bytes": 9836
+ },
+ "audio/saetze/geraeusch.loesung.2.mp3": {
+  "fingerabdruck": "e8209ef5696083980d51",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 1.14,
+  "bytes": 9836
+ },
+ "audio/saetze/geraeusch.oh-oh.1.mp3": {
+  "fingerabdruck": "f9703ccfa39da3b7b0e2",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.68,
+  "bytes": 6188
+ },
+ "audio/saetze/geraeusch.oh-oh.2.mp3": {
+  "fingerabdruck": "b9da3d8b76fa57fb2038",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.68,
+  "bytes": 6188
+ },
+ "audio/saetze/geraeusch.plopp.1.mp3": {
+  "fingerabdruck": "b157a86801e205f519ab",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.14,
+  "bytes": 1772
+ },
+ "audio/saetze/geraeusch.plopp.2.mp3": {
+  "fingerabdruck": "e4cab4cc16124f721138",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.14,
+  "bytes": 1772
+ },
+ "audio/saetze/geraeusch.schlaflied.1.mp3": {
+  "fingerabdruck": "e5dc7f2194d319257d84",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 6.33,
+  "bytes": 51308
+ },
+ "audio/saetze/geraeusch.trommel.1.mp3": {
+  "fingerabdruck": "79e450fd2a08d4be2243",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.45,
+  "bytes": 4268
+ },
+ "audio/saetze/geraeusch.trommel.2.mp3": {
+  "fingerabdruck": "4bbf81e21a9a0ab0e5af",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.45,
+  "bytes": 4268
+ },
+ "audio/saetze/geraeusch.trommel.3.mp3": {
+  "fingerabdruck": "59d65fbf2e339d75aa0a",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.45,
+  "bytes": 4268
+ },
+ "audio/saetze/geraeusch.wisch.1.mp3": {
+  "fingerabdruck": "a0016edbb95a3bbf8229",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.42,
+  "bytes": 4076
+ },
+ "audio/saetze/geraeusch.wisch.2.mp3": {
+  "fingerabdruck": "0d41a2757e302df684fb",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.34,
+  "bytes": 3500
+ },
+ "audio/saetze/geraeusch.wisch.3.mp3": {
+  "fingerabdruck": "9f0098b817aff99906d4",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.48,
+  "bytes": 4460
+ },
+ "audio/saetze/geraeusch.zurueck.1.mp3": {
+  "fingerabdruck": "47a2d047631b6b9b83bd",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.34,
+  "bytes": 3500
+ },
+ "audio/saetze/geraeusch.zurueck.2.mp3": {
+  "fingerabdruck": "228c958be5ca5f05ab8e",
+  "quelle": "synthetisch (tools/geraeusche.py)",
+  "text": "",
+  "dauer_s": 0.16,
+  "bytes": 1964
+ },
+ "audio/saetze/geschichte.ende.1.mp3": {
+  "fingerabdruck": "6755effd714e28f59569",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Jetzt kuscheln sich alle auf die Decke.",
+  "dauer_s": 1.59,
+  "bytes": 13484
+ },
+ "audio/saetze/geschichte.ende.2.mp3": {
+  "fingerabdruck": "6d4a73c2054b45264996",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Alle sind froh – und jetzt wird gekuschelt.",
+  "dauer_s": 2.27,
+  "bytes": 18860
+ },
+ "audio/saetze/geschichte.ende.3.mp3": {
+  "fingerabdruck": "32c9503cb8d6a0cc2863",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Das war eine schöne Geschichte.",
+  "dauer_s": 1.42,
+  "bytes": 12140
+ },
+ "audio/saetze/geschichte.gemeinsam.1.mp3": {
+  "fingerabdruck": "b482264c7f8ad61dc160",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Zusammen geht's!",
+  "dauer_s": 0.9,
+  "bytes": 7916
+ },
+ "audio/saetze/geschichte.gemeinsam.2.mp3": {
+  "fingerabdruck": "bb66a9139967e5878b8e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Geschafft – zusammen!",
+  "dauer_s": 1.53,
+  "bytes": 12908
+ },
+ "audio/saetze/geschichte.gemeinsam.3.mp3": {
+  "fingerabdruck": "7b331b68ecb0a0e243a6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Jetzt freuen sich beide!",
+  "dauer_s": 1.22,
+  "bytes": 10412
+ },
+ "audio/saetze/gutenacht.satz.1.mp3": {
+  "fingerabdruck": "efdbb002a3d797f72b72",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Die Tiere werden müde und kuscheln sich auf die Decke.",
+  "dauer_s": 2.72,
+  "bytes": 22508
+ },
+ "audio/saetze/gutenacht.satz.2.mp3": {
+  "fingerabdruck": "66cdceb7ee6dd057a417",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Gähn … alle Tiere gehen schlafen.",
+  "dauer_s": 2.39,
+  "bytes": 19820
+ },
+ "audio/saetze/gutenacht.satz.3.mp3": {
+  "fingerabdruck": "30a5519c788198ad0259",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Psst – die Tiere schlafen jetzt.",
+  "dauer_s": 1.99,
+  "bytes": 16556
+ },
+ "audio/saetze/gutenacht.wecken.1.mp3": {
+  "fingerabdruck": "f7640d4d7573059c7e23",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Oh, wer ist denn da wach?",
+  "dauer_s": 1.2,
+  "bytes": 10220
+ },
+ "audio/saetze/gutenacht.wecken.2.mp3": {
+  "fingerabdruck": "7524b53150ed30d5a404",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Guten Morgen, ihr Tiere!",
+  "dauer_s": 1.4,
+  "bytes": 11948
+ },
+ "audio/saetze/hilfe.nochmal.1.mp3": {
+  "fingerabdruck": "509275159809caac4af9",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör noch mal genau hin.",
+  "dauer_s": 1.11,
+  "bytes": 9644
+ },
+ "audio/saetze/hilfe.nochmal.2.mp3": {
+  "fingerabdruck": "99bd08dfae37d76d383b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wir probieren's noch mal.",
+  "dauer_s": 1.25,
+  "bytes": 10796
+ },
+ "audio/saetze/hilfe.nochmal.3.mp3": {
+  "fingerabdruck": "0b0a5e101cc5995122c0",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal …",
+  "dauer_s": 0.53,
+  "bytes": 5036
+ },
+ "audio/saetze/kachel.decke.1.mp3": {
+  "fingerabdruck": "f6cd60cfebe54107a66e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer ist unter der Decke?",
+  "dauer_s": 1.1,
+  "bytes": 9452
+ },
+ "audio/saetze/kachel.decke.2.mp3": {
+  "fingerabdruck": "3bcfcae28f20e1c7c0a1",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Versteckspiel!",
+  "dauer_s": 0.83,
+  "bytes": 7340
+ },
+ "audio/saetze/kachel.frei.1.mp3": {
+  "fingerabdruck": "749a9832e7a021efcae5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Frei schreiben!",
+  "dauer_s": 0.83,
+  "bytes": 7340
+ },
+ "audio/saetze/kachel.frei.2.mp3": {
+  "fingerabdruck": "0b5d9ef6fd4a03ef9b13",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Schreib, was du willst!",
+  "dauer_s": 1.43,
+  "bytes": 12140
+ },
+ "audio/saetze/kachel.geschichten.1.mp3": {
+  "fingerabdruck": "0a380591d1f8890df45d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer hilft?",
+  "dauer_s": 0.63,
+  "bytes": 5804
+ },
+ "audio/saetze/kachel.geschichten.2.mp3": {
+  "fingerabdruck": "91441c8476142cf37bc1",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Eine Geschichte!",
+  "dauer_s": 0.78,
+  "bytes": 6956
+ },
+ "audio/saetze/kachel.laut-ruft-tier.1.mp3": {
+  "fingerabdruck": "e6d588f4fd4c4ded3f5e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Buchstaben rufen Tiere!",
+  "dauer_s": 1.42,
+  "bytes": 12140
+ },
+ "audio/saetze/kachel.laut-ruft-tier.2.mp3": {
+  "fingerabdruck": "9d6054a57bc8172a54c4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wer kommt bei welchem Buchstaben?",
+  "dauer_s": 1.53,
+  "bytes": 12908
+ },
+ "audio/saetze/kachel.leute.1.mp3": {
+  "fingerabdruck": "32f3c9f551bce810602e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Meine Leute!",
+  "dauer_s": 0.85,
+  "bytes": 7532
+ },
+ "audio/saetze/kachel.leute.2.mp3": {
+  "fingerabdruck": "b2de5d21d56c6b4312f7",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Mama, Papa, Oma, Opa!",
+  "dauer_s": 2.37,
+  "bytes": 19628
+ },
+ "audio/saetze/kachel.nachfuellen.1.mp3": {
+  "fingerabdruck": "05ba66723aa269e60302",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wörter nachlegen!",
+  "dauer_s": 1.2,
+  "bytes": 10220
+ },
+ "audio/saetze/kachel.nachfuellen.2.mp3": {
+  "fingerabdruck": "aaefdb1c2d71723c9ae0",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Lücken füllen!",
+  "dauer_s": 0.85,
+  "bytes": 7532
+ },
+ "audio/saetze/kachel.silben.1.mp3": {
+  "fingerabdruck": "5dfc4fff543fc635a603",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Silben klatschen!",
+  "dauer_s": 0.99,
+  "bytes": 8684
+ },
+ "audio/saetze/kachel.silben.2.mp3": {
+  "fingerabdruck": "26672d83a3b017e38dd7",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Wir hüpfen den Namen!",
+  "dauer_s": 1.05,
+  "bytes": 9068
+ },
+ "audio/saetze/kachel.tiere.1.mp3": {
+  "fingerabdruck": "bf159d6c9a9a5ac1832a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Tiere schreiben!",
+  "dauer_s": 0.94,
+  "bytes": 8300
+ },
+ "audio/saetze/kachel.tiere.2.mp3": {
+  "fingerabdruck": "047a18ec926b9eb78e2c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Zu den Tieren!",
+  "dauer_s": 0.88,
+  "bytes": 7724
+ },
+ "audio/saetze/lob.allgemein.1.mp3": {
+  "fingerabdruck": "53e8caf4890e7f9b8b3f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Das hast du geschrieben!",
+  "dauer_s": 0.98,
+  "bytes": 8492
+ },
+ "audio/saetze/lob.allgemein.2.mp3": {
+  "fingerabdruck": "146d06f57b23c0e3797c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hör mal, was du geschrieben hast!",
+  "dauer_s": 1.74,
+  "bytes": 14636
+ },
+ "audio/saetze/lob.allgemein.3.mp3": {
+  "fingerabdruck": "dd7a67cd2907d80fb6db",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Du hast den Anfang gefunden!",
+  "dauer_s": 1.42,
+  "bytes": 12140
+ },
+ "audio/saetze/lob.allgemein.4.mp3": {
+  "fingerabdruck": "dbadcb9610af6691f198",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Das klingt richtig!",
+  "dauer_s": 0.99,
+  "bytes": 8684
+ },
+ "audio/saetze/lob.anlaut.1.mp3": {
+  "fingerabdruck": "28bbca6ee7d28413a83a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ja, so fängt es an!",
+  "dauer_s": 1.76,
+  "bytes": 14828
+ },
+ "audio/saetze/lob.anlaut.2.mp3": {
+  "fingerabdruck": "2256aeaaf7d389938e37",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Genau, das ist der Anfang!",
+  "dauer_s": 1.66,
+  "bytes": 14060
+ },
+ "audio/saetze/lob.anlaut.3.mp3": {
+  "fingerabdruck": "f4a484305bbd803b161d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Den Anfang hast du gehört!",
+  "dauer_s": 1.38,
+  "bytes": 11756
+ },
+ "audio/saetze/lob.leute.1.mp3": {
+  "fingerabdruck": "53e8caf4890e7f9b8b3f",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Das hast du geschrieben!",
+  "dauer_s": 1.0,
+  "bytes": 8684
+ },
+ "audio/saetze/lob.leute.2.mp3": {
+  "fingerabdruck": "3d353d5c6020e6fe3a35",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Schau mal, wer da ist!",
+  "dauer_s": 1.52,
+  "bytes": 12908
+ },
+ "audio/saetze/lob.leute.3.mp3": {
+  "fingerabdruck": "146dd34bb8ab03b02c71",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Da freut sich jemand!",
+  "dauer_s": 1.03,
+  "bytes": 8876
+ },
+ "audio/saetze/wegraeumen.satz.1.mp3": {
+  "fingerabdruck": "9f17f2ea8b7814aef9f7",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Alles weg – jetzt ist Platz für Neues!",
+  "dauer_s": 2.38,
+  "bytes": 19820
+ },
+ "audio/saetze/wegraeumen.satz.2.mp3": {
+  "fingerabdruck": "14b96a52ba95faec36fe",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Schwupp, alles aufgeräumt!",
+  "dauer_s": 1.66,
+  "bytes": 14060
+ },
+ "audio/saetze/wegraeumen.satz.3.mp3": {
+  "fingerabdruck": "48eefe12dd172624b90a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Das Blatt ist wieder leer.",
+  "dauer_s": 1.25,
+  "bytes": 10796
+ },
+ "audio/saetze/wegraeumen.satz.4.mp3": {
+  "fingerabdruck": "7022ad4764f2ad8f0728",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Weggewischt! Was schreibst du jetzt?",
+  "dauer_s": 2.13,
+  "bytes": 17708
+ },
+ "audio/saetze/zurueck.halten.1.mp3": {
+  "fingerabdruck": "8a5a710f988ec4e89e5e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Zum Zurückgehen lange drücken.",
+  "dauer_s": 1.37,
+  "bytes": 11756
+ },
+ "audio/saetze/zurueckholen.satz.1.mp3": {
+  "fingerabdruck": "b5d566447032134e1266",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Da ist es wieder!",
+  "dauer_s": 0.95,
+  "bytes": 8300
+ },
+ "audio/saetze/zurueckholen.satz.2.mp3": {
+  "fingerabdruck": "363d31e3d4e7dab64366",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hoppla – alles wieder da!",
+  "dauer_s": 1.7,
+  "bytes": 14252
+ },
+ "audio/saetze/zurueckholen.satz.3.mp3": {
+  "fingerabdruck": "157218c7e88e460bf131",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Zurückgeholt!",
+  "dauer_s": 0.75,
+  "bytes": 6764
+ },
+ "audio/woerter/apfel.mp3": {
+  "fingerabdruck": "9e5c5fd34bdb8e0637bd",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Apfel",
+  "dauer_s": 0.74,
+  "bytes": 6572
+ },
+ "audio/woerter/auto.mp3": {
+  "fingerabdruck": "30f1542ef02c39b3ab46",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Auto",
+  "dauer_s": 0.63,
+  "bytes": 5804
+ },
+ "audio/woerter/baer.mp3": {
+  "fingerabdruck": "ce434f1431b52418baa5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Bär",
+  "dauer_s": 0.55,
+  "bytes": 5036
+ },
+ "audio/woerter/ball.mp3": {
+  "fingerabdruck": "bbe73b314c76c61bcdd6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ball",
+  "dauer_s": 0.47,
+  "bytes": 4460
+ },
+ "audio/woerter/baum.mp3": {
+  "fingerabdruck": "1ad999bb4a3b8840a359",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Baum",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/woerter/brot.mp3": {
+  "fingerabdruck": "a7d67540d35fe3c56262",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Brot",
+  "dauer_s": 0.45,
+  "bytes": 4268
+ },
+ "audio/woerter/buch.mp3": {
+  "fingerabdruck": "838152a223762be469db",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Buch",
+  "dauer_s": 0.29,
+  "bytes": 3116
+ },
+ "audio/woerter/dose.mp3": {
+  "fingerabdruck": "12b65d559a28eb8b2f5a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Dose",
+  "dauer_s": 0.6,
+  "bytes": 5420
+ },
+ "audio/woerter/ei.mp3": {
+  "fingerabdruck": "6da36850c13864ea3fb2",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ei",
+  "dauer_s": 0.48,
+  "bytes": 4460
+ },
+ "audio/woerter/eis.mp3": {
+  "fingerabdruck": "1511762bbef0b910ab60",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Eis",
+  "dauer_s": 0.65,
+  "bytes": 5996
+ },
+ "audio/woerter/ente.mp3": {
+  "fingerabdruck": "5fbac69ac0a4ce9eb9bc",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ente",
+  "dauer_s": 0.55,
+  "bytes": 5036
+ },
+ "audio/woerter/fisch.mp3": {
+  "fingerabdruck": "1fa18bb63ab145bc71c8",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Fisch",
+  "dauer_s": 0.59,
+  "bytes": 5420
+ },
+ "audio/woerter/hand.mp3": {
+  "fingerabdruck": "5d91f79282230b371413",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hand",
+  "dauer_s": 0.54,
+  "bytes": 5036
+ },
+ "audio/woerter/hase.mp3": {
+  "fingerabdruck": "e4ae71b142c321dee6b5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hase",
+  "dauer_s": 0.66,
+  "bytes": 5996
+ },
+ "audio/woerter/haus.mp3": {
+  "fingerabdruck": "fd057378a19bf4071515",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Haus",
+  "dauer_s": 0.71,
+  "bytes": 6380
+ },
+ "audio/woerter/hose.mp3": {
+  "fingerabdruck": "4f26848aec05faa7ef57",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hose",
+  "dauer_s": 0.57,
+  "bytes": 5228
+ },
+ "audio/woerter/hund.mp3": {
+  "fingerabdruck": "ab5d1d17ac00e3dd2372",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hund",
+  "dauer_s": 0.45,
+  "bytes": 4268
+ },
+ "audio/woerter/hut.mp3": {
+  "fingerabdruck": "829ac97e00c3a94da81d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Hut",
+  "dauer_s": 0.44,
+  "bytes": 4268
+ },
+ "audio/woerter/igel.mp3": {
+  "fingerabdruck": "60422da65f9509155f1a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Igel",
+  "dauer_s": 0.47,
+  "bytes": 4460
+ },
+ "audio/woerter/kaese.mp3": {
+  "fingerabdruck": "461e756dc56ec5307968",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Käse",
+  "dauer_s": 0.72,
+  "bytes": 6380
+ },
+ "audio/woerter/katze.mp3": {
+  "fingerabdruck": "0060dc3e6bdc60607cc5",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Katze",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/woerter/kino.mp3": {
+  "fingerabdruck": "c95ddb25684c2085597e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Kino",
+  "dauer_s": 0.61,
+  "bytes": 5612
+ },
+ "audio/woerter/kuh.mp3": {
+  "fingerabdruck": "cd032e2198b746d0dd8e",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Kuh",
+  "dauer_s": 0.31,
+  "bytes": 3116
+ },
+ "audio/woerter/lama.mp3": {
+  "fingerabdruck": "ba4d960e28bcff973432",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Lama",
+  "dauer_s": 0.66,
+  "bytes": 5996
+ },
+ "audio/woerter/limo.mp3": {
+  "fingerabdruck": "7ef2047330e09176f55d",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Limo",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/woerter/loewe.mp3": {
+  "fingerabdruck": "c87a6d3a2bfa98733f99",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Löwe",
+  "dauer_s": 0.54,
+  "bytes": 5036
+ },
+ "audio/woerter/mama.mp3": {
+  "fingerabdruck": "639c68c7c0145485a82a",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Mama",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/woerter/maus.mp3": {
+  "fingerabdruck": "d141d75398a724d15280",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Maus",
+  "dauer_s": 0.7,
+  "bytes": 6380
+ },
+ "audio/woerter/milch.mp3": {
+  "fingerabdruck": "317e0ed7b3cc37adfd73",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Milch",
+  "dauer_s": 0.6,
+  "bytes": 5420
+ },
+ "audio/woerter/mofa.mp3": {
+  "fingerabdruck": "a24512180ac570a642ea",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Mofa",
+  "dauer_s": 0.64,
+  "bytes": 5804
+ },
+ "audio/woerter/mond.mp3": {
+  "fingerabdruck": "f70ce957ed38d12531db",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Mond",
+  "dauer_s": 0.44,
+  "bytes": 4268
+ },
+ "audio/woerter/nase.mp3": {
+  "fingerabdruck": "e5ca450d1826fb31e856",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Nase",
+  "dauer_s": 0.57,
+  "bytes": 5228
+ },
+ "audio/woerter/ofen.mp3": {
+  "fingerabdruck": "d2c513ad5dc91ad0d1d6",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ofen",
+  "dauer_s": 0.68,
+  "bytes": 6188
+ },
+ "audio/woerter/oma.mp3": {
+  "fingerabdruck": "d58b79c30f9c3524187c",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Oma",
+  "dauer_s": 0.57,
+  "bytes": 5228
+ },
+ "audio/woerter/opa.mp3": {
+  "fingerabdruck": "5f06ef979099af8a25d4",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Opa",
+  "dauer_s": 0.5,
+  "bytes": 4652
+ },
+ "audio/woerter/papa.mp3": {
+  "fingerabdruck": "e7d27b14c2ad7362197b",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Papa",
+  "dauer_s": 0.59,
+  "bytes": 5420
+ },
+ "audio/woerter/rabe.mp3": {
+  "fingerabdruck": "40fdd2ccf7833dd39ded",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Rabe",
+  "dauer_s": 0.52,
+  "bytes": 4844
+ },
+ "audio/woerter/rad.mp3": {
+  "fingerabdruck": "1faea737b8ba65d7be53",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Rad",
+  "dauer_s": 0.37,
+  "bytes": 3692
+ },
+ "audio/woerter/rose.mp3": {
+  "fingerabdruck": "99ec806a4c6330274605",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Rose",
+  "dauer_s": 0.6,
+  "bytes": 5420
+ },
+ "audio/woerter/sofa.mp3": {
+  "fingerabdruck": "12c2324e55300ee44d98",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Sofa",
+  "dauer_s": 0.64,
+  "bytes": 5804
+ },
+ "audio/woerter/sonne.mp3": {
+  "fingerabdruck": "dea5be2f139cff60f125",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Sonne",
+  "dauer_s": 0.58,
+  "bytes": 5420
+ },
+ "audio/woerter/tomate.mp3": {
+  "fingerabdruck": "4bc3abcf593dc1c28153",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Tomate",
+  "dauer_s": 0.71,
+  "bytes": 6380
+ },
+ "audio/woerter/tuer.mp3": {
+  "fingerabdruck": "d51eec96c906cab11110",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Tür",
+  "dauer_s": 0.48,
+  "bytes": 4460
+ },
+ "audio/woerter/ufo.mp3": {
+  "fingerabdruck": "80e1fc1bfab948c5fec1",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Ufo",
+  "dauer_s": 0.57,
+  "bytes": 5228
+ },
+ "audio/woerter/uhu.mp3": {
+  "fingerabdruck": "61a869945e61c61a9135",
+  "quelle": "piper:de_DE-thorsten-high",
+  "text": "Uhu",
+  "dauer_s": 0.63,
+  "bytes": 5804
+ }
+}
