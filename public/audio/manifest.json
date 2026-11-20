@@ -1,0 +1,597 @@
+{
+  "laute": {
+    "a": "audio/laute/a.katja.mp3",
+    "b": "audio/laute/b.katja.mp3",
+    "c": "audio/laute/c.katja.mp3",
+    "d": "audio/laute/d.katja.mp3",
+    "e": "audio/laute/e.katja.mp3",
+    "f": "audio/laute/f.katja.mp3",
+    "g": "audio/laute/g.katja.mp3",
+    "h": "audio/laute/h.katja.mp3",
+    "i": "audio/laute/i.katja.mp3",
+    "j": "audio/laute/j.katja.mp3",
+    "k": "audio/laute/k.katja.mp3",
+    "l": "audio/laute/l.katja.mp3",
+    "m": "audio/laute/m.katja.mp3",
+    "n": "audio/laute/n.katja.mp3",
+    "o": "audio/laute/o.katja.mp3",
+    "p": "audio/laute/p.katja.mp3",
+    "q": "audio/laute/q.katja.mp3",
+    "r": "audio/laute/r.katja.mp3",
+    "s": "audio/laute/s.katja.mp3",
+    "t": "audio/laute/t.katja.mp3",
+    "u": "audio/laute/u.katja.mp3",
+    "v": "audio/laute/v.katja.mp3",
+    "w": "audio/laute/w.katja.mp3",
+    "x": "audio/laute/x.katja.mp3",
+    "y": "audio/laute/y.katja.mp3",
+    "z": "audio/laute/z.katja.mp3",
+    "ä": "audio/laute/ae.katja.mp3",
+    "ö": "audio/laute/oe.katja.mp3",
+    "ü": "audio/laute/ue.katja.mp3",
+    "ß": "audio/laute/sz.katja.mp3"
+  },
+  "namen": {
+    "a": "audio/namen/a.mp3",
+    "b": "audio/namen/b.mp3",
+    "c": "audio/namen/c.mp3",
+    "d": "audio/namen/d.mp3",
+    "e": "audio/namen/e.mp3",
+    "f": "audio/namen/f.mp3",
+    "g": "audio/namen/g.mp3",
+    "h": "audio/namen/h.mp3",
+    "i": "audio/namen/i.mp3",
+    "j": "audio/namen/j.mp3",
+    "k": "audio/namen/k.mp3",
+    "l": "audio/namen/l.mp3",
+    "m": "audio/namen/m.mp3",
+    "n": "audio/namen/n.mp3",
+    "o": "audio/namen/o.mp3",
+    "p": "audio/namen/p.mp3",
+    "q": "audio/namen/q.mp3",
+    "r": "audio/namen/r.mp3",
+    "s": "audio/namen/s.mp3",
+    "t": "audio/namen/t.mp3",
+    "u": "audio/namen/u.mp3",
+    "v": "audio/namen/v.mp3",
+    "w": "audio/namen/w.mp3",
+    "x": "audio/namen/x.mp3",
+    "y": "audio/namen/y.mp3",
+    "z": "audio/namen/z.mp3",
+    "ä": "audio/namen/ae.mp3",
+    "ö": "audio/namen/oe.mp3",
+    "ü": "audio/namen/ue.mp3",
+    "ß": "audio/namen/sz.mp3"
+  },
+  "woerter": {
+    "mama": "audio/woerter/mama.mp3",
+    "papa": "audio/woerter/papa.mp3",
+    "oma": "audio/woerter/oma.mp3",
+    "opa": "audio/woerter/opa.mp3",
+    "ball": "audio/woerter/ball.mp3",
+    "hund": "audio/woerter/hund.mp3",
+    "katze": "audio/woerter/katze.mp3",
+    "maus": "audio/woerter/maus.mp3",
+    "igel": "audio/woerter/igel.mp3",
+    "hase": "audio/woerter/hase.mp3",
+    "sonne": "audio/woerter/sonne.mp3",
+    "mond": "audio/woerter/mond.mp3",
+    "baum": "audio/woerter/baum.mp3",
+    "haus": "audio/woerter/haus.mp3",
+    "auto": "audio/woerter/auto.mp3",
+    "nase": "audio/woerter/nase.mp3",
+    "hand": "audio/woerter/hand.mp3",
+    "fisch": "audio/woerter/fisch.mp3",
+    "ente": "audio/woerter/ente.mp3",
+    "kuh": "audio/woerter/kuh.mp3",
+    "eis": "audio/woerter/eis.mp3",
+    "ei": "audio/woerter/ei.mp3",
+    "bär": "audio/woerter/baer.mp3",
+    "löwe": "audio/woerter/loewe.mp3",
+    "käse": "audio/woerter/kaese.mp3",
+    "tür": "audio/woerter/tuer.mp3",
+    "apfel": "audio/woerter/apfel.mp3",
+    "brot": "audio/woerter/brot.mp3",
+    "milch": "audio/woerter/milch.mp3",
+    "buch": "audio/woerter/buch.mp3",
+    "sofa": "audio/woerter/sofa.mp3",
+    "rad": "audio/woerter/rad.mp3",
+    "tomate": "audio/woerter/tomate.mp3",
+    "lama": "audio/woerter/lama.mp3",
+    "hut": "audio/woerter/hut.mp3"
+  },
+  "saetze": {
+    "Fertig!": "audio/saetze/fertig.mp3",
+    "Wunderbar.": "audio/saetze/wunderbar.mp3",
+    "Das hast du geschrieben.": "audio/saetze/das-hast-du-geschrieben.mp3",
+    "Schön gemacht.": "audio/saetze/schoen-gemacht.mp3"
+  },
+  "varianten": {
+    "a": [
+      {
+        "id": "katja",
+        "url": "audio/laute/a.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/a.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "b": [
+      {
+        "id": "katja",
+        "url": "audio/laute/b.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/b.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/b.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "c": [
+      {
+        "id": "katja",
+        "url": "audio/laute/c.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/c.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/c.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "d": [
+      {
+        "id": "katja",
+        "url": "audio/laute/d.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/d.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/d.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "e": [
+      {
+        "id": "katja",
+        "url": "audio/laute/e.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/e.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "f": [
+      {
+        "id": "katja",
+        "url": "audio/laute/f.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/f.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "g": [
+      {
+        "id": "katja",
+        "url": "audio/laute/g.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/g.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/g.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "h": [
+      {
+        "id": "katja",
+        "url": "audio/laute/h.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/h.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/h.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "i": [
+      {
+        "id": "katja",
+        "url": "audio/laute/i.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/i.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "j": [
+      {
+        "id": "katja",
+        "url": "audio/laute/j.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/j.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "k": [
+      {
+        "id": "katja",
+        "url": "audio/laute/k.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/k.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/k.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "l": [
+      {
+        "id": "katja",
+        "url": "audio/laute/l.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/l.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "m": [
+      {
+        "id": "katja",
+        "url": "audio/laute/m.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/m.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "n": [
+      {
+        "id": "katja",
+        "url": "audio/laute/n.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/n.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "o": [
+      {
+        "id": "katja",
+        "url": "audio/laute/o.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/o.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "p": [
+      {
+        "id": "katja",
+        "url": "audio/laute/p.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/p.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/p.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "q": [
+      {
+        "id": "katja",
+        "url": "audio/laute/q.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/q.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/q.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "r": [
+      {
+        "id": "katja",
+        "url": "audio/laute/r.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/r.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "s": [
+      {
+        "id": "katja",
+        "url": "audio/laute/s.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/s.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "t": [
+      {
+        "id": "katja",
+        "url": "audio/laute/t.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/t.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/t.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "u": [
+      {
+        "id": "katja",
+        "url": "audio/laute/u.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/u.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "v": [
+      {
+        "id": "katja",
+        "url": "audio/laute/v.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/v.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "w": [
+      {
+        "id": "katja",
+        "url": "audio/laute/w.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/w.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "x": [
+      {
+        "id": "katja",
+        "url": "audio/laute/x.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/x.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/x.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "y": [
+      {
+        "id": "katja",
+        "url": "audio/laute/y.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/y.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "z": [
+      {
+        "id": "katja",
+        "url": "audio/laute/z.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/z.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      },
+      {
+        "id": "kurz",
+        "url": "audio/laute/z.kurz.mp3",
+        "beschreibung": "Katja, mit ganz kurzem Vokal",
+        "quelle": "vorab"
+      }
+    ],
+    "ä": [
+      {
+        "id": "katja",
+        "url": "audio/laute/ae.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/ae.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "ö": [
+      {
+        "id": "katja",
+        "url": "audio/laute/oe.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/oe.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "ü": [
+      {
+        "id": "katja",
+        "url": "audio/laute/ue.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/ue.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ],
+    "ß": [
+      {
+        "id": "katja",
+        "url": "audio/laute/sz.katja.mp3",
+        "beschreibung": "Stimme Katja",
+        "quelle": "vorab"
+      },
+      {
+        "id": "amala",
+        "url": "audio/laute/sz.amala.mp3",
+        "beschreibung": "Stimme Amala",
+        "quelle": "vorab"
+      }
+    ]
+  }
+}
