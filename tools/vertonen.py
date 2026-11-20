@@ -74,12 +74,14 @@ NAME_IPA: dict[str, str] = {
     "ä": "ɛː", "ö": "øː", "ü": "yː", "ß": "ɛsˈtsɛt",
 }
 
-# Startwortschatz: STARTWOERTER aus src/kern/woerter.ts plus Ergänzungen. Kanonisch klein.
+# Startwortschatz: STARTWOERTER aus src/kern/woerter.ts (lautgetreu) plus die Wörter der ersten
+# Startliste (bleiben vertont, weil sie auf älteren Geräten noch im Wörterbuch stehen). Kanonisch klein.
 WOERTER = [
     "mama", "papa", "oma", "opa", "ball", "hund", "katze", "maus", "igel", "hase",
     "sonne", "mond", "baum", "haus", "auto", "nase", "hand", "fisch", "ente", "kuh",
     "eis", "ei", "bär", "löwe", "käse", "tür", "apfel", "brot", "milch", "buch",
     "sofa", "rad", "tomate", "lama", "hut",
+    "limo", "kino", "uhu", "ufo", "mofa", "hose", "rose", "dose", "ofen", "rabe",
 ]
 # So spricht die Engine sie: Nomen mit großem Anfangsbuchstaben, NIE ganz groß (sonst buchstabiert sie).
 WORT_ANZEIGE = {w: w[:1].upper() + w[1:] for w in WOERTER}

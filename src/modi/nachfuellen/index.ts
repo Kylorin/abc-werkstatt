@@ -1,15 +1,17 @@
 /**
  * Nachfüllen (Bau „schreiben"): ein Wort aus dem Wörterbuch als Schattenvorlage,
  * das Kind legt die Buchstaben der Reihe nach hinein. Fertig → Wort wird ganz vorgelesen,
- * ruhige Hervorhebung, nach ~3 s kommt ein anderes Wort.
+ * ruhige Hervorhebung. Das nächste Wort kommt erst, wenn das Wort zu Ende gesprochen ist
+ * (mindestens ~3 s Verweilen; die Obergrenze greift nur bei hängender Sprachausgabe).
  */
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import type { Kontext, Modus } from '../../kern/vertrag';
-import { Sitzung, erzeugeMeldung, spiele } from './sitzung';
+import { Sitzung, erzeugeMeldung, spiele, warteAufSprache } from './sitzung';
 import { erzeugeWortarbeit, type Wortarbeit } from './wortarbeit';
 
 const PAUSE_NACH_GESCHAFFT_MS = 3000;
+const HOECHSTENS_NACH_GESCHAFFT_MS = 8000;
 
 let sitzung: Sitzung | undefined;
 
@@ -53,10 +55,14 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       vollesAlphabet: false,
       melde: meldung.melde,
       beiGeschafft(letzterLaut) {
-        void letzterLaut.then(() => {
-          if (s.lebt && arbeit === neu) return spiele(ctx.audio.wort(wort), meldung.melde);
+        const gesprochen = letzterLaut.then((a) => {
+          // abgebrochen: das Kind hat schon etwas anderes angetippt — das nicht übertönen.
+          if (a === 'abgebrochen' || !s.lebt || arbeit !== neu) return;
+          return spiele(ctx.audio.wort(wort), meldung.melde);
         });
-        s.warte(PAUSE_NACH_GESCHAFFT_MS, () => {
+        void warteAufSprache(s, gesprochen, PAUSE_NACH_GESCHAFFT_MS, HOECHSTENS_NACH_GESCHAFFT_MS).then(() => {
+          if (!s.lebt || arbeit !== neu) return;
+          ctx.audio.stopp();
           naechstesWort(wort).catch(meldung.melde);
         });
       },

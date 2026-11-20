@@ -10,12 +10,18 @@
  *  (f) Browserstimme (speechSynthesis, de-DE)
  * Tier-Paket-Audio spielen die Modi über `datei(await ctx.pakete.audioUrl(...))`.
  *
- * Jede neue Ausgabe bricht die laufende ab. Geworfen wird nur bei echten Fehlern
- * (`AudioFehler`), nie wegen einer Autoplay-Sperre vor der ersten Berührung.
+ * Jede neue Ausgabe bricht die laufende ab und liefert dann `abgebrochen` (siehe `Ausgang`).
+ * Geworfen wird bei echten Fehlern (`AudioFehler`). Eine Autoplay-Sperre ist nur vor der
+ * ersten erfolgreichen Wiedergabe harmlos; danach wird sie als Fehler gemeldet.
+ *
+ * Entsperren (iOS/Android): erst `touchend`/`pointerup`/`click`/`keydown` zählen als Nutzer-
+ * aktivierung — `pointerdown` mit Finger nicht. Deshalb bleiben die Listener aktiv, bis eine
+ * Wiedergabe wirklich gestartet ist.
  */
 import { istBuchstabe } from '../kern/alphabet';
 import {
   AudioFehler,
+  type Ausgang,
   type AudioDienst,
   type AudioManifest,
   type AudioSchluessel,
@@ -27,6 +33,7 @@ import { Aufnahmen } from './aufnahmen';
 import { ausCache, vertone, type AzureZugang } from './azure';
 import { browserstimmeVerfuegbar, sprich } from './browserstimme';
 import { lautSsml, nameSsml, textSsml } from './ipa';
+import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 
 /** Präfixe für besondere Varianten-URLs (siehe `Einstellungen.gewaehlteLautVarianten`). */
 const AUFNAHME = 'aufnahme:';
@@ -63,8 +70,8 @@ function stilleWav(): string {
 /** Was für eine Ausgabe in Frage kommt. */
 interface Plan {
   aufnahme?: AudioSchluessel;
-  /** Datei-URL (relativ oder Blob), nachdem das Manifest geladen ist; undefined = keine Datei. */
-  datei?: () => Promise<string | undefined>;
+  /** Datei-URL (relativ oder Blob-URL) bzw. fertiges Audio, nachdem das Manifest geladen ist; undefined = keine Datei. */
+  datei?: () => Promise<string | Blob | undefined>;
   /** SSML-Inhalt für Cache und Azure. */
   ssml: string;
   /** Text für die Browserstimme. */
@@ -77,14 +84,25 @@ class Dienst implements AudioDienst {
   private manifest: AudioManifest | undefined;
   private laden: Promise<void> | undefined;
   private ctrl = new AbortController();
+  /** true, sobald eine Wiedergabe wirklich gestartet ist (play() aufgelöst). */
   private entsperrt = false;
+  private gestenAbmelden: () => void = () => undefined;
 
   constructor(private readonly einstellungen: EinstellungenStore) {
     this.el.preload = 'auto';
     const geste = (): void => this.entsperre();
-    for (const ereignis of ['pointerdown', 'touchend', 'keydown'] as const) {
-      document.addEventListener(ereignis, geste, { capture: true, once: true, passive: true });
-    }
+    const ereignisse = ['touchend', 'pointerup', 'click', 'keydown'] as const;
+    for (const e of ereignisse) document.addEventListener(e, geste, { capture: true, passive: true });
+    this.gestenAbmelden = () => {
+      for (const e of ereignisse) document.removeEventListener(e, geste, { capture: true });
+    };
+  }
+
+  /** Eine Wiedergabe lief an: ab jetzt ist eine Sperre ein echter Fehler, die Gesten-Listener gehen weg. */
+  private markiereEntsperrt(): void {
+    if (this.entsperrt) return;
+    this.entsperrt = true;
+    this.gestenAbmelden();
   }
 
   // ---- Laden -------------------------------------------------------------
@@ -114,15 +132,28 @@ class Dienst implements AudioDienst {
 
   // ---- Ausgaben ----------------------------------------------------------
 
-  laut(b: Buchstabe): Promise<void> {
+  laut(b: Buchstabe): Promise<Ausgang> {
     return this.ausgabe({
       aufnahme: { art: 'laut', text: b },
       datei: async () => {
         const gewaehlt = this.einstellungen.lese().gewaehlteLautVarianten[b];
+        if (gewaehlt?.startsWith(AZURE)) {
+          const z = this.azure();
+          if (!z) {
+            throw new AudioFehler(
+              `Im Laut-Studio ist für „${b}“ die Live-Stimme gewählt, aber der eigene Azure-Schlüssel fehlt. ` +
+                'Bitte den Schlüssel eintragen oder im Laut-Studio „Standard“ wählen.',
+            );
+          }
+          const ssml = lautSsml(b);
+          return (await ausCache(z.stimme, ssml)) ?? (await vertone(z, ssml));
+        }
         if (gewaehlt) {
           const url = await this.varianteUrl(gewaehlt);
           if (url) return url;
-          // gewählte Aufnahme wurde gelöscht → Standardvariante
+          // Die gewählte eigene Aufnahme fehlt: Auswahl zurücksetzen und melden, nicht still ersetzen.
+          this.vergissWahl(b, gewaehlt);
+          throw new AudioFehler(`Die gewählte eigene Aufnahme für „${b}“ fehlt. Es gilt wieder die Standard-Aussprache.`);
         }
         return (await this.m()).laute[b];
       },
@@ -131,7 +162,7 @@ class Dienst implements AudioDienst {
     });
   }
 
-  name(b: Buchstabe): Promise<void> {
+  name(b: Buchstabe): Promise<Ausgang> {
     return this.ausgabe({
       aufnahme: { art: 'name', text: b },
       datei: async () => (await this.m()).namen[b],
@@ -140,11 +171,11 @@ class Dienst implements AudioDienst {
     });
   }
 
-  buchstabe(b: Buchstabe): Promise<void> {
+  buchstabe(b: Buchstabe): Promise<Ausgang> {
     return this.einstellungen.lese().namenStattLaute ? this.name(b) : this.laut(b);
   }
 
-  wort(w: string): Promise<void> {
+  wort(w: string): Promise<Ausgang> {
     // So sprechen, wie es im Wörterbuch steht — aber nie ganz in Großbuchstaben (sonst wird buchstabiert).
     const sprech = w.length > 1 && w === w.toLocaleUpperCase('de-DE') ? w.toLocaleLowerCase('de-DE') : w;
     return this.ausgabe({
@@ -155,7 +186,7 @@ class Dienst implements AudioDienst {
     });
   }
 
-  satz(text: string): Promise<void> {
+  satz(text: string): Promise<Ausgang> {
     return this.ausgabe({
       datei: async () => (await this.m()).saetze?.[text],
       ssml: textSsml(text, true),
@@ -163,18 +194,18 @@ class Dienst implements AudioDienst {
     });
   }
 
-  async datei(url: string): Promise<void> {
+  async datei(url: string): Promise<Ausgang> {
     const signal = this.neu();
     if (url.startsWith(AZURE)) {
       const b = this.buchstabeAus(url, AZURE);
       const z = this.azure();
       if (!z) throw new AudioFehler('Für die Live-Vertonung fehlt der eigene Azure-Schlüssel.');
       const blob = (await ausCache(z.stimme, lautSsml(b))) ?? (await vertone(z, lautSsml(b)));
-      if (signal.aborted) return;
+      if (signal.aborted) return 'abgebrochen';
       return this.spieleBlob(blob, signal);
     }
     const aufgeloest = await this.varianteUrl(url);
-    if (signal.aborted) return;
+    if (signal.aborted) return 'abgebrochen';
     if (!aufgeloest) throw new AudioFehler('Diese Aufnahme gibt es nicht mehr.');
     return this.spiele(aufgeloest, signal);
   }
@@ -206,12 +237,16 @@ class Dienst implements AudioDienst {
     return this.aufnahmen.starten();
   }
 
-  aufnahmeSpeichern(s: AudioSchluessel, blob: Blob): Promise<void> {
-    return this.aufnahmen.speichern(s, blob);
+  async aufnahmeSpeichern(s: AudioSchluessel, blob: Blob): Promise<void> {
+    await this.aufnahmen.speichern(s, blob);
+    // Eigene Aufnahmen gibt es nirgends sonst: den Browser um dauerhaften Speicher bitten.
+    bitteUmDauerhaftenSpeicher().catch((f: unknown) => console.error('Dauerhafter Speicher nicht anfragbar', f));
   }
 
-  aufnahmeLoeschen(s: AudioSchluessel): Promise<void> {
-    return this.aufnahmen.loeschen(s);
+  async aufnahmeLoeschen(s: AudioSchluessel): Promise<void> {
+    await this.aufnahmen.loeschen(s);
+    // War genau diese Aufnahme im Laut-Studio gewählt, gilt wieder die Standard-Aussprache.
+    if (s.art === 'laut' && istBuchstabe(s.text)) this.vergissWahl(s.text, AUFNAHME + s.text);
   }
 
   hatAufnahme(s: AudioSchluessel): Promise<boolean> {
@@ -234,6 +269,15 @@ class Dienst implements AudioDienst {
     return schluessel && region ? { schluessel, region, stimme: e.stimme } : undefined;
   }
 
+  /** Entfernt die Laut-Studio-Auswahl für `b`, wenn sie noch `url` ist. */
+  private vergissWahl(b: Buchstabe, url: string): void {
+    const alle = this.einstellungen.lese().gewaehlteLautVarianten;
+    if (alle[b] !== url) return;
+    const neu = { ...alle };
+    delete neu[b];
+    this.einstellungen.setze({ gewaehlteLautVarianten: neu });
+  }
+
   private buchstabeAus(url: string, praefix: string): Buchstabe {
     const b = url.slice(praefix.length);
     if (!istBuchstabe(b)) throw new AudioFehler(`Unbekannter Buchstabe in „${url}".`);
@@ -247,57 +291,60 @@ class Dienst implements AudioDienst {
     return url;
   }
 
-  private async ausgabe(p: Plan): Promise<void> {
+  private async ausgabe(p: Plan): Promise<Ausgang> {
     const signal = this.neu();
     if (p.aufnahme) {
       const u = await this.aufnahmen.url(p.aufnahme);
-      if (signal.aborted) return;
+      if (signal.aborted) return 'abgebrochen';
       if (u) return this.spiele(u, signal);
     }
     const d = await p.datei?.();
-    if (signal.aborted) return;
+    if (signal.aborted) return 'abgebrochen';
+    if (d instanceof Blob) return this.spieleBlob(d, signal);
     if (d) return this.spiele(d, signal);
 
     const stimme = this.einstellungen.lese().stimme;
     const gecacht = await ausCache(stimme, p.ssml);
-    if (signal.aborted) return;
+    if (signal.aborted) return 'abgebrochen';
     if (gecacht) return this.spieleBlob(gecacht, signal);
 
     const z = this.azure();
     if (z) {
       const blob = await vertone(z, p.ssml);
-      if (signal.aborted) return;
+      if (signal.aborted) return 'abgebrochen';
       return this.spieleBlob(blob, signal);
     }
-    return sprich(p.text, signal);
+    return sprich(p.text, signal, () => this.entsperrt);
   }
 
-  private async spieleBlob(blob: Blob, signal: AbortSignal): Promise<void> {
+  private async spieleBlob(blob: Blob, signal: AbortSignal): Promise<Ausgang> {
     const url = URL.createObjectURL(blob);
     try {
-      await this.spiele(url, signal);
+      return await this.spiele(url, signal);
     } finally {
       URL.revokeObjectURL(url);
     }
   }
 
-  /** Spielt eine URL auf dem gemeinsamen Audio-Element; löst bei Ende oder Abbruch auf. */
-  private spiele(pfad: string, signal: AbortSignal): Promise<void> {
+  /** Spielt eine URL auf dem gemeinsamen Audio-Element; löst bei Ende (`fertig`) oder Abbruch (`abgebrochen`) auf. */
+  private spiele(pfad: string, signal: AbortSignal): Promise<Ausgang> {
     const el = this.el;
     const url = aufloesen(pfad);
-    return new Promise<void>((ok, fehler) => {
+    return new Promise<Ausgang>((ok, fehler) => {
       let erledigt = false;
       const aufraeumen = (): void => {
         erledigt = true;
         el.removeEventListener('ended', ende);
         el.removeEventListener('error', kaputt);
-        signal.removeEventListener('abort', ende);
+        signal.removeEventListener('abort', abbruch);
       };
-      const ende = (): void => {
+      const schluss = (a: Ausgang): void => {
         if (erledigt) return;
         aufraeumen();
-        ok();
+        ok(a);
       };
+      const ende = (): void => schluss('fertig');
+      const abbruch = (): void => schluss('abgebrochen');
       const kaputt = (): void => {
         if (erledigt) return;
         aufraeumen();
@@ -306,12 +353,19 @@ class Dienst implements AudioDienst {
       };
       el.addEventListener('ended', ende);
       el.addEventListener('error', kaputt);
-      signal.addEventListener('abort', ende, { once: true });
+      signal.addEventListener('abort', abbruch, { once: true });
       el.src = url;
-      el.play().catch((f: unknown) => {
+      el.play().then(() => this.markiereEntsperrt(), (f: unknown) => {
         const name = f instanceof DOMException ? f.name : '';
-        // Autoplay vor der ersten Berührung (NotAllowed) oder durch neue Ausgabe unterbrochen (Abort): kein Fehler.
-        if (name === 'NotAllowedError' || name === 'AbortError' || signal.aborted) ende();
+        // Durch eine neue Ausgabe unterbrochen: kein Fehler.
+        if (name === 'AbortError' || signal.aborted) abbruch();
+        // Autoplay-Sperre vor der ersten erfolgreichen Wiedergabe: erwartbar (noch keine Berührung).
+        else if (name === 'NotAllowedError' && !this.entsperrt) abbruch();
+        else if (name === 'NotAllowedError') {
+          if (erledigt) return;
+          aufraeumen();
+          fehler(new AudioFehler('Der Browser hat die Tonausgabe blockiert. Bitte einmal auf den Bildschirm tippen.'));
+        }
         // NotSupportedError u. a.: das error-Ereignis des Elements meldet die Ursache; ohne Ereignis hier melden.
         else
           queueMicrotask(() => {
@@ -323,20 +377,25 @@ class Dienst implements AudioDienst {
     });
   }
 
-  /** iOS/Safari: Wiedergabe erst nach der ersten Nutzergeste möglich — dort einmal still anspielen. */
+  /**
+   * iOS/Safari: Wiedergabe erst nach einer Nutzergeste möglich — dort einmal still anspielen.
+   * `entsperrt` wird erst gesetzt, wenn play() wirklich aufgelöst hat; scheitert der Versuch
+   * (Geste zählte nicht), probiert es die nächste Geste erneut.
+   */
   private entsperre(): void {
     if (this.entsperrt) return;
-    this.entsperrt = true;
+    // Läuft schon eine echte Ausgabe, entsperrt deren play() — nicht dazwischenfunken.
     if (!this.el.paused) return;
     const still = stilleWav();
     this.el.src = still;
     this.el
       .play()
       .then(() => {
+        this.markiereEntsperrt();
         if (this.el.src === still) this.el.pause();
       })
       .catch(() => {
-        /* Entsperren ist ein Versuch ohne Folgen; echte Ausgaben melden ihre Fehler selbst. */
+        /* Diese Geste reichte nicht (oder eine echte Ausgabe hat übernommen) — die nächste Geste versucht es wieder. */
       })
       .finally(() => URL.revokeObjectURL(still));
     if (browserstimmeVerfuegbar()) {

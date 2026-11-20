@@ -7,10 +7,12 @@
  * - data-testid="slot-<i>" mit data-gefuellt="ja|nein".
  * - data-testid="rueckmeldung" mit data-art leer|richtig|falsch|geschafft.
  *
- * Fehlerkontrolle im Material: ein falscher Buchstabe wackelt sanft und bleibt im Kasten —
- * kein Rot, kein Fehlerton, keine Strafe. Der richtige fliegt in sein Feld und klingt.
+ * Fehlerkontrolle im Material: ein falscher Buchstabe klingt mit seinem normalen Laut, wackelt
+ * sanft und bleibt im Kasten — kein Rot, kein Fehlerton, keine Strafe. So hört das Kind selbst,
+ * dass er nicht passt. Nach dem dritten Fehlversuch am selben Feld klingt danach der gesuchte
+ * Laut, und das Feld leuchtet kurz auf. Der richtige fliegt in sein Feld und klingt.
  */
-import { LAUTE, type Buchstabe, type Kontext, type RueckmeldungsArt } from '../../kern/vertrag';
+import { LAUTE, type Ausgang, type Buchstabe, type Kontext, type RueckmeldungsArt } from '../../kern/vertrag';
 import { anzeigeZeichen, artVon, buchstabenVon } from '../../kern/alphabet';
 import { animiere, el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
@@ -29,8 +31,11 @@ export interface WortarbeitOptionen {
   /** Klein vor dem Wort angezeigt, wird nicht geschrieben (Tier-Modus). */
   artikel?: string;
   melde(fehler: unknown): void;
-  /** Wort fertig. `letzterLaut` löst auf, wenn der Laut des letzten Buchstabens verklungen ist. */
-  beiGeschafft(letzterLaut: Promise<void>): void;
+  /**
+   * Wort fertig. `letzterLaut` löst auf, wenn der Laut des letzten Buchstabens verklungen ist:
+   * `fertig`, `abgebrochen` (das Kind hat schon etwas Neues angetippt) oder `undefined` nach einem gemeldeten Fehler.
+   */
+  beiGeschafft(letzterLaut: Promise<Ausgang | undefined>): void;
 }
 
 export interface Wortarbeit {
@@ -77,6 +82,7 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
   const buchstaben = buchstabenVon(wort); // wirft bei fremden Zeichen
   let gross = ctx.einstellungen.lese().grossbuchstaben;
   let index = 0;
+  let fehlversuche = 0;
   let fertig = false;
   const flieger = new Set<HTMLElement>();
 
@@ -169,8 +175,21 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
       if (b !== soll) {
         alphabet.wackle(b);
         setzeRueckmeldung('falsch');
+        fehlversuche++;
+        const feld = index;
+        const klang = spiele(ctx.audio.buchstabe(b), o.melde);
+        if (fehlversuche >= 3 && soll) {
+          // Hilfe ohne Strafe: nach dem eigenen Laut der gesuchte, das Feld leuchtet kurz auf.
+          void klang.then((a) => {
+            if (a !== 'fertig' || fertig || zerstoert || index !== feld) return;
+            const slot = slots[feld];
+            if (slot) animiere(slot, 'slot--hinweis');
+            return spiele(ctx.audio.buchstabe(soll), o.melde);
+          });
+        }
         return;
       }
+      fehlversuche = 0;
       fuelle(index, b);
       const laut = spiele(ctx.audio.buchstabe(b), o.melde);
       index++;
@@ -186,6 +205,7 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
   });
   wurzel.append(alphabet.el);
 
+  let zerstoert = false;
   const abmelden = ctx.einstellungen.abonniere((e) => {
     if (e.grossbuchstaben === gross) return;
     gross = e.grossbuchstaben;
@@ -197,7 +217,6 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
     });
   });
 
-  let zerstoert = false;
   return {
     el: wurzel,
     zerstoere() {

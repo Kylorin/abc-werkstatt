@@ -15,6 +15,9 @@ import type { Kontext, Modus, ModusId } from './vertrag';
 
 export type Dienste = Omit<Kontext, 'navigiere' | 'param' | 'setzeTitel'>;
 
+/** Wird nach jedem Bildschirmwechsel auf `window` ausgelöst (z. B. für aufgeschobene Updates). */
+export const ROUTE_GEWECHSELT = 'abc-werkstatt:route';
+
 export interface Router {
   navigiere(ziel: ModusId | 'start', param?: string): void;
   /** Aktuelle Route. */
@@ -58,6 +61,11 @@ export function starteRouter(wurzel: HTMLElement, dienste: Dienste, modi: readon
   }
 
   function zeige(): void {
+    zeichne();
+    window.dispatchEvent(new Event(ROUTE_GEWECHSELT));
+  }
+
+  function zeichne(): void {
     const nr = ++lauf;
     verlasseAktiv();
     leeren(wurzel);

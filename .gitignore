@@ -6,7 +6,6 @@ playwright-report/
 abnahme-ergebnis/
 tools/.lokal/
 .env
-.claude/settings.local.json
-.claude/carpe-noctem/
+.claude/
 # Worktrees der Bau-Agenten (node_modules wird von oben gefunden)
 .wt/

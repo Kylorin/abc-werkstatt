@@ -7,6 +7,7 @@
 import './einstellungen.css';
 import { el, fehlerHinweis } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
+import { speicherStand } from '../../kern/speicher';
 import type { Einstellungen, Kontext, Modus } from '../../kern/vertrag';
 
 const STANDARD_REGION = 'germanywestcentral';
@@ -118,6 +119,24 @@ function stimmeUndAzure(ctx: Kontext): HTMLElement {
   );
 }
 
+/** Zeigt, ob der Browser die Daten dauerhaft hält — sonst darf er Paket und Aufnahmen bei Platzmangel räumen. */
+function speicher(): HTMLElement {
+  const zeile = el('p', { klasse: 'einstellungen__hinweis', testid: 'speicher-stand', text: 'Speicher wird geprüft …' });
+  speicherStand().then(
+    (st) => {
+      const mb = st.belegt !== undefined ? `, belegt ${(st.belegt / 1_000_000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} MB` : '';
+      if (st.dauerhaft === true) zeile.textContent = `Speicher dauerhaft: ja${mb}.`;
+      else if (st.dauerhaft === false) {
+        zeile.textContent =
+          `Speicher dauerhaft: nein${mb}. Der Browser darf Tier-Pakete und eigene Aufnahmen bei Platzmangel löschen. ` +
+          'Tipp: die App zum Startbildschirm hinzufügen und ein Paket importieren – dann fragt sie erneut.';
+      } else zeile.textContent = `Dieses Gerät sagt nicht, ob der Speicher dauerhaft ist${mb}.`;
+    },
+    (f: unknown) => zeile.replaceWith(fehlerHinweis(f)),
+  );
+  return abschnitt('Speicher', zeile);
+}
+
 function kind(ctx: Kontext): HTMLElement {
   const name = el('input', {
     klasse: 'feld',
@@ -170,14 +189,39 @@ function pakete(ctx: Kontext): HTMLElement {
     });
   }
 
+  /** Löschen ist rückholbar (Papierkorb im Paket-Dienst): danach steht hier „zurückholen". */
   async function loeschen(id: string): Promise<void> {
     meldung.replaceChildren();
+    const titel = (await ctx.pakete.hole(id))?.titel ?? id;
     try {
       await ctx.pakete.loesche(id);
     } catch (f) {
       if (aktiv) meldung.replaceChildren(fehlerHinweis(f));
+      if (aktiv) neuZeigen();
+      return;
     }
-    if (aktiv) neuZeigen();
+    if (!aktiv) return;
+    neuZeigen();
+    meldung.replaceChildren(
+      el('div', { klasse: 'rueckgaengig', testid: 'paket-rueckgaengig' },
+        el('span', { text: `„${titel}“ ist gelöscht.` }),
+        el('button', {
+          klasse: 'knopf',
+          testid: `paket-zurueckholen-${id}`,
+          beiKlick: () => {
+            meldung.replaceChildren();
+            ctx.pakete.stelleWiederHer(id).then(
+              () => {
+                if (aktiv) neuZeigen();
+              },
+              (f: unknown) => {
+                if (aktiv) meldung.replaceChildren(fehlerHinweis(f));
+              },
+            );
+          },
+        }, icon('nochmal', { groesse: 20 }), el('span', { text: 'zurückholen' })),
+      ),
+    );
   }
 
   const datei = el('input', {
@@ -250,6 +294,7 @@ export const modus: Modus = {
       ),
       stimmeUndAzure(ctx),
       pakete(ctx),
+      speicher(),
       kind(ctx),
     );
   },

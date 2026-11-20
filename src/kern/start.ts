@@ -1,7 +1,9 @@
 /**
  * Startseite (Fundament, data-testid="start").
  * Oben – falls installiert – groß die Tier-Pakete (Titel + Cover aus dem Paket),
- * darunter die drei Arbeiten, unten leise die Einstellungen für Eltern.
+ * darunter die Arbeiten des Kindes, unten leise der Elternbereich (Wörterbuch, Einstellungen).
+ * Das Wörterbuch ist bewusst KEINE große Kachel: für ein Kind, das nicht liest, sähe es aus
+ * wie eine weitere Arbeit — dort kann man aber Wörter löschen.
  */
 import { el, fehlerHinweis } from './dom';
 import { icon } from './ui/icons';
@@ -10,8 +12,10 @@ import type { Modus, ModusId, TierPaket } from './vertrag';
 
 type Navigiere = (ziel: ModusId | 'start', param?: string) => void;
 
-/** Reihenfolge der Kacheln für die Arbeiten. */
-const ARBEITEN: readonly ModusId[] = ['frei', 'nachfuellen', 'woerterbuch'];
+/** Reihenfolge der Kacheln für die Arbeiten des Kindes. */
+const ARBEITEN: readonly ModusId[] = ['frei', 'nachfuellen'];
+/** Elternbereich: leise Knöpfe im Fuß. */
+const ELTERN: readonly ModusId[] = ['woerterbuch', 'einstellungen'];
 
 export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly Modus[], navigiere: Navigiere): void {
   const nachId = new Map(modi.map((m) => [m.id, m]));
@@ -31,19 +35,19 @@ export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly
     );
   }
 
-  const einst = nachId.get('einstellungen');
-  const fuss = el(
-    'footer',
-    { klasse: 'start__fuss' },
-    einst
-      ? el(
-          'button',
-          { klasse: 'knopf knopf--leise', testid: 'einstellungen', beiKlick: () => navigiere('einstellungen') },
-          icon(einst.icon, { groesse: 24 }),
-          el('span', { text: einst.titel }),
-        )
-      : null,
-  );
+  const fuss = el('footer', { klasse: 'start__fuss', attr: { 'aria-label': 'Für Eltern' } });
+  for (const id of ELTERN) {
+    const m = nachId.get(id);
+    if (!m) continue;
+    fuss.append(
+      el(
+        'button',
+        { klasse: 'knopf knopf--leise', testid: id === 'einstellungen' ? 'einstellungen' : `modus-${id}`, beiKlick: () => navigiere(id) },
+        icon(m.icon, { groesse: 24 }),
+        el('span', { text: m.titel }),
+      ),
+    );
+  }
 
   const seite = el(
     'div',
@@ -93,7 +97,11 @@ async function zeigeTiere(bereich: HTMLElement, dienste: Dienste, navigiere: Nav
       dienste.pakete
         .bildUrl(p.id, p.cover)
         .then((url) => bild.append(el('img', { attr: { src: url, alt: '', decoding: 'async' } })))
-        .catch((f: unknown) => console.error(f));
+        .catch((f: unknown) => {
+          // Cover fehlt oder ist unlesbar: Tier-Icon statt leerer Fläche, und die Eltern sehen warum.
+          bild.replaceChildren(icon('tiere', { groesse: 56, strich: 1.5 }));
+          bereich.append(fehlerHinweis(f));
+        });
     } else {
       bild.append(icon('tiere', { groesse: 56, strich: 1.5 }));
     }

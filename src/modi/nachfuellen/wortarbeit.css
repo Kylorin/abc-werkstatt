@@ -9,7 +9,7 @@
   background: transparent; color: var(--tinte);
   transition: background var(--dauer-lang) var(--kurve), border-color var(--dauer-lang);
 }
-.zielwort:hover { background: var(--papier-tief); }
+@media (hover: hover) and (pointer: fine) { .zielwort:hover { background: var(--papier-tief); } }
 .zielwort__artikel { font-size: var(--gr-l); color: var(--tinte-leise); line-height: 1; }
 
 .zielwort .felder { max-width: 100%; }
@@ -47,3 +47,10 @@
 }
 
 .meldung:empty { display: none; }
+
+/* Hilfe nach drei Fehlversuchen: das gesuchte Feld leuchtet kurz und ruhig auf. */
+@keyframes slot-hinweis {
+  0%, 100% { background: var(--karte); transform: scale(1); }
+  45% { background: var(--sonne-hell); transform: scale(1.06); }
+}
+.slot--hinweis { animation: slot-hinweis 1.2s var(--kurve); }

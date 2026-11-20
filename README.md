@@ -11,19 +11,20 @@ Startbildschirm hinzufügen" installieren.
 
 | Bereich | Was das Kind tut |
 |---|---|
-| **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. |
-| **Nachfüllen** | Ein Wort steht als Vorlage mit leeren Feldern da; das Kind legt die Buchstaben der Reihe nach hinein. |
-| **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Bild eines Tiers, das Kind schreibt seinen Namen, und das Tier freut sich. |
-| **Wörterbuch** (Eltern) | Eigene Übungswörter anlegen und löschen. |
-| **Einstellungen** (Eltern) | Buchstabennamen statt Laute, Großbuchstaben, eigener Azure-Schlüssel für neue Wörter, Laut-Studio (Aussprache je Buchstabe wählen oder selbst aufnehmen), Tier-Pakete importieren. |
+| **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. Der Text bleibt beim Verlassen erhalten, „Alles wegräumen" lässt sich zurückholen. |
+| **Nachfüllen** | Ein lautgetreues Wort steht als Vorlage mit leeren Feldern da; das Kind legt die Buchstaben der Reihe nach hinein. Leichte Wörter kommen öfter dran als schwere. |
+| **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Bild eines Tiers, das Kind schreibt seinen Namen, und das Tier freut sich. Es geht beim nächsten Mal beim nächsten Tier weiter. |
+| **Wörterbuch** (Eltern, leise im Fuß des Starts) | Eigene Übungswörter anlegen, fürs Üben an-/abwählen und löschen (das zuletzt gelöschte Wort lässt sich zurückholen). |
+| **Einstellungen** (Eltern, leise im Fuß des Starts) | Buchstabennamen statt Laute, Großbuchstaben, eigener Azure-Schlüssel für neue Wörter, Laut-Studio (Aussprache je Buchstabe wählen oder selbst aufnehmen), Tier-Pakete importieren und löschen (zurückholbar bis zum nächsten Löschen/Import), Speicherstand. |
 
 ## Montessori-Grundsätze
 
 - **Laute statt Buchstabennamen** – `m` klingt „mmm", nicht „em". Namen und Großbuchstaben gibt es nur als Einstellung.
 - **Kleinbuchstaben** in der Leseanfänger-Schrift **Andika** (SIL, OFL – selbst gehostet).
 - **Bewegliches Alphabet:** Vokale blau, Konsonanten rot; Umlaute zählen als Vokale.
-- **Fehlerkontrolle im Material:** Ein unpassender Buchstabe wackelt sanft und springt zurück – kein rotes X, kein Fehlerton, keine Punkte.
-- **Ruhe:** ein Ding pro Bildschirm, keine Zeitlimits, alles lässt sich antippen und erneut hören.
+- **Lautgetreue Startwörter:** Die Laute der Buchstaben ergeben das Wort (oma, sofa, igel …); Phonogramme wie sch, ei, au kommen später.
+- **Fehlerkontrolle im Material:** Ein unpassender Buchstabe klingt mit seinem Laut, wackelt sanft und springt zurück – kein rotes X, kein Fehlerton, keine Punkte. Nach drei Versuchen klingt der gesuchte Laut.
+- **Ruhe:** ein Ding pro Bildschirm, keine Zeitlimits, alles lässt sich antippen und erneut hören. Nach einem geschafften Wort geht es erst weiter, wenn zu Ende gesprochen ist.
 - Bewusste Ausnahme im Tier-Modus: Das Tier freut sich sichtbar und hörbar – fröhlich, aber ohne Münzen oder Punkte.
 
 ## Tier-Pakete
@@ -70,6 +71,11 @@ Vite + TypeScript (strict), ohne Framework. **Richter ist die GitHub-CI:** Jeder
 `main` baut, fährt die Playwright-Abnahme in `tests/abnahme/` und veröffentlicht nur bei Grün
 auf GitHub Pages. `tools/ci_gruen.sh [Gruppe …]` wartet auf den Lauf zum aktuellen Commit und
 meldet das Ergebnis (ganz oder je Testgruppe).
+
+**Datenschutz-Abnahme:** Die privaten Begriffe, die nie ins Repo dürfen, stehen nicht im Code,
+sondern im Actions-Secret `VERBOTENE_BEGRIFFE` bzw. lokal in `tools/.lokal/verboten.txt`
+(gitignored, ein regulärer Ausdruck je Zeile). Fehlt die Liste, ist die Abnahme rot. Geprüft
+werden der Arbeitsbaum und alle neuen Commits (CI checkt mit voller Historie aus).
 
 ## Lizenz
 

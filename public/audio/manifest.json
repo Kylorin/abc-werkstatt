@@ -98,7 +98,17 @@
     "rad": "audio/woerter/rad.mp3",
     "tomate": "audio/woerter/tomate.mp3",
     "lama": "audio/woerter/lama.mp3",
-    "hut": "audio/woerter/hut.mp3"
+    "hut": "audio/woerter/hut.mp3",
+    "limo": "audio/woerter/limo.mp3",
+    "kino": "audio/woerter/kino.mp3",
+    "uhu": "audio/woerter/uhu.mp3",
+    "ufo": "audio/woerter/ufo.mp3",
+    "mofa": "audio/woerter/mofa.mp3",
+    "hose": "audio/woerter/hose.mp3",
+    "rose": "audio/woerter/rose.mp3",
+    "dose": "audio/woerter/dose.mp3",
+    "ofen": "audio/woerter/ofen.mp3",
+    "rabe": "audio/woerter/rabe.mp3"
   },
   "saetze": {
     "Fertig!": "audio/saetze/fertig.mp3",

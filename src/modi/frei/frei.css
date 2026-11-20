@@ -1,6 +1,6 @@
 /* Freies Schreiben (Bau „schreiben"). Das Blatt ist der Teppich, auf den die Buchstaben gelegt werden. */
 
-.flaeche--frei { gap: var(--abstand-4); }
+.flaeche--frei { gap: var(--abstand-4); position: relative; }
 
 .frei__blatt {
   min-height: calc(var(--gr-wort) * 1.6);
@@ -30,11 +30,18 @@
 .frei__mikro[aria-pressed='true'] { background: var(--vokal-hell); border-color: var(--vokal); color: var(--vokal); }
 @media (max-width: 380px) { .frei__knopftext { display: none; } }
 
-/* Tier-Besuch: erscheint groß über dem Blatt */
+/* Tier-Besuch: erscheint groß ÜBER dem Blatt als Einblendung — belegt keinen Platz im Fluss,
+   damit Alphabet und Leertaste beim Tippen nicht verrutschen. Nur das Tier selbst nimmt Tipps an. */
 .frei__besuch[data-offen='nein'] { display: none; }
 .frei__besuch {
+  position: absolute; z-index: 10; top: 0; left: 0; right: 0;
   display: grid; place-items: center;
-  --buehne: min(64vw, 34dvh, 300px);
+  pointer-events: none;
+  --buehne: min(56vw, 28dvh, 260px);
   animation: erscheinen var(--dauer-lang) var(--kurve-feder) both;
 }
-.frei__besuch-knopf { padding: 0; border: 0; background: transparent; border-radius: var(--radius-l); }
+.frei__besuch-knopf {
+  pointer-events: auto;
+  padding: var(--abstand-2); border: 0; border-radius: var(--radius-l);
+  background: color-mix(in srgb, var(--karte) 88%, transparent); box-shadow: var(--schatten);
+}

@@ -5,30 +5,43 @@
  * geschrieben). Reihenfolge nach Schwierigkeit, der Reihe nach statt zufällig. Mit Vorlage
  * (Schattenbuchstaben) oder nur Bild + Laut-Hilfe (Antippen des Bildes spricht den Namen),
  * je nach Einstellung `tierModusMitVorlage`. Das ganze Alphabet liegt bereit wie der Holzkasten:
- * beim Tier sucht das Kind selbst. Geschafft → das Tier freut sich (data-testid="tier-freude"),
- * nach ~4,6 s kommt das nächste Tier.
+ * beim Tier sucht das Kind selbst. Geschafft → das Tier freut sich (data-testid="tier-freude");
+ * das nächste Tier kommt erst, wenn die Freude zu Ende gesprochen ist (mindestens ~4,6 s).
+ *
+ * Fortschritt je Paket bleibt gespeichert (IndexedDB): wer den Modus verlässt, macht beim
+ * nächsten Mal beim nächsten Tier weiter statt wieder beim leichtesten.
  */
+import { createStore, get, set } from 'idb-keyval';
 import { schreibwort } from '../../kern/alphabet';
+import { wortSchwierigkeit } from '../../kern/woerter';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import type { Kontext, Modus, Tier, TierPaket, TierTreffer } from '../../kern/vertrag';
-import { Sitzung, erzeugeMeldung } from '../nachfuellen/sitzung';
+import { Sitzung, erzeugeMeldung, warteAufSprache } from '../nachfuellen/sitzung';
 import { erzeugeWortarbeit, type Wortarbeit } from '../nachfuellen/wortarbeit';
 import { erzeugeFreude, sprichFreude, sprichTierName, tierBezeichnung } from './freude';
 import './tiere.css';
 
 const FREUDE_DAUER_MS = 4600;
+/** Obergrenze nur gegen eine hängende Sprachausgabe; normal endet die Freude vorher. */
+const FREUDE_HOECHSTENS_MS = 8500;
+
+const fortschritt = createStore('abc-werkstatt-fortschritt', 'kv');
+const fortschrittSchluessel = (paketId: string): string => `tiere:${paketId}`;
+
+/** Gespeicherte Position in der Reihe (Index des nächsten Tiers), 0 wenn noch keine. */
+async function ladePosition(paketId: string): Promise<number> {
+  const roh = await get<unknown>(fortschrittSchluessel(paketId), fortschritt);
+  if (roh === undefined) return 0;
+  if (typeof roh !== 'number' || !Number.isInteger(roh) || roh < 0) throw new Error('Gespeicherter Tier-Fortschritt ist beschädigt.');
+  return roh;
+}
 
 let sitzung: Sitzung | undefined;
 
-/** Leicht vor schwer: kurze Wörter, wenige verschiedene Buchstaben, keine Umlaute/ß/Doppelkonsonanten zuerst. */
+/** Leicht vor schwer — dieselbe Bewertung wie beim Nachfüllen (`wortSchwierigkeit`). */
 export function schwierigkeit(tier: Tier): number {
-  const w = schreibwort(tier.name);
-  const zeichen = Array.from(w);
-  const verschieden = new Set(zeichen).size;
-  const besonders = zeichen.filter((z) => 'äöüßqxyc'.includes(z)).length;
-  const verbindungen = (w.match(/sch|ch|ck|qu|ei|eu|äu|ie|pf/g) ?? []).length;
-  return zeichen.length * 10 + verschieden * 2 + besonders * 6 + verbindungen * 4;
+  return wortSchwierigkeit(schreibwort(tier.name));
 }
 
 export function reiheNachSchwierigkeit(tiere: readonly Tier[]): Tier[] {
@@ -79,8 +92,13 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
 
   let arbeit: Wortarbeit | undefined;
   s.nachher(() => arbeit?.zerstoere());
-  let position = 0;
+  let position = await ladePosition(gewaehlt.id);
+  if (!s.lebt) return;
   let runde = 0;
+
+  function merkePosition(): void {
+    set(fortschrittSchluessel(gewaehlt.id), position % reihe.length, fortschritt).catch(meldung.melde);
+  }
 
   async function naechstesTier(): Promise<void> {
     const tier = reihe[position % reihe.length];
@@ -116,11 +134,15 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
         buehne.replaceChildren(
           el('button', { klasse: 'tier-buehne__knopf', attr: { 'aria-label': `${name} – Namen hören` }, beiKlick: sprichName }, erzeugeFreude({ bildUrl, alt: name })),
         );
+        merkePosition(); // geschafft → beim nächsten Öffnen geht es mit dem nächsten Tier weiter
         const aktuell = (): boolean => s.lebt && meineRunde === runde;
-        void letzterLaut.then(() => {
-          if (aktuell()) return sprichFreude(ctx, treffer, wort, aktuell, meldung.melde);
+        const gesprochen = letzterLaut.then((a) => {
+          // abgebrochen: das Kind hat schon etwas Neues angetippt — die Freude-Kette nicht drüberlegen.
+          if (a !== 'abgebrochen' && aktuell()) return sprichFreude(ctx, treffer, wort, aktuell, meldung.melde);
         });
-        s.warte(FREUDE_DAUER_MS, () => {
+        void warteAufSprache(s, gesprochen, FREUDE_DAUER_MS, FREUDE_HOECHSTENS_MS).then(() => {
+          if (!aktuell()) return;
+          ctx.audio.stopp();
           naechstesTier().catch(meldung.melde);
         });
       },

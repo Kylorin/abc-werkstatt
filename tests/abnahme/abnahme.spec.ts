@@ -1,7 +1,8 @@
 // Abnahmetests der ABC-Werkstatt — RICHTER-DATEI, nachts schreibgeschützt.
 // Vertrag über data-testid. Die App darf intern beliebig gebaut sein, solange diese Tests grün sind.
 import { test, expect, Page } from '@playwright/test';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const LAUTE = 'abcdefghijklmnopqrstuvwxyzäöüß'.split('');
@@ -195,22 +196,65 @@ test.describe('Audio-Bestand', () => {
 });
 
 test.describe('Datenschutz im Repo', () => {
-  test('kein Kindername und kein Schlüssel im Code', () => {
-    // Name und Serienwort zusammengesetzt, damit diese Datei sich nicht selbst meldet
-    const verboten = new RegExp(
-      ['phil', 'eas'].join('') + '|' + ['schmuse', '[\\s_-]?', 'decke'].join('') + '|Ocp-Apim-Subscription-Key:\\s*[0-9a-zA-Z]{20,}',
-      'i',
-    );
+  // Die privaten Begriffe (Name des Kindes, Serienwort, Arbeitsidentität …) stehen NICHT in dieser
+  // öffentlichen Datei: in der CI kommen sie aus dem Actions-Secret VERBOTENE_BEGRIFFE, lokal aus der
+  // gitignorierten tools/.lokal/verboten.txt. Ein regulärer Ausdruck je Zeile, ohne Groß/klein.
+  // Fehlt die Liste, ist der Test ROT — ein Gate ohne Begriffe darf nie still grün sein.
+  function privateBegriffe(): RegExp {
+    const lokal = join(process.cwd(), 'tools', '.lokal', 'verboten.txt');
+    const roh = process.env.VERBOTENE_BEGRIFFE || (existsSync(lokal) ? readFileSync(lokal, 'utf8') : '');
+    const zeilen = roh.split(/\r?\n/).map(z => z.trim()).filter(z => z && !z.startsWith('#'));
+    expect(zeilen.length, 'Liste verbotener Begriffe fehlt (Secret VERBOTENE_BEGRIFFE bzw. tools/.lokal/verboten.txt)').toBeGreaterThan(0);
+    return new RegExp(zeilen.join('|'), 'i');
+  }
+
+  // Feste Muster, die nie öffentlich werden dürfen: Schlüssel-Header, UUIDs (z. B. Projekt-IDs eines
+  // Secret-Stores), lokale Benutzerpfade und der Name des Secret-Stores.
+  const FEST = new RegExp(
+    [
+      String.raw`Ocp-Apim-Subscription-Key:\s*[0-9a-zA-Z]{20,}`,
+      '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
+      String.raw`[A-Za-z]:[\\/]Users[\\/]`,
+      String.raw`/c/User` + 's/',
+      ['infi', 'sical'].join(''),
+    ].join('|'),
+    'i',
+  );
+
+  test('kein Kindername, kein privater Begriff und kein Schlüssel im Code', () => {
+    const privat = privateBegriffe();
     const treffer: string[] = [];
     const lauf = (dir: string) => {
       for (const n of readdirSync(dir)) {
-        if (['node_modules', '.git', 'dist', 'test-results', 'playwright-report'].includes(n)) continue;
+        if (['node_modules', '.git', 'dist', 'dev-dist', 'test-results', 'playwright-report', 'abnahme-ergebnis', '.lokal', '.wt'].includes(n)) continue;
         const p = join(dir, n);
+        if (privat.test(n)) treffer.push(`${p} (Dateiname)`);
         if (statSync(p).isDirectory()) lauf(p);
-        else if (/\.(ts|js|mjs|html|css|json|md|py|sh|yml|webmanifest|svg)$/.test(n) && verboten.test(readFileSync(p, 'utf8'))) treffer.push(p);
+        else if (/\.(ts|js|mjs|html|css|json|md|py|sh|yml|webmanifest|svg|txt)$/.test(n)) {
+          const inhalt = readFileSync(p, 'utf8');
+          if (privat.test(inhalt) || FEST.test(inhalt)) treffer.push(p);
+        }
       }
     };
     lauf(process.cwd());
+    expect(treffer).toEqual([]);
+  });
+
+  test('neue Commits (seit der Bereinigungs-Basis) bringen nichts davon in die Historie', () => {
+    // Prüft jede HINZUGEFÜGTE Zeile, jeden Dateinamen und jede Commit-Nachricht seit BASIS.
+    // Ältere Commits vor BASIS sind bekannt belastet und brauchen eine Bereinigung der Historie.
+    const BASIS = 'e339fec';
+    const git = (args: string[]) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
+    expect(git(['rev-parse', '--is-shallow-repository']).trim(), 'CI braucht die volle Historie (fetch-depth: 0)').toBe('false');
+    const privat = privateBegriffe();
+    const log = git(['log', '-p', '--no-color', '--no-ext-diff', '--format=commit %H%n%B', `${BASIS}..HEAD`]);
+    const treffer: string[] = [];
+    let commit = '';
+    for (const zeile of log.split('\n')) {
+      if (zeile.startsWith('commit ')) commit = zeile.slice(7, 19);
+      const geprueft = zeile.startsWith('-') && !zeile.startsWith('--- ') ? '' : zeile; // entfernte Zeilen zählen nicht
+      if (privat.test(geprueft) || FEST.test(geprueft)) treffer.push(`${commit}: ${zeile.slice(0, 1)}… (Zeile mit Treffer)`);
+    }
     expect(treffer).toEqual([]);
   });
 });

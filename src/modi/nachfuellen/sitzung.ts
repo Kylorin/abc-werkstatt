@@ -3,6 +3,7 @@
  * damit unmount() garantiert alles abmeldet — auch nach async-Lücken.
  */
 import { el, fehlerHinweis } from '../../kern/dom';
+import type { Ausgang } from '../../kern/vertrag';
 
 export class Sitzung {
   lebt = true;
@@ -52,7 +53,43 @@ export function erzeugeMeldung(): Meldung {
   };
 }
 
-/** Audio abspielen: Fehler gehen an die Meldung, das Ergebnis-Promise löst danach auf. */
-export function spiele(p: Promise<void>, melde: (f: unknown) => void): Promise<void> {
-  return p.catch((f: unknown) => melde(f));
+/**
+ * Audio abspielen: Fehler gehen an die Meldung, das Ergebnis-Promise löst danach auf —
+ * mit dem Ausgang (`fertig`/`abgebrochen`) oder `undefined` nach einem gemeldeten Fehler.
+ */
+export function spiele(p: Promise<Ausgang>, melde: (f: unknown) => void): Promise<Ausgang | undefined> {
+  return p.catch((f: unknown) => {
+    melde(f);
+    return undefined;
+  });
+}
+
+/**
+ * Wartet auf `fertig`, aber mindestens `mindestens` ms und höchstens `hoechstens` ms.
+ * Für den Schritt nach einem geschafften Wort: erst weiter, wenn zu Ende gesprochen ist —
+ * die Obergrenze schützt nur vor einer hängenden Sprachausgabe.
+ */
+export function warteAufSprache(s: Sitzung, fertig: Promise<unknown>, mindestens: number, hoechstens: number): Promise<void> {
+  return new Promise((ok) => {
+    let gesprochen = false;
+    let mindestZeit = false;
+    const pruefe = (): void => {
+      if (gesprochen && mindestZeit) ok();
+    };
+    s.warte(mindestens, () => {
+      mindestZeit = true;
+      pruefe();
+    });
+    s.warte(hoechstens, ok);
+    void fertig.then(
+      () => {
+        gesprochen = true;
+        pruefe();
+      },
+      () => {
+        gesprochen = true;
+        pruefe();
+      },
+    );
+  });
 }

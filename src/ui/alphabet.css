@@ -8,11 +8,17 @@
 }
 
 .alphabet__raster {
-  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--abstand-2);
 }
 @media (min-width: 560px) {
   .alphabet__raster { grid-template-columns: repeat(10, minmax(48px, 1fr)); }
+}
+/* Sehr schmale Handys (320 px, große Anzeige): alle 6 Spalten sichtbar statt rechts abgeschnitten. */
+@media (max-width: 359px) {
+  .alphabet { padding: var(--abstand-2); }
+  .alphabet__raster { gap: 6px; }
+  .alphabet__raster .taste { min-width: 0; }
 }
 
 /* Auswahl (Nachfüllen): wenige, große Kacheln, mittig */
@@ -24,7 +30,7 @@
   font-size: clamp(2rem, 9vw, 2.8rem);
 }
 
-.alphabet .taste:hover { background: var(--papier); }
+@media (hover: hover) and (pointer: fine) { .alphabet .taste:hover { background: var(--papier); } }
 .alphabet .taste--leer { min-height: var(--touch-gross); }
 .alphabet .taste--zurueck { min-height: var(--touch-gross); }
 

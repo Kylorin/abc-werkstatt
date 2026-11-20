@@ -8,7 +8,7 @@
  */
 import { animiere, el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
-import type { Kontext, TierTreffer } from '../../kern/vertrag';
+import type { Ausgang, Kontext, TierTreffer } from '../../kern/vertrag';
 import './freude.css';
 
 export interface FreudeOptionen {
@@ -48,16 +48,18 @@ function mitGrossemAnfang(text: string): string {
 }
 
 /** Name des Tiers sprechen: Paket-Audio, sonst das Wort über den Audio-Dienst. */
-export async function sprichTierName(ctx: Kontext, treffer: TierTreffer, wort: string): Promise<void> {
+export async function sprichTierName(ctx: Kontext, treffer: TierTreffer, wort: string): Promise<Ausgang> {
   const pfad = treffer.tier.audio?.name;
-  if (pfad) await ctx.audio.datei(await ctx.pakete.audioUrl(treffer.paket.id, pfad));
-  else await ctx.audio.wort(wort);
+  if (pfad) return ctx.audio.datei(await ctx.pakete.audioUrl(treffer.paket.id, pfad));
+  return ctx.audio.wort(wort);
 }
 
 /**
  * Sprachausgabe der Freude: zuerst das Wort, dann die Freude (Paket-Audio, tier.freude oder
- * „Der Igel freut sich!"), danach – falls noch dieselbe Runde – was das Tier kann.
- * Fehler gehen an `melde`, nie still verloren.
+ * „Der Igel freut sich!"), danach, was das Tier kann.
+ * Die Kette endet, sobald die Runde vorbei ist (`aktuell`) ODER ein Schritt abgebrochen wurde —
+ * dann hat das Kind etwas Neues angetippt, und dessen Laut darf nicht übertönt werden.
+ * Fehler gehen an `melde`, nie still verloren. Löst erst auf, wenn die Kette zu Ende ist.
  */
 export async function sprichFreude(
   ctx: Kontext,
@@ -67,14 +69,15 @@ export async function sprichFreude(
   melde: (f: unknown) => void,
 ): Promise<void> {
   const { paket, tier } = treffer;
+  const weiter = (a: Ausgang): boolean => a === 'fertig' && aktuell();
   try {
-    await sprichTierName(ctx, treffer, wort);
-    if (!aktuell()) return;
+    if (!weiter(await sprichTierName(ctx, treffer, wort))) return;
     const freuden = tier.audio?.freude ?? [];
     const wahl = freuden[Math.floor(Math.random() * freuden.length)];
-    if (wahl) await ctx.audio.datei(await ctx.pakete.audioUrl(paket.id, wahl));
-    else await ctx.audio.satz(tier.freude ?? `${mitGrossemAnfang(tier.artikel)} ${tier.name} freut sich!`);
-    if (!aktuell() || !tier.kann) return;
+    const freude = wahl
+      ? await ctx.audio.datei(await ctx.pakete.audioUrl(paket.id, wahl))
+      : await ctx.audio.satz(tier.freude ?? `${mitGrossemAnfang(tier.artikel)} ${tier.name} freut sich!`);
+    if (!weiter(freude) || !tier.kann) return;
     await ctx.audio.satz(tier.kann);
   } catch (f) {
     melde(f);

@@ -5,6 +5,8 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overflow-x: hidden;
+  /* kein Doppeltipp-Zoom, wenn das Kind zwischen die Tasten tippt; Pinch-Zoom bleibt möglich */
+  touch-action: manipulation;
 }
 
 body {
@@ -20,7 +22,23 @@ body {
   overscroll-behavior: none;
 }
 
-#app { min-height: 100dvh; }
+#app { min-height: 100dvh; touch-action: manipulation; }
+
+/* Kinder-Bereiche (Start, Freies Schreiben, Nachfüllen, Tiere): langes Drücken öffnet kein
+   Bildmenü und markiert keinen Text — aus beidem käme ein Kleinkind allein nicht heraus.
+   Der Elternbereich (Wörterbuch, Einstellungen, Laut-Studio) bleibt unverändert. */
+.start,
+.rahmen[data-modus='frei'],
+.rahmen[data-modus='nachfuellen'],
+.rahmen[data-modus='tiere'] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.start img,
+.rahmen[data-modus='frei'] img,
+.rahmen[data-modus='nachfuellen'] img,
+.rahmen[data-modus='tiere'] img { -webkit-user-drag: none; }
 
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { font-weight: 700; line-height: 1.15; }

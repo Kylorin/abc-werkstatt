@@ -4,17 +4,23 @@
  * Speicher: ein eigener IndexedDB-Store (idb-keyval) mit
  * - `pakete`                    → Record<id, TierPaket> (alle Metadaten in einem Wert)
  * - `['datei', paketId, pfad]`  → Blob mit passendem MIME-Typ (nur referenzierte Dateien)
+ * - `papierkorb`                → zuletzt gelöschtes Paket (Metadaten; seine Dateien bleiben liegen)
  * Import und Löschen laufen in EINER Transaktion: entweder ist alles gespeichert oder nichts.
+ *
+ * Löschen ist rückholbar: das Paket wandert in den Papierkorb und verschwindet aus Liste und
+ * Suche. Endgültig entfernt werden seine Dateien erst beim nächsten Löschen oder Import.
  */
 import { createStore, get, promisifyRequest } from 'idb-keyval';
 import { PaketFehler, type PaketDienst, type TierPaket, type TierTreffer } from '../kern/vertrag';
 import { pruefeZip, referenzierteDateien, MAX_ENTPACKT_BYTES, type DateiArt } from './validierung';
 import { kanonischesWort } from './woerter';
+import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 
 export { kanonischesWort, tiereNachSchwierigkeit, istLautgetreu } from './woerter';
 export { pruefeZip, pruefePaketJson } from './validierung';
 
 const PAKETE = 'pakete';
+const PAPIERKORB = 'papierkorb';
 type Verzeichnis = Record<string, TierPaket>;
 const dateiSchluessel = (paketId: string, pfad: string): IDBValidKey => ['datei', paketId, pfad];
 
@@ -55,13 +61,31 @@ export function erzeugePaketDienst(): PaketDienst {
     }
   }
 
-  /** Schreibt Verzeichnis + Dateien und löscht alte Dateien in einer Transaktion. */
-  async function schreibe(neu: Verzeichnis, setzen: [IDBValidKey, Blob][], loeschen: IDBValidKey[]): Promise<void> {
+  async function papierkorb(): Promise<TierPaket | undefined> {
+    try {
+      return await get<TierPaket>(PAPIERKORB, store);
+    } catch (e) {
+      throw new PaketFehler('Der Papierkorb der Tier-Pakete konnte nicht gelesen werden.', { cause: e });
+    }
+  }
+
+  /**
+   * Schreibt Verzeichnis + Dateien und löscht alte Dateien in einer Transaktion.
+   * `korb`: undefined = Papierkorb leeren, ein Paket = hineinlegen.
+   */
+  async function schreibe(
+    neu: Verzeichnis,
+    setzen: [IDBValidKey, Blob][],
+    loeschen: IDBValidKey[],
+    korb: TierPaket | undefined,
+  ): Promise<void> {
     try {
       await store('readwrite', (s) => {
         for (const k of loeschen) s.delete(k);
         for (const [k, v] of setzen) s.put(v, k);
         s.put(neu, PAKETE);
+        if (korb) s.put(korb, PAPIERKORB);
+        else s.delete(PAPIERKORB);
         return promisifyRequest(s.transaction);
       });
     } catch (e) {
@@ -130,9 +154,14 @@ export function erzeugePaketDienst(): PaketDienst {
       const loeschen = vorher
         ? [...referenzierteDateien(vorher).keys()].filter((p) => !neuePfade.has(p)).map((p) => dateiSchluessel(paket.id, p))
         : [];
-      await schreibe(neu, setzen, loeschen);
+      // Ein Import leert den Papierkorb endgültig (Dateien gleicher Pfade schreibt `setzen` danach neu).
+      const korb = await papierkorb();
+      if (korb) loeschen.push(...alteDateien(korb));
+      await schreibe(neu, setzen, loeschen, undefined);
       gibUrlsFrei(paket.id);
       melde();
+      // Paket nicht dem Aufräumen des Browsers überlassen; das Ergebnis zeigen die Einstellungen.
+      bitteUmDauerhaftenSpeicher().catch((f: unknown) => console.error('Dauerhafter Speicher nicht anfragbar', f));
       return paket;
     },
 
@@ -152,9 +181,23 @@ export function erzeugePaketDienst(): PaketDienst {
       if (!paket) return;
       const neu: Verzeichnis = { ...alt };
       delete neu[id];
-      await schreibe(neu, [], alteDateien(paket));
+      // Das bisher im Papierkorb liegende Paket wird jetzt endgültig entfernt, dieses kommt hinein.
+      const korb = await papierkorb();
+      await schreibe(neu, [], korb ? alteDateien(korb) : [], paket);
       gibUrlsFrei(id);
       melde();
+    },
+
+    async stelleWiederHer(id) {
+      const korb = await papierkorb();
+      if (!korb || korb.id !== id) {
+        throw new PaketFehler('Dieses Tier-Paket lässt sich nicht mehr zurückholen. Bitte die Zip-Datei neu importieren.');
+      }
+      const alt = await verzeichnis();
+      if (alt[id]) throw new PaketFehler(`Ein Paket „${alt[id].titel}" ist schon installiert.`);
+      await schreibe({ ...alt, [id]: korb }, [], [], undefined);
+      melde();
+      return korb;
     },
 
     bildUrl: (paketId, pfad) => url(paketId, pfad, 'bild'),

@@ -119,29 +119,37 @@ export interface LaufendeAufnahme {
 }
 
 /**
+ * Wie eine Ausgabe geendet hat: zu Ende gespielt oder von einer neueren Ausgabe bzw. `stopp()`
+ * abgebrochen. Ketten (z. B. Tier-Freude) brechen ab, sobald ein Schritt `abgebrochen` liefert —
+ * sonst übertönt der nächste Kettenschritt das, was das Kind gerade angetippt hat.
+ */
+export type Ausgang = 'fertig' | 'abgebrochen';
+
+/**
  * Audio-Dienst (Bau „audio", src/audio). Reihenfolge der Quellen je Ausgabe:
  * Elternaufnahme → gewählte Laut-Variante → vorab vertont (manifest) → Cache live → Azure live
  * (nur mit eigenem Schlüssel) → Browserstimme (speechSynthesis) als letzte Stufe.
  *
- * Alle Abspiel-Methoden beenden eine laufende Ausgabe (kein Überlappen) und lösen auf,
- * wenn die Ausgabe zu Ende ist. Sie werfen nur bei echten Fehlern (Datei kaputt),
- * nie wegen Autoplay-Sperren vor der ersten Berührung.
+ * Alle Abspiel-Methoden beenden eine laufende Ausgabe (kein Überlappen) und lösen mit
+ * `Ausgang` auf: `fertig` nach dem Ende, `abgebrochen`, wenn eine neuere Ausgabe oder `stopp()`
+ * sie beendet hat. Sie werfen bei echten Fehlern (Datei kaputt). Eine Autoplay-Sperre gilt nur
+ * VOR der ersten erfolgreichen Entsperrung als harmlos (`abgebrochen`), danach als `AudioFehler`.
  */
 export interface AudioDienst {
   /** Lädt manifest.json (einmalig, idempotent). Muss vor der ersten Ausgabe nicht abgewartet werden. */
   vorab(): Promise<void>;
   /** Spielt den LAUT („mmm"). Erzeugt bei vorab vertonten Lauten einen Request auf audio/laute/<b>….mp3. */
-  laut(b: Buchstabe): Promise<void>;
+  laut(b: Buchstabe): Promise<Ausgang>;
   /** Spielt den Buchstaben-NAMEN („em"). */
-  name(b: Buchstabe): Promise<void>;
+  name(b: Buchstabe): Promise<Ausgang>;
   /** Laut ODER Name je nach Einstellung `namenStattLaute` — das, was Tasten benutzen. */
-  buchstabe(b: Buchstabe): Promise<void>;
+  buchstabe(b: Buchstabe): Promise<Ausgang>;
   /** Liest ein ganzes Wort (kanonisch klein). Vorab vertonte Wörter → Request auf audio/woerter/…. */
-  wort(w: string): Promise<void>;
+  wort(w: string): Promise<Ausgang>;
   /** Spricht beliebigen Text (Satz, Freude, Tiername mit Artikel). */
-  satz(text: string): Promise<void>;
+  satz(text: string): Promise<Ausgang>;
   /** Spielt eine beliebige Audio-URL (z. B. Blob-URL aus einem Tier-Paket). */
-  datei(url: string): Promise<void>;
+  datei(url: string): Promise<Ausgang>;
   /** Bricht jede laufende Ausgabe sofort ab. */
   stopp(): void;
   /** Alle Varianten eines Lauts fürs Laut-Studio (vorab + Aufnahme + ggf. Azure). */
@@ -220,8 +228,14 @@ export interface PaketDienst {
   liste(): Promise<TierPaket[]>;
   /** Ein Paket oder undefined. */
   hole(id: string): Promise<TierPaket | undefined>;
-  /** Entfernt Paket und alle seine Dateien; gibt Blob-URLs frei. */
+  /**
+   * Entfernt ein Paket aus der Liste (und aus `findeTier`). Es bleibt im Papierkorb, bis zum
+   * nächsten Löschen oder Import — so lange holt `stelleWiederHer` es zurück. Erst dann werden
+   * seine Dateien endgültig entfernt. Gibt Blob-URLs frei.
+   */
   loesche(id: string): Promise<void>;
+  /** Holt das zuletzt gelöschte Paket zurück; wirft `PaketFehler`, wenn es nicht mehr da ist. */
+  stelleWiederHer(id: string): Promise<TierPaket>;
   /** Blob-URL eines Bildes im Paket (gecacht, gleiche URL bei gleichem Pfad). */
   bildUrl(paketId: string, pfad: string): Promise<string>;
   /** Blob-URL einer Audiodatei im Paket. */

@@ -22,6 +22,8 @@ export interface AufnahmeOptionen {
 
 export function aufnahmeKnoepfe(audio: AudioDienst, schluessel: AudioSchluessel, opt: AufnahmeOptionen): AufnahmeKnoepfe {
   let laufend: LaufendeAufnahme | undefined;
+  /** true, solange aufnahmeStarten() noch auf das Mikrofon wartet (z. B. Berechtigungsdialog). */
+  let startet = false;
   let zerstoert = false;
 
   const meldung = el('div', { klasse: 'aufnahme__meldung' });
@@ -54,16 +56,26 @@ export function aufnahmeKnoepfe(audio: AudioDienst, schluessel: AudioSchluessel,
   }
 
   async function umschalten(): Promise<void> {
+    // Ein zweiter Tipp während des Starts darf keine zweite Aufnahme öffnen (offenes Mikrofon).
+    if (startet) return;
     meldung.replaceChildren();
     try {
       if (!laufend) {
         audio.stopp();
-        laufend = await audio.aufnahmeStarten();
+        startet = true;
+        aufnehmen.disabled = true;
+        let neu: LaufendeAufnahme;
+        try {
+          neu = await audio.aufnahmeStarten();
+        } finally {
+          startet = false;
+          aufnehmen.disabled = false;
+        }
         if (zerstoert) {
-          laufend.abbrechen();
-          laufend = undefined;
+          neu.abbrechen();
           return;
         }
+        laufend = neu;
         zeige('laeuft');
         return;
       }

@@ -4,6 +4,10 @@
  *
  * Speicher: Wörter und Üben-Auswahl über den Kern-WoerterDienst (IndexedDB);
  * `zufall()` überspringt abgewählte Wörter.
+ *
+ * Löschen ist rückholbar: das zuletzt gelöschte Wort lässt sich zurückholen, solange der
+ * Bildschirm offen ist und kein weiteres Wort gelöscht wurde. Die eigene Aufnahme des Worts
+ * wird erst dann endgültig entfernt (beim nächsten Löschen oder beim Verlassen).
  */
 import './woerterbuch.css';
 import { schreibwort } from '../../kern/alphabet';
@@ -15,6 +19,14 @@ import { aufnahmeKnoepfe, type AufnahmeKnoepfe } from '../laut-studio/aufnahme';
 
 let aufnahmen = new Map<string, AufnahmeKnoepfe>();
 let aktiv = false;
+/** Endgültiges Entfernen der Aufnahme des zuletzt gelöschten Worts (läuft spätestens beim Verlassen). */
+let ausstehend: (() => void) | undefined;
+
+function raeumeAusstehendAuf(): void {
+  const fn = ausstehend;
+  ausstehend = undefined;
+  fn?.();
+}
 
 export const modus: Modus = {
   id: 'woerterbuch',
@@ -24,6 +36,7 @@ export const modus: Modus = {
     aktiv = true;
     let pausiert = new Set<string>();
     const meldung = el('div', { klasse: 'woerterbuch__meldung' });
+    const rueckgaengig = el('div', { klasse: 'woerterbuch__rueckgaengig', attr: { 'aria-live': 'polite' } });
     const liste = el('ul', { klasse: 'liste woerterbuch__liste', testid: 'wortliste' });
     const leer = el('p', { klasse: 'hinweis', text: 'Noch keine Wörter. Oben ein Wort eintragen.' });
     /** Lebende Zeilen je Wort (gelöschte sind nicht mehr drin). */
@@ -101,6 +114,8 @@ export const modus: Modus = {
       meldung.replaceChildren();
       const li = zeilen.get(wort);
       if (!li) return;
+      const warPausiert = pausiert.has(wort);
+      raeumeAusstehendAuf(); // das vorher gelöschte Wort ist jetzt endgültig weg
       try {
         await ctx.woerter.loeschen(wort);
       } catch (f) {
@@ -118,8 +133,43 @@ export const modus: Modus = {
         el('button', { testid: `wort-loeschen-${wort}~entfernt`, attr: { hidden: true, tabindex: -1 } }));
       li.replaceWith(platzhalter);
       aktualisiereLeer();
-      if (!aktiv) return;
-      ctx.audio.aufnahmeLoeschen({ art: 'wort', text: wort }).catch(zeigeFehler);
+      ausstehend = () => {
+        rueckgaengig.replaceChildren();
+        ctx.audio.aufnahmeLoeschen({ art: 'wort', text: wort }).catch((f: unknown) => {
+          if (aktiv) zeigeFehler(f);
+          else console.error(f);
+        });
+      };
+      if (!aktiv) {
+        raeumeAusstehendAuf();
+        return;
+      }
+      rueckgaengig.replaceChildren(
+        el('div', { klasse: 'rueckgaengig', testid: 'wort-rueckgaengig' },
+          el('span', { text: `„${wort}“ ist gelöscht.` }),
+          el('button', {
+            klasse: 'knopf',
+            testid: `wort-zurueckholen-${wort}`,
+            beiKlick: () => void zurueckholen(wort, warPausiert),
+          }, icon('nochmal', { groesse: 20 }), el('span', { text: 'zurückholen' })),
+        ),
+      );
+    }
+
+    async function zurueckholen(wort: string, warPausiert: boolean): Promise<void> {
+      meldung.replaceChildren();
+      ausstehend = undefined; // Aufnahme bleibt erhalten
+      rueckgaengig.replaceChildren();
+      try {
+        await ctx.woerter.hinzufuegen(wort);
+        if (warPausiert) await ctx.woerter.setzeUeben(wort, false);
+      } catch (f) {
+        if (aktiv) zeigeFehler(f);
+        return;
+      }
+      if (!aktiv || zeilen.has(wort)) return;
+      if (warPausiert) pausiert.add(wort);
+      einfuegen(wort);
     }
 
     const eingabe = el('input', {
@@ -172,6 +222,7 @@ export const modus: Modus = {
         }),
         formular,
         meldung,
+        rueckgaengig,
         liste,
         leer,
       ),
@@ -189,6 +240,7 @@ export const modus: Modus = {
   },
   unmount() {
     aktiv = false;
+    raeumeAusstehendAuf();
     for (const a of aufnahmen.values()) a.zerstoere();
     aufnahmen = new Map();
   },

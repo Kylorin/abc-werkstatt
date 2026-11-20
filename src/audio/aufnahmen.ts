@@ -47,13 +47,19 @@ export class Aufnahmen {
       );
     }
     const format = waehleFormat();
-    const rec = format ? new MediaRecorder(strom, { mimeType: format }) : new MediaRecorder(strom);
-    const teile: Blob[] = [];
-    rec.addEventListener('dataavailable', (e) => {
-      if (e.data.size > 0) teile.push(e.data);
-    });
     const freigeben = (): void => strom.getTracks().forEach((t) => t.stop());
-    rec.start();
+    const teile: Blob[] = [];
+    let rec: MediaRecorder;
+    try {
+      rec = format ? new MediaRecorder(strom, { mimeType: format }) : new MediaRecorder(strom);
+      rec.addEventListener('dataavailable', (e) => {
+        if (e.data.size > 0) teile.push(e.data);
+      });
+      rec.start();
+    } catch (f) {
+      freigeben(); // Mikrofon nie offen lassen, wenn der Recorder nicht startet
+      throw new AudioFehler(`Die Aufnahme ließ sich nicht starten (${f instanceof DOMException ? f.name : String(f)}).`);
+    }
 
     let beendet = false;
     return {

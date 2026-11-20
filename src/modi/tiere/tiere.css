@@ -10,7 +10,7 @@
   border: 0; border-radius: var(--radius-l);
   background: transparent;
 }
-.tier-buehne__knopf:hover { background: var(--sonne-hell); }
+@media (hover: hover) and (pointer: fine) { .tier-buehne__knopf:hover { background: var(--sonne-hell); } }
 
 .tier-bild {
   width: var(--buehne); height: var(--buehne);

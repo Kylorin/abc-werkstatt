@@ -6,12 +6,15 @@
  *   „Vorlesen" liest den ganzen Text.
  * - Spracheingabe (Web Speech API): Ergebnis anhängen und vorlesen; ohne API kein Knopf.
  * - Passt das Wort am Ende des Texts zu einem Tier aus einem installierten Paket, kommt das
- *   Tier groß und freut sich (data-testid="tier-freude").
+ *   Tier groß und freut sich (data-testid="tier-freude") — als Einblendung über dem Blatt,
+ *   damit das Alphabet beim Tippen nicht verrutscht.
+ * - Der Text bleibt erhalten, wenn das Kind den Modus verlässt (bis zum Neuladen der Seite).
+ *   „Alles wegräumen" lässt sich einige Sekunden lang zurückholen.
  */
 import { anzeigeZeichen, artVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
-import type { Buchstabe, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
+import type { Ausgang, Buchstabe, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
 import { erzeugeAlphabet } from '../../ui/alphabet';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, sprichFreude, tierBezeichnung } from '../tiere/freude';
@@ -19,6 +22,11 @@ import './frei.css';
 
 const MAX_ZEICHEN = 240;
 const BESUCH_DAUER_MS = 5200;
+/** So lange lässt sich „Alles wegräumen" zurückholen. */
+const ZURUECKHOLEN_MS = 10_000;
+
+/** Text des Kindes über das Verlassen des Modus hinweg (Respekt vor dem Werk, versehentliches Zurück kostet nichts). */
+let gemerkterText = '';
 
 // ---------------------------------------------------------------------------
 // Web Speech API (nicht in allen lib.dom-Ständen typisiert → minimale eigene Typen)
@@ -74,7 +82,10 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   const s = new Sitzung();
   sitzung = s;
 
-  let text = '';
+  let text = gemerkterText;
+  /** Zuletzt weggeräumter Text, solange er sich zurückholen lässt. */
+  let weggeraeumt: string | undefined;
+  let zurueckholenNr = 0;
   let gross = ctx.einstellungen.lese().grossbuchstaben;
   /** Schlüssel des zuletzt gefeierten Worts (Position + Wort), damit dasselbe Wort nicht doppelt feiert. */
   let gefeiert = '';
@@ -89,6 +100,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   const besuch = el('div', { klasse: 'frei__besuch', attr: { 'aria-live': 'polite' } });
 
   function zeichne(): void {
+    gemerkterText = text;
     textEl.replaceChildren(
       ...Array.from(text).map((z) =>
         istBuchstabe(z) ? el('span', { klasse: artVon(z), text: anzeigeZeichen(z, gross) }) : document.createTextNode(z),
@@ -96,13 +108,16 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
     );
     blatt.dataset.leer = text.length === 0 ? 'ja' : 'nein';
     vorlesenKnopf.disabled = text.trim().length === 0;
+    const holen = weggeraeumt !== undefined && text.length === 0;
+    leerenKnopf.hidden = holen;
+    holKnopf.hidden = !holen;
     leerenKnopf.disabled = text.length === 0;
   }
 
   // --- Vorlesen -----------------------------------------------------------
-  function lies(inhalt: string): Promise<void> {
+  function lies(inhalt: string): Promise<Ausgang | undefined> {
     const t = inhalt.trim();
-    if (!t) return Promise.resolve();
+    if (!t) return Promise.resolve(undefined);
     const p = t.includes(' ') ? ctx.audio.satz(t) : ctx.audio.wort(t);
     return spiele(p, meldung.melde);
   }
@@ -118,7 +133,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
     besuch.dataset.offen = 'nein';
   }
 
-  async function zeigeBesuch(treffer: TierTreffer, wort: string, nachLaut: Promise<void>): Promise<void> {
+  async function zeigeBesuch(treffer: TierTreffer, wort: string, nachLaut: Promise<Ausgang | undefined>): Promise<void> {
     const nr = ++besuchNr;
     const bildUrl = await ctx.pakete.bildUrl(treffer.paket.id, treffer.tier.bild);
     if (!s.lebt || nr !== besuchNr) return;
@@ -132,8 +147,9 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
       ),
     );
     const aktuell = (): boolean => s.lebt && nr === besuchNr;
-    void nachLaut.then(() => {
-      if (aktuell()) return sprichFreude(ctx, treffer, wort, aktuell, meldung.melde);
+    void nachLaut.then((a) => {
+      // abgebrochen: das Kind tippt schon weiter — dessen Laute nicht übertönen.
+      if (a !== 'abgebrochen' && aktuell()) return sprichFreude(ctx, treffer, wort, aktuell, meldung.melde);
     });
     s.warte(BESUCH_DAUER_MS, () => {
       if (nr === besuchNr) schliesseBesuch();
@@ -141,7 +157,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   }
 
   /** Prüft am Wortende des laufenden Texts, ob ein Tier gemeint ist. */
-  function pruefeTier(nachLaut: Promise<void>): void {
+  function pruefeTier(nachLaut: Promise<Ausgang | undefined>): void {
     const { wort, start } = letztesWort();
     if (wort.length < 2) return;
     const schluessel = `${start}:${wort}`;
@@ -158,11 +174,18 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   }
 
   // --- Eingaben -----------------------------------------------------------
+  /** Sobald das Kind weiterschreibt, ist das Zurückholen vorbei. */
+  function vergissWeggeraeumtes(): void {
+    weggeraeumt = undefined;
+    zurueckholenNr++;
+  }
+
   function schreibe(b: Buchstabe): void {
     if (text.length >= MAX_ZEICHEN) {
       alphabet.wackle(b);
       return;
     }
+    vergissWeggeraeumtes();
     text += b;
     zeichne();
     const laut = spiele(ctx.audio.buchstabe(b), meldung.melde);
@@ -178,6 +201,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
 
   function leertaste(): void {
     const { wort } = letztesWort();
+    vergissWeggeraeumtes();
     if (text.length > 0 && !text.endsWith(' ') && text.length < MAX_ZEICHEN) {
       text += ' ';
       zeichne();
@@ -207,15 +231,39 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
       testid: 'text-leeren',
       attr: { 'aria-label': 'Alles wegräumen' },
       beiKlick: () => {
+        if (!text) return;
+        weggeraeumt = text;
+        const nr = ++zurueckholenNr;
         text = '';
         gefeiert = '';
         schliesseBesuch();
         zeichne();
+        s.warte(ZURUECKHOLEN_MS, () => {
+          if (nr !== zurueckholenNr) return;
+          weggeraeumt = undefined;
+          zeichne();
+        });
       },
     },
     icon('loeschen', { groesse: 26 }),
   );
-  const knoepfe = el('div', { klasse: 'frei__knoepfe' }, leerenKnopf, vorlesenKnopf);
+  // Nach dem Wegräumen steht an derselben Stelle „zurückholen": ein zweiter Tipp bringt alles wieder.
+  const holKnopf = el(
+    'button',
+    {
+      klasse: 'knopf knopf--icon frei__holen',
+      testid: 'text-zurueckholen',
+      attr: { 'aria-label': 'Text zurückholen', hidden: true },
+      beiKlick: () => {
+        if (weggeraeumt === undefined) return;
+        text = weggeraeumt;
+        vergissWeggeraeumtes();
+        zeichne();
+      },
+    },
+    icon('nochmal', { groesse: 26 }),
+  );
+  const knoepfe = el('div', { klasse: 'frei__knoepfe' }, leerenKnopf, holKnopf, vorlesenKnopf);
 
   // --- Spracheingabe ------------------------------------------------------
   const Erkennung = spracherkennungKonstruktor();
@@ -241,6 +289,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
             const roh = ev.results[0]?.[0]?.transcript ?? '';
             const neu = normiereGesprochenes(roh);
             if (!neu || !s.lebt) return;
+            vergissWeggeraeumtes();
             const trenner = text.length > 0 && !text.endsWith(' ') ? ' ' : '';
             text = (text + trenner + neu).slice(0, MAX_ZEICHEN);
             zeichne();

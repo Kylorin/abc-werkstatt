@@ -8,7 +8,7 @@
   --linie-stark: #d6c8b4;
   --tinte: #2b2723;
   --tinte-sanft: #5e5750;
-  --tinte-leise: #8f857a;
+  --tinte-leise: #6f665c;   /* ≥ 4,5:1 auf Papier und Karte (WCAG AA auch für Kleintext) */
 
   /* Bewegliches Alphabet (Montessori): Vokale blau, Konsonanten rot — gedämpft */
   --vokal: #2f5d9e;
@@ -19,6 +19,7 @@
   /* Ruhige Akzente */
   --gruen: #4d7c5f;        /* geschafft, gewählt */
   --gruen-hell: #e6efe8;
+  --gruen-tief: #3d664c;   /* Text auf --gruen-hell (≥ 4,5:1) */
   --sonne: #d99a3d;        /* Wärme, Hervorhebung */
   --sonne-hell: #f8eedd;
   --herz: #d9646e;         /* nur für die Tier-Freude */
