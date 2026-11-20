@@ -24,21 +24,17 @@ body {
 
 #app { min-height: 100dvh; touch-action: manipulation; }
 
-/* Kinder-Bereiche (Start, Freies Schreiben, Nachfüllen, Tiere): langes Drücken öffnet kein
+/* Kinder-Bereiche (Start und alle Kind-Modi, data-kind="ja" vom Router): langes Drücken öffnet kein
    Bildmenü und markiert keinen Text — aus beidem käme ein Kleinkind allein nicht heraus.
    Der Elternbereich (Wörterbuch, Einstellungen, Laut-Studio) bleibt unverändert. */
 .start,
-.rahmen[data-modus='frei'],
-.rahmen[data-modus='nachfuellen'],
-.rahmen[data-modus='tiere'] {
+.rahmen[data-kind='ja'] {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
 }
 .start img,
-.rahmen[data-modus='frei'] img,
-.rahmen[data-modus='nachfuellen'] img,
-.rahmen[data-modus='tiere'] img { -webkit-user-drag: none; }
+.rahmen[data-kind='ja'] img { -webkit-user-drag: none; }
 
 /* hidden gilt immer — auch für Elemente, deren Klasse ein display setzt (z. B. .knopf). */
 [hidden] { display: none !important; }

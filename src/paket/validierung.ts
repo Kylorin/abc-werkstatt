@@ -5,7 +5,17 @@
  */
 import { unzipSync, strFromU8, type UnzipFileInfo } from 'fflate';
 import { istBuchstabe } from '../kern/alphabet';
-import { PaketFehler, TIERPAKET_FORMAT, type Tier, type TierPaketDatei } from '../kern/vertrag';
+import {
+  BEWEGUNGEN,
+  PaketFehler,
+  TIERPAKET_FORMAT,
+  type Bewegung,
+  type Situation,
+  type Tier,
+  type TierAudio,
+  type TierAudioListe,
+  type TierPaketDatei,
+} from '../kern/vertrag';
 import { kanonischesWort } from './woerter';
 
 export const MAX_TIERE = 200;
@@ -16,6 +26,16 @@ const MAX_ID = 40;
 const MAX_TITEL = 40;
 const MAX_TEXT = 300;
 const MAX_FEHLER_ANZEIGE = 6;
+const ANLAUT_MUSTER = /^[a-zäöüß-]{1,12}$/;
+const MAX_SILBEN = 8;
+const MAX_RAETSEL = 3;
+const MAX_SITUATIONEN = 20;
+/** Höchstzahl Dateien in einer Audio-Liste (Varianten bzw. je Silbe/Rätselsatz eine). */
+const MAX_LISTE = 8;
+/** Listen-Felder in `audio` (Varianten bzw. je Silbe/Rätsel eine Datei). */
+const AUDIO_LISTEN: readonly TierAudioListe[] = [
+  'freude', 'anlautName', 'lautRuf', 'ichFange', 'raetsel', 'ichBin', 'silben', 'geschrieben', 'nichtIch', 'gaehnen', 'geraeusch',
+];
 
 /** Erlaubte Endungen → MIME-Typ. */
 const BILD_TYPEN: Readonly<Record<string, string>> = {
@@ -63,8 +83,12 @@ export function referenzierteDateien(p: TierPaketDatei): Map<string, DateiArt> {
   for (const t of p.tiere) {
     m.set(t.bild, 'bild');
     if (t.audio?.name) m.set(t.audio.name, 'audio');
-    for (const f of t.audio?.freude ?? []) m.set(f, 'audio');
     if (t.audio?.kann) m.set(t.audio.kann, 'audio');
+    for (const feld of AUDIO_LISTEN) for (const f of t.audio?.[feld] ?? []) m.set(f, 'audio');
+    for (const sit of t.situationen ?? []) {
+      for (const f of sit.audio?.problem ?? []) m.set(f, 'audio');
+      for (const f of sit.audio?.loesung ?? []) m.set(f, 'audio');
+    }
   }
   return m;
 }
@@ -122,6 +146,7 @@ export function pruefePaketJson(roh: unknown): TierPaketDatei {
     });
   }
 
+  pruefeQuerbezuege(tiere, f);
   if (fehler.length) wirfSammlung(fehler);
 
   const datei: TierPaketDatei = {
@@ -134,6 +159,20 @@ export function pruefePaketJson(roh: unknown): TierPaketDatei {
   if (untertitel !== undefined) datei.untertitel = untertitel;
   if (cover !== undefined) datei.cover = cover;
   return datei;
+}
+
+/** Helfer existieren im Paket, Situations-ids sind eindeutig, ein Tier hilft sich nicht selbst. */
+function pruefeQuerbezuege(tiere: readonly Tier[], f: (t: string) => void): void {
+  const ids = new Set(tiere.map((t) => t.id));
+  const situationen = new Set<string>();
+  for (const t of tiere) {
+    for (const s of t.situationen ?? []) {
+      if (situationen.has(s.id)) f(`Die Situations-id „${s.id}“ kommt mehrfach vor.`);
+      situationen.add(s.id);
+      if (!ids.has(s.helfer)) f(`Situation „${s.id}“: Das Helfer-Tier „${s.helfer}“ gibt es im Paket nicht.`);
+      else if (s.helfer === t.id) f(`Situation „${s.id}“: Ein Tier kann nicht sein eigener Helfer sein.`);
+    }
+  }
 }
 
 function wirfSammlung(fehler: string[]): never {
@@ -210,7 +249,24 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
   const kann = pruefeOptionalText(roh['kann'], `${benannt}: „kann“`, g);
   const freude = pruefeOptionalText(roh['freude'], `${benannt}: „freude“`, g);
 
-  let audio: Tier['audio'];
+  const anlautRoh = roh['anlaut'];
+  let anlaut: string | undefined;
+  if (anlautRoh !== undefined) {
+    if (typeof anlautRoh !== 'string' || !ANLAUT_MUSTER.test(anlautRoh)) {
+      g(`${benannt}: „anlaut“ muss ein Laut aus 1–12 Kleinbuchstaben sein (z. B. „m“ oder „sch“).`);
+    } else anlaut = anlautRoh;
+  }
+  const silben = pruefeTextListe(roh['silben'], `${benannt}: „silben“`, MAX_SILBEN, g);
+  const raetsel = pruefeTextListe(roh['raetsel'], `${benannt}: „raetsel“`, MAX_RAETSEL, g);
+  const bewegungRoh = roh['bewegung'];
+  let bewegung: Bewegung | undefined;
+  if (bewegungRoh !== undefined) {
+    if (!(BEWEGUNGEN as readonly unknown[]).includes(bewegungRoh)) g(`${benannt}: „bewegung“ muss eine von ${BEWEGUNGEN.join(', ')} sein.`);
+    else bewegung = bewegungRoh as Bewegung;
+  }
+  const situationen = pruefeSituationen(roh['situationen'], benannt, g);
+
+  let audio: TierAudio | undefined;
   const audioRoh = roh['audio'];
   if (audioRoh !== undefined) {
     if (!istObjekt(audioRoh)) {
@@ -221,16 +277,15 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
       if (audioName !== undefined) audio.name = audioName;
       const audioKann = pruefeOptionalPfad(audioRoh['kann'], `${benannt}: „audio.kann“`, g);
       if (audioKann !== undefined) audio.kann = audioKann;
-      const freudeRoh = audioRoh['freude'];
-      if (freudeRoh !== undefined) {
-        if (!Array.isArray(freudeRoh)) {
-          g(`${benannt}: „audio.freude“ muss eine Liste von Dateipfaden sein.`);
-        } else {
-          const liste = freudeRoh
-            .map((p, j) => pruefePfad(p, `${benannt}: „audio.freude[${j + 1}]“`, g))
-            .filter((p): p is string => p !== undefined);
-          if (liste.length) audio.freude = liste;
-        }
+      for (const feld of AUDIO_LISTEN) {
+        const liste = pruefePfadListe(audioRoh[feld], `${benannt}: „audio.${feld}“`, g);
+        if (liste) audio[feld] = liste;
+      }
+      if (audio.silben && audio.silben.length !== (silben?.length ?? 0)) {
+        g(`${benannt}: „audio.silben“ braucht genau eine Datei je Silbe in „silben“.`);
+      }
+      if (audio.raetsel && audio.raetsel.length !== (raetsel?.length ?? 0)) {
+        g(`${benannt}: „audio.raetsel“ braucht genau eine Datei je Satz in „raetsel“.`);
       }
     }
   }
@@ -244,8 +299,94 @@ function pruefeTier(roh: unknown, i: number, f: (t: string) => void): Tier | und
   };
   if (kann !== undefined) tier.kann = kann;
   if (freude !== undefined) tier.freude = freude;
-  if (audio && (audio.name || audio.freude || audio.kann)) tier.audio = audio;
+  if (anlaut !== undefined) tier.anlaut = anlaut;
+  if (silben) tier.silben = silben;
+  if (bewegung) tier.bewegung = bewegung;
+  if (raetsel) tier.raetsel = raetsel;
+  if (situationen?.length) tier.situationen = situationen;
+  if (audio && Object.keys(audio).length) tier.audio = audio;
   return tier;
+}
+
+/** Liste von Texten (je 1–MAX_TEXT Zeichen), 1–max Einträge; undefined, wenn das Feld fehlt oder ungültig ist. */
+function pruefeTextListe(w: unknown, feld: string, max: number, f: (t: string) => void): string[] | undefined {
+  if (w === undefined) return undefined;
+  if (!Array.isArray(w) || w.length < 1 || w.length > max) {
+    f(`${feld} muss eine Liste mit 1–${max} Texten sein.`);
+    return undefined;
+  }
+  const aus: string[] = [];
+  w.forEach((t, i) => {
+    if (typeof t !== 'string' || t.trim().length === 0 || t.length > MAX_TEXT) f(`${feld}[${i + 1}] muss ein Text mit 1–${MAX_TEXT} Zeichen sein.`);
+    else aus.push(t.trim());
+  });
+  return aus.length === w.length ? aus : undefined;
+}
+
+/** Liste von 1–MAX_LISTE Dateipfaden; undefined, wenn das Feld fehlt oder ungültig ist. */
+function pruefePfadListe(w: unknown, feld: string, f: (t: string) => void): string[] | undefined {
+  if (w === undefined) return undefined;
+  if (!Array.isArray(w) || w.length === 0 || w.length > MAX_LISTE) {
+    f(`${feld} muss eine Liste von 1–${MAX_LISTE} Dateipfaden sein.`);
+    return undefined;
+  }
+  const liste = w.map((p, j) => pruefePfad(p, `${feld}[${j + 1}]`, f)).filter((p): p is string => p !== undefined);
+  return liste.length === w.length ? liste : undefined;
+}
+
+/** Situationen eines Problemtiers (F6). Der Helfer wird in `pruefeQuerbezuege` gegen das Paket geprüft. */
+function pruefeSituationen(w: unknown, benannt: string, f: (t: string) => void): Situation[] | undefined {
+  if (w === undefined) return undefined;
+  if (!Array.isArray(w) || w.length > MAX_SITUATIONEN) {
+    f(`${benannt}: „situationen“ muss eine Liste mit höchstens ${MAX_SITUATIONEN} Einträgen sein.`);
+    return undefined;
+  }
+  const aus: Situation[] = [];
+  w.forEach((roh, i) => {
+    const wo = `${benannt}: Situation ${i + 1}`;
+    if (!istObjekt(roh)) {
+      f(`${wo} ist kein Objekt.`);
+      return;
+    }
+    let ok = true;
+    const id = roh['id'];
+    if (typeof id !== 'string' || !ID_MUSTER.test(id) || id.length > MAX_ID) {
+      f(`${wo}: „id“ muss aus 1–${MAX_ID} Zeichen a–z, 0–9 und - bestehen.`);
+      ok = false;
+    }
+    const helfer = roh['helfer'];
+    if (typeof helfer !== 'string' || !ID_MUSTER.test(helfer)) {
+      f(`${wo}: „helfer“ muss die id eines Tiers im Paket sein.`);
+      ok = false;
+    }
+    const texte: Record<'problem' | 'loesung', string | undefined> = { problem: undefined, loesung: undefined };
+    for (const k of ['problem', 'loesung'] as const) {
+      const t = roh[k];
+      if (typeof t !== 'string' || t.trim().length === 0 || t.length > MAX_TEXT) {
+        f(`${wo}: „${k}“ muss ein Text mit 1–${MAX_TEXT} Zeichen sein.`);
+        ok = false;
+      } else texte[k] = t.trim();
+    }
+    let audio: Situation['audio'];
+    const audioRoh = roh['audio'];
+    if (audioRoh !== undefined) {
+      if (!istObjekt(audioRoh)) {
+        f(`${wo}: „audio“ muss ein Objekt sein.`);
+        ok = false;
+      } else {
+        audio = {};
+        const pr = pruefePfadListe(audioRoh['problem'], `${wo}: „audio.problem“`, f);
+        const lo = pruefePfadListe(audioRoh['loesung'], `${wo}: „audio.loesung“`, f);
+        if (pr) audio.problem = pr;
+        if (lo) audio.loesung = lo;
+      }
+    }
+    if (!ok) return;
+    const s: Situation = { id: id as string, problem: texte.problem as string, helfer: helfer as string, loesung: texte.loesung as string };
+    if (audio && (audio.problem || audio.loesung)) s.audio = audio;
+    aus.push(s);
+  });
+  return aus;
 }
 
 function istVerzeichnis(name: string): boolean {

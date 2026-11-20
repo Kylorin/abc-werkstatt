@@ -1,7 +1,8 @@
 /**
  * Einstellungen (Bau „verwaltung“) — Erwachsenen-Bereich.
- * Laute ↔ Namen, Großbuchstaben, Tier-Modus mit/ohne Vorlage, Stimme + eigener Azure-Schlüssel,
- * Name des Kindes (nur Gerät), Laut-Studio, Tier-Pakete (Import, Liste, Löschen).
+ * Laute ↔ Namen, Großbuchstaben, Tier-Modus mit/ohne Vorlage, Regal (B1), Lernpfad, Stimme und
+ * Spracheingabe (B18), Kind (Anfangsbuchstabe, „heute dran“), Laut-Studio, Tier-Pakete, Speicher.
+ * Abschnitte einzelner Arbeiten (z. B. „Meine Leute“) und Begleitkarten kommen aus den Modi selbst.
  * Jede Änderung wird sofort über den Einstellungs-Store gespeichert.
  */
 import './einstellungen.css';
@@ -9,116 +10,11 @@ import { el, fehlerHinweis } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { speicherStand, type SpeicherStand } from '../../kern/speicher';
 import { ELTERNSPERRE_SEKUNDEN } from '../../kern/elternsperre';
-import type { Einstellungen, Kontext, Modus } from '../../kern/vertrag';
-
-const STANDARD_REGION = 'germanywestcentral';
-
-const REGIONEN: readonly [string, string][] = [
-  ['germanywestcentral', 'Deutschland, West-Mitte'],
-  ['westeurope', 'Westeuropa'],
-  ['northeurope', 'Nordeuropa'],
-  ['switzerlandnorth', 'Schweiz, Nord'],
-  ['swedencentral', 'Schweden'],
-  ['francecentral', 'Frankreich'],
-];
-
-const STIMMEN: readonly [string, string][] = [
-  ['de-DE-KatjaNeural', 'Katja (ruhig, weiblich)'],
-  ['de-DE-AmalaNeural', 'Amala (weiblich)'],
-  ['de-DE-LouisaNeural', 'Louisa (weiblich)'],
-  ['de-DE-ElkeNeural', 'Elke (weiblich)'],
-  ['de-DE-KlarissaNeural', 'Klarissa (weiblich)'],
-  ['de-DE-ConradNeural', 'Conrad (männlich)'],
-  ['de-DE-KillianNeural', 'Killian (männlich)'],
-  ['de-DE-GiselaNeural', 'Gisela (Kinderstimme)'],
-];
+import type { Kontext, Modus } from '../../kern/vertrag';
+import { abschnitt, ausDenModi, kindUndHeute, lernpfad, regal, schalter, tonquellen } from './abschnitte';
 
 let abmelden: (() => void)[] = [];
 let aktiv = false;
-
-type SchalterFeld = 'namenStattLaute' | 'grossbuchstaben' | 'tierModusMitVorlage' | 'elternsperre';
-
-function schalter(ctx: Kontext, feld: SchalterFeld, testid: string, text: string, erklaerung: string): HTMLElement {
-  const kasten = el('input', { testid, attr: { type: 'checkbox', role: 'switch' } });
-  kasten.checked = ctx.einstellungen.lese()[feld];
-  kasten.addEventListener('change', () => ctx.einstellungen.setze({ [feld]: kasten.checked } as Partial<Einstellungen>));
-  return el('label', { klasse: 'schalter' },
-    el('span', { klasse: 'einstellungen__text' },
-      el('span', { text }),
-      el('small', { klasse: 'leise', text: erklaerung }),
-    ),
-    kasten,
-  );
-}
-
-function auswahl(optionen: readonly [string, string][], aktuell: string, testid: string): HTMLSelectElement {
-  const liste = optionen.some(([w]) => w === aktuell) ? optionen : [...optionen, [aktuell, aktuell] as [string, string]];
-  const s = el('select', { klasse: 'feld', testid },
-    ...liste.map(([wert, name]) => el('option', { attr: { value: wert }, text: name })));
-  s.value = aktuell;
-  return s;
-}
-
-function abschnitt(titel: string, ...inhalt: HTMLElement[]): HTMLElement {
-  return el('section', { klasse: 'abschnitt' }, el('h2', { klasse: 'abschnitt__titel', text: titel }), ...inhalt);
-}
-
-function stimmeUndAzure(ctx: Kontext): HTMLElement {
-  const e = ctx.einstellungen.lese();
-  const meldung = el('div', { klasse: 'einstellungen__meldung' });
-
-  const stimme = auswahl(STIMMEN, e.stimme, 'einstellung-stimme');
-  stimme.id = 'einstellung-stimme';
-  stimme.addEventListener('change', () => ctx.einstellungen.setze({ stimme: stimme.value }));
-  const probe = el('button', {
-    klasse: 'knopf knopf--icon',
-    testid: 'stimme-probe',
-    attr: { 'aria-label': 'Stimme anhören', title: 'Stimme anhören' },
-    beiKlick: () => {
-      meldung.replaceChildren();
-      ctx.audio.satz('Hallo! So klinge ich.').catch((f: unknown) => meldung.replaceChildren(fehlerHinweis(f)));
-    },
-  }, icon('lautsprecher'));
-
-  const region = auswahl(REGIONEN, e.azureRegion ?? STANDARD_REGION, 'einstellung-azure-region');
-  region.id = 'einstellung-azure-region';
-  region.addEventListener('change', () => ctx.einstellungen.setze({ azureRegion: region.value }));
-
-  const schluessel = el('input', {
-    klasse: 'feld',
-    testid: 'einstellung-azure-key',
-    attr: { type: 'password', id: 'einstellung-azure-key', autocomplete: 'off', spellcheck: 'false', placeholder: 'Schlüssel einfügen' },
-  });
-  schluessel.value = e.azureSchluessel ?? '';
-  schluessel.addEventListener('input', () => {
-    const wert = schluessel.value.trim();
-    const teil: Partial<Einstellungen> = { azureSchluessel: wert || undefined };
-    if (wert && !ctx.einstellungen.lese().azureRegion) teil.azureRegion = region.value;
-    ctx.einstellungen.setze(teil);
-  });
-
-  return abschnitt('Stimme',
-    el('div', {},
-      el('label', { klasse: 'beschriftung', attr: { for: 'einstellung-stimme' }, text: 'Vorlesestimme' }),
-      el('div', { klasse: 'einstellungen__zeile' }, stimme, probe),
-    ),
-    el('div', {},
-      el('label', { klasse: 'beschriftung', attr: { for: 'einstellung-azure-key' }, text: 'Eigener Azure-Speech-Schlüssel (optional)' }),
-      schluessel,
-    ),
-    el('div', {},
-      el('label', { klasse: 'beschriftung', attr: { for: 'einstellung-azure-region' }, text: 'Azure-Region' }),
-      region,
-    ),
-    el('p', {
-      klasse: 'einstellungen__hinweis',
-      text:
-        'Mit eigenem Schlüssel werden neue Wörter in der gewählten Stimme vorgelesen, sonst spricht die Stimme des Geräts. ' +
-        'Der Schlüssel bleibt nur auf diesem Gerät. Der kostenlose Tarif F0 reicht völlig aus.',
-    }),
-    meldung,
-  );
-}
 
 /** Zeigt, ob der Browser die Daten dauerhaft hält — sonst darf er Paket und Aufnahmen bei Platzmangel räumen. */
 function speicher(ctx: Kontext): HTMLElement {
@@ -155,23 +51,6 @@ function speicher(ctx: Kontext): HTMLElement {
         'Tipp: die App zum Startbildschirm hinzufügen und ein Paket importieren – dann fragt sie erneut.';
     } else zeile.textContent = `Dieses Gerät sagt nicht, ob der Speicher dauerhaft ist${mb}.`;
   }
-}
-
-function kind(ctx: Kontext): HTMLElement {
-  const name = el('input', {
-    klasse: 'feld',
-    testid: 'einstellung-kindname',
-    attr: { type: 'text', id: 'einstellung-kindname', autocomplete: 'off', maxlength: 40, placeholder: 'optional' },
-  });
-  name.value = ctx.einstellungen.lese().kindName ?? '';
-  name.addEventListener('input', () => ctx.einstellungen.setze({ kindName: name.value.trim() || undefined }));
-  return abschnitt('Kind',
-    el('div', {},
-      el('label', { klasse: 'beschriftung', attr: { for: 'einstellung-kindname' }, text: 'Name des Kindes' }),
-      name,
-    ),
-    el('p', { klasse: 'einstellungen__hinweis', text: 'Nur für eine persönliche Begrüßung. Bleibt auf diesem Gerät.' }),
-  );
 }
 
 function pakete(ctx: Kontext): HTMLElement {
@@ -296,6 +175,7 @@ export const modus: Modus = {
   id: 'einstellungen',
   titel: 'Einstellungen',
   icon: 'einstellungen',
+  fuerEltern: true,
   mount(flaeche, ctx) {
     aktiv = true;
     flaeche.append(
@@ -316,10 +196,13 @@ export const modus: Modus = {
         schalter(ctx, 'elternsperre', 'einstellung-elternsperre', 'Elternsperre',
           `In der installierten App öffnen sich Wörterbuch und Einstellungen erst, wenn man den Knopf ${ELTERNSPERRE_SEKUNDEN} Sekunden gedrückt hält. Ein kurzer Tipp des Kindes tut nichts.`),
       ),
-      stimmeUndAzure(ctx),
+      regal(ctx),
+      lernpfad(ctx),
+      kindUndHeute(ctx),
+      tonquellen(ctx),
       pakete(ctx),
+      ...ausDenModi(ctx),
       speicher(ctx),
-      kind(ctx),
     );
   },
   unmount() {

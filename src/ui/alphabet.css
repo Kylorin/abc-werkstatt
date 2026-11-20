@@ -37,3 +37,12 @@
 /* Rückmeldung beim Tippen auf der echten Tastatur */
 @keyframes taste-druck { 0%, 100% { transform: none; } 40% { transform: scale(0.92); } }
 .taste--gedrueckt { animation: taste-druck var(--dauer) var(--kurve); }
+
+/* Hilfe (B3): die gesuchte Taste pulsiert sanft (data-hinweis="ja"). Kein Dauerzustand, nur nach Fehlversuchen. */
+.alphabet .taste--hinweis { animation: taste-hinweis 1.4s var(--kurve) infinite; box-shadow: 0 0 0 4px var(--hinweis-ring); }
+@keyframes taste-hinweis { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .alphabet .taste--hinweis { animation: none; } }
+
+/* Große Tasten (2–6 Stück: Stufe 1, kleiner Kasten, Decke Stufe 1). Feinschliff beim Bau F1/F2. */
+.alphabet--gross .alphabet__raster { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-4); }
+.alphabet--gross .taste { width: var(--taste-gross); height: var(--taste-gross); font-size: clamp(2.6rem, 14vw, 4rem); }

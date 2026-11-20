@@ -50,6 +50,20 @@ const PFADE = {
   nochmal: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/>',
   /** Weiter */
   weiter: '<path d="M9.5 5.5L16 12l-6.5 6.5"/>',
+  /** Laut ruft Tier: Buchstabe, aus dem ein kleines Medaillon lugt */
+  lautruf: '<rect x="2.5" y="4" width="11" height="13" rx="2.5"/><circle cx="8" cy="11.6" r="2.2"/><path d="M10.2 9.4v4.4"/><circle cx="17.6" cy="15.6" r="4"/><circle cx="16.3" cy="15" r=".6" fill="currentColor"/><circle cx="18.9" cy="15" r=".6" fill="currentColor"/>',
+  /** Decke mit Beule und einem Ohr (F3) */
+  decke: '<path d="M2.5 19.5c0-5 3.6-9 9.5-9s9.5 4 9.5 9z"/><path d="M8.4 11.3L7.2 6.6l3.4 3.6"/><path d="M7 15.5l3 1.5M13 13.8l2 3.2M16.8 15.6l-1.6 2"/>',
+  /** Silben: Tier auf drei Trommelflecken (F5) */
+  silben: '<ellipse cx="5" cy="18.5" rx="3" ry="1.6"/><ellipse cx="12" cy="18.5" rx="3" ry="1.6"/><ellipse cx="19" cy="18.5" rx="3" ry="1.6"/><circle cx="12" cy="9" r="4"/><path d="M5 13.5c1.2-2 2.6-3 4-3.3M19 13.5c-1.2-2-2.6-3-4-3.3" stroke-dasharray="1.6 1.6"/>',
+  /** Wer hilft? zwei Tiere Hand in Hand (F6) */
+  helfen: '<circle cx="7" cy="7.5" r="3"/><circle cx="17" cy="7.5" r="3"/><path d="M3.5 20v-3.5a3.5 3.5 0 0 1 7 0V20"/><path d="M13.5 20v-3.5a3.5 3.5 0 0 1 7 0V20"/><path d="M9.8 14.5h4.4"/>',
+  /** Meine Leute: zwei Gesichter-Umrisse (F7) */
+  leute: '<circle cx="8.5" cy="9" r="4.5"/><circle cx="16.5" cy="11" r="4"/><circle cx="7" cy="8.3" r=".6" fill="currentColor"/><circle cx="10" cy="8.3" r=".6" fill="currentColor"/><path d="M7 10.6c.9.7 2.1.7 3 0"/><circle cx="15.2" cy="10.4" r=".6" fill="currentColor"/><circle cx="17.8" cy="10.4" r=".6" fill="currentColor"/><path d="M15.3 12.6c.7.5 1.7.5 2.4 0"/><path d="M3 21c.8-2.6 3-4 5.5-4M21 21c-.7-2.2-2.4-3.4-4.5-3.4"/>',
+  /** Andere Tiere: drei kleine Medaillons (F1) */
+  medaillons: '<circle cx="6" cy="13" r="3.5"/><circle cx="12" cy="8" r="3.5"/><circle cx="18" cy="13" r="3.5"/>',
+  /** Mond (Gute Nacht, B9) */
+  mond: '<path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/>',
 } as const;
 
 /** Name eines Icons aus dem Satz oben. */

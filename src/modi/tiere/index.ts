@@ -16,7 +16,7 @@ import { schreibwort } from '../../kern/alphabet';
 import { wortSchwierigkeit } from '../../kern/woerter';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
-import type { Kontext, Modus, Tier, TierPaket, TierTreffer } from '../../kern/vertrag';
+import type { Dienste, Kontext, Modus, RegalKachel, Tier, TierPaket, TierTreffer } from '../../kern/vertrag';
 import { Sitzung, erzeugeMeldung, warteAufSprache } from '../nachfuellen/sitzung';
 import { erzeugeWortarbeit, type Wortarbeit } from '../nachfuellen/wortarbeit';
 import { erzeugeFreude, erzeugeMedaillon, sprichFreude, sprichTierName, tierBezeichnung } from './freude';
@@ -154,10 +154,31 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   await naechstesTier();
 }
 
+/** Regal: eine Kachel je installiertem Paket (Titel, Untertitel, Cover). Ohne Paket fehlt die Arbeit. */
+async function kacheln(dienste: Dienste): Promise<RegalKachel[]> {
+  const pakete = await dienste.pakete.liste();
+  return Promise.all(
+    pakete.map(async (p) => {
+      const k: RegalKachel = { titel: p.titel, param: p.id, daten: { 'data-paket': p.id } };
+      if (p.untertitel) k.untertitel = p.untertitel;
+      if (p.cover) {
+        try {
+          k.bildUrl = await dienste.pakete.bildUrl(p.id, p.cover);
+        } catch (f) {
+          // Cover unlesbar: Kachel mit Tier-Icon statt gar keiner Kachel; Ursache im Log.
+          console.error(f);
+        }
+      }
+      return k;
+    }),
+  );
+}
+
 export const modus: Modus = {
   id: 'tiere',
   titel: 'Tiere',
   icon: 'tiere',
+  kacheln,
   mount,
   unmount() {
     sitzung?.beende();

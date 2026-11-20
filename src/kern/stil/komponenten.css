@@ -234,3 +234,19 @@
 }
 @keyframes halten-fuellen { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .start__sperrhinweis { flex-basis: 100%; text-align: center; font-size: var(--gr-s); color: var(--tinte-leise); }
+
+/* ---------- Regal (B1) ---------- */
+.regal[aria-busy='true'] { min-height: 112px; }
+.kachel__text { display: flex; flex-direction: column; gap: 2px; }
+/* Erster Tipp: Kachel hat gesprochen und wartet auf den zweiten Tipp — sanft hervorgehoben, kein Blinken. */
+.kachel[data-bereit='ja'] { border-color: var(--sonne); box-shadow: 0 0 0 4px var(--sonne-hell), var(--schatten); }
+.start__meldung:empty { display: none; }
+.kachel--laut-ruft-tier .kachel__icon { background: var(--konsonant-hell); color: var(--konsonant); }
+.kachel--decke .kachel__icon { background: var(--sonne-hell); color: var(--decke-1); }
+.kachel--silben .kachel__icon { background: var(--silbe); color: var(--vokal); }
+.kachel--geschichten .kachel__icon { background: var(--gruen-hell); color: var(--gruen); }
+.kachel--leute .kachel__icon { background: var(--sonne-hell); color: var(--sonne); }
+
+/* ---------- Zurück in Kind-Modi (B7): klein, 1 s halten ---------- */
+.kopf__zurueck--kind { opacity: 0.7; }
+.kopf__zurueck--kind[data-halten='laeuft'] { opacity: 1; }

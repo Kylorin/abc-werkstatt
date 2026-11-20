@@ -62,5 +62,22 @@
   --kurve: cubic-bezier(0.2, 0.8, 0.2, 1);
   --kurve-feder: cubic-bezier(0.3, 1.5, 0.5, 1);
 
+  /* Neue Spiele (Konzept „Spaß und Lernen“) */
+  --hinweis-ring: rgba(217, 154, 61, 0.55); /* Hilfe-Puls der gesuchten Taste (B3) */
+  --taste-gross: clamp(84px, 26vw, 128px);  /* große Tasten bei 2–6 Tasten */
+  --medaillon: clamp(104px, 30vw, 168px);   /* Tier-Medaillon auf Wiese/Decke/Geschichte */
+  --medaillon-klein: 72px;                  /* Gucker am Blattrand (F2) */
+  --decke-1: #c98a6b;                       /* Patchwork-Decke (F3, Gute Nacht) */
+  --decke-2: #8fae8b;
+  --decke-3: #e5c27a;
+  --decke-naht: #fffdf9;
+  --nacht: #2e2a3f;                         /* Gute Nacht (B9): warm gedimmt */
+  --nacht-licht: #f3d9a4;
+  --nacht-schleier: rgba(46, 42, 63, 0.55);
+  --silbe: #e8eef7;                         /* Trommelfleck (F5) */
+  --silbe-gespielt: #2f5d9e;
+  --elternzeile: var(--tinte-leise);        /* kleine graue Elternzeilen */
+  --dauer-halten: 1000ms;                   /* Zurück halten (B7) */
+
   color-scheme: light;
 }

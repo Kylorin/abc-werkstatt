@@ -3,6 +3,8 @@ import './kern/stil/index.css';
 import { registerSW } from 'virtual:pwa-register';
 import { erzeugeEinstellungen } from './kern/einstellungen';
 import { erzeugeWoerter } from './kern/woerter';
+import { erzeugeLeute } from './kern/leute';
+import { erzeugeNotizen } from './kern/notizen';
 import { ROUTE_GEWECHSELT, starteRouter } from './kern/router';
 import { erzeugeAudioDienst } from './audio';
 import { erzeugePaketDienst } from './paket';
@@ -15,12 +17,14 @@ const einstellungen = erzeugeEinstellungen();
 const audio = erzeugeAudioDienst(einstellungen);
 const pakete = erzeugePaketDienst();
 const woerter = erzeugeWoerter();
+const leute = erzeugeLeute();
+const notizen = erzeugeNotizen();
 
-const router = starteRouter(wurzel, { audio, pakete, woerter, einstellungen }, MODI);
+const router = starteRouter(wurzel, { audio, pakete, woerter, einstellungen, leute, notizen }, MODI);
 audio.vorab().catch((f: unknown) => console.error('Audio-Vorab fehlgeschlagen', f));
 
 // Langes Drücken in den Kinder-Bereichen öffnet kein Kontextmenü (Bild sichern/teilen).
-const KINDER_BEREICH = ".start, .rahmen[data-modus='frei'], .rahmen[data-modus='nachfuellen'], .rahmen[data-modus='tiere']";
+const KINDER_BEREICH = ".start, .rahmen[data-kind='ja']";
 document.addEventListener('contextmenu', (ev) => {
   if (ev.target instanceof Element && ev.target.closest(KINDER_BEREICH)) ev.preventDefault();
 });

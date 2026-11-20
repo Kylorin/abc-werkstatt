@@ -9,13 +9,20 @@ Startbildschirm hinzufügen" installieren.
 
 ## Bedienung
 
+Der Start ist ein **Regal** mit höchstens vier großen Bildkacheln – genau die Arbeiten, die Eltern
+im Elternbereich hineingestellt haben. Ein erster Tipp sagt, was die Kachel ist, ein zweiter Tipp
+(oder Halten) öffnet sie. In den Arbeiten des Kindes braucht „Zurück" eine Sekunde Halten, das
+Zurück des Handys wird abgefangen und der Bildschirm bleibt an. Neue Arbeiten (Laut ruft Tier,
+Wer ist unter der Decke?, Silben-Hüpfen, Wer hilft?, Meine Leute) beschreibt
+[`docs/konzept-spass-und-lernen.md`](docs/konzept-spass-und-lernen.md); sie entstehen gerade.
+
 | Bereich | Was das Kind tut |
 |---|---|
 | **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. Der Text bleibt beim Verlassen erhalten, „Alles wegräumen" lässt sich zurückholen. |
 | **Nachfüllen** | Ein lautgetreues Wort steht als Vorlage mit leeren Feldern da; das Kind legt die Buchstaben der Reihe nach hinein. Leichte Wörter kommen öfter dran als schwere. |
 | **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Bild eines Tiers, das Kind schreibt seinen Namen, und das Tier freut sich. Es geht beim nächsten Mal beim nächsten Tier weiter. |
 | **Wörterbuch** (Eltern, leise im Fuß des Starts) | Eigene Übungswörter anlegen, fürs Üben an-/abwählen und löschen (das zuletzt gelöschte Wort lässt sich zurückholen). |
-| **Einstellungen** (Eltern, leise im Fuß des Starts) | Buchstabennamen statt Laute, Großbuchstaben, eigener Azure-Schlüssel für neue Wörter, Laut-Studio (Aussprache je Buchstabe wählen oder selbst aufnehmen), Tier-Pakete importieren und löschen (zurückholbar bis zum nächsten Löschen/Import), Speicherstand. |
+| **Einstellungen** (Eltern, leise im Fuß des Starts) | Regal, Lernpfad (Tier-Stufe, Hilfe, Gute Nacht, Laut ruft Tier), Anfangsbuchstabe des Kindes und „heute dran", Live-Stimme für frei Geschriebenes (Gerät, Offline-Stimme oder OpenRouter mit eigenem Schlüssel) und Spracheingabe für Eltern, Buchstabennamen statt Laute, Großbuchstaben, Laut-Studio (Aussprache je Buchstabe wählen oder selbst aufnehmen), Tier-Pakete importieren und löschen (zurückholbar bis zum nächsten Löschen/Import), Speicherstand. |
 
 ## Montessori-Grundsätze
 
@@ -43,16 +50,16 @@ abc-werkstatt/
 ├── src/
 │   ├── main.ts             # Dienste erzeugen, Router starten, Service Worker
 │   ├── kern/               # Fundament: vertrag.ts (Typen), Router, Start, Stores, DOM-Helfer, Icons, Stile
-│   ├── audio/              # Wiedergabe, vorab vertonte Laute/Wörter, Azure-TTS, Elternaufnahmen
+│   ├── audio/              # Wiedergabe, feste Sätze aus Dateien, Live-Stimme (Browser/Piper/OpenRouter), Elternaufnahmen
 │   ├── paket/              # Tier-Paket-Import und -Speicher (IndexedDB)
 │   ├── ui/alphabet.{ts,css} # Bildschirm-Alphabet (bewegliches Alphabet)
-│   └── modi/               # je Bildschirm ein Ordner (frei, nachfuellen, tiere, woerterbuch, einstellungen, laut-studio)
+│   └── modi/               # je Bildschirm ein Ordner (frei, nachfuellen, tiere, laut-ruft-tier, decke, silben, geschichten, leute, woerterbuch, einstellungen, laut-studio)
 ├── public/                 # Schrift (Andika), App-Icons, vorab vertonter Audio-Bestand
 ├── tests/
 │   ├── abnahme/            # Playwright-Abnahme (Vertrag über data-testid)
 │   └── fixtures/           # Testpaket
 ├── tools/                  # Hilfsskripte (Icons, Testpaket, Vertonung, Push, CI-Prüfung)
-├── docs/                   # Paketformat, frühere Einzeldatei-Version (grundversion.html)
+├── docs/                   # Paketformat, Bau-Spezifikation (konzept-spass-und-lernen.md), frühere Einzeldatei-Version
 └── .github/workflows/      # CI: Build, Abnahme, Pages-Deploy
 ```
 
@@ -64,7 +71,7 @@ npm run dev          # Entwicklungsserver
 npm run build        # Typprüfung + Produktionsbuild nach dist/
 npm run preview      # gebauten Stand unter http://localhost:4173/abc-werkstatt/ ansehen
 npm run testpaket    # tests/fixtures/testpaket.zip neu bauen
-bash tools/vertonen.sh [--neu | --nur woerter/o | --nur-manifest]   # Wörter und Sätze in public/audio vertonen (Azure-Schlüssel aus tools/.lokal/, gitignored)
+python tools/vertonen.py …   # feste Wörter und Sätze in public/audio vertonen (wird gerade auf Piper lokal / gpt-audio umgestellt, siehe unten)
 python tools/laute_ki.py alles [--lauf haupt] [--nur m,b,k,a]   # Laute per Sprachmodell erzeugen + von Hör-Modellen bewerten (OpenRouter-Schlüssel aus .env, gitignored; Rohdaten + Hörseite unter tools/.lokal/laute-roh/)
 python tools/laute_ki.py namen [--nur b,c]   # Buchstabennamen (A, Be, Ze …) ebenso erzeugen + bewerten, Lauf tools/.lokal/laute-roh/namen/
 ```
@@ -88,18 +95,25 @@ Der Ton liegt fertig unter `public/audio/` und ist in `public/audio/manifest.jso
 |---|---|---|
 | **Laute** `laute/<b>.ki1.mp3` (Standard) und `.ki2.mp3` (zweite Variante im Laut-Studio) | Sprachmodell gpt-audio über OpenRouter, bewertet von drei Hör-Modellen | `tools/laute_ki.py` |
 | **Buchstabennamen** `namen/<b>.mp3` („Be“, „Zett“) | ebenso | `tools/laute_ki.py namen` |
-| **Wörter und Sätze** `woerter/`, `saetze/` | Azure Speech (Stimme Katja) | `tools/vertonen.sh` |
+| **Wörter, feste Sätze, Geräusche** `woerter/`, `saetze/`, gedehnte Laute `laute_lang` | lokal und kostenlos mit Piper (Stimme de_DE-thorsten-high); später in einem Lauf mit gpt-audio ersetzbar | `tools/vertonen.py` |
 
 `tools/laute_ki.py` erzeugt je Buchstabe mehrere Kandidaten mit einer Montessori-Vorgabe (Anlaut,
 Dauerlaute gedehnt, Verschlusslaute ohne Vokal), schneidet und normalisiert sie und lässt jeden
 Kandidaten von drei Hör-Modellen zweistufig bewerten (erst blind, dann gegen die Vorgabe). Gewählt
 werden die zwei besten gültigen Kandidaten; alle Rohdaten und eine Hörseite liegen gitignored unter
 `tools/.lokal/laute-roh/<lauf>/`. Die Übernahme nach `public/audio/` ist ein bewusster Schritt
-nach dem Anhören. `tools/vertonen.sh` fasst Laute und Namen nicht an: Es übernimmt deren
+nach dem Anhören. `tools/vertonen.py` fasst Laute und Namen nicht an: Es übernimmt deren
 Manifest-Einträge unverändert und prüft nur, dass die Dateien vorhanden sind.
 
 Wer im Laut-Studio eine Variante gewählt hat, die es nicht mehr gibt (frühere Dateinamen), fällt
 beim nächsten Start still auf die neue Standard-Aussprache zurück; eigene Aufnahmen bleiben.
+
+**Feste Sätze** (Ton-Gesamtliste im Konzept, Abschnitt 6a) stehen in `manifest.saetze` als
+Schlüssel → Liste von Varianten, z. B. `"kachel.tiere": ["audio/saetze/kachel.tiere.1.mp3", …]`.
+Die App spielt sie nur aus diesen Dateien und nie zweimal dieselbe Variante hintereinander; fehlt
+eine, ist das ein sichtbarer Fehler. **Live** gesprochen wird nur frei Geschriebenes – mit der
+Stimme des Geräts, offline mit Piper (wird beim ersten Wählen geladen) oder über OpenRouter mit
+dem eigenen Schlüssel der Eltern.
 
 ## Lizenz
 

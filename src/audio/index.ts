@@ -1,14 +1,15 @@
 /**
- * AudioDienst (Bau „audio“) — Implementierung von `AudioDienst` aus src/kern/vertrag.ts.
+ * AudioDienst — Implementierung von `AudioDienst` aus src/kern/vertrag.ts.
  *
- * Quellen je Ausgabe, in dieser Reihenfolge:
- *  (a) Elternaufnahme (IndexedDB)
- *  (b) im Laut-Studio gewählte Variante (nur Laute)
- *  (c) vorab vertonte Datei laut public/audio/manifest.json
- *  (d) bereits live vertontes Audio aus dem Cache
- *  (e) Azure live — nur mit eigenem Schlüssel + Region aus den Einstellungen
- *  (f) Browserstimme (speechSynthesis, de-DE)
- * Tier-Paket-Audio spielen die Modi über `datei(await ctx.pakete.audioUrl(...))`.
+ * FESTE Ausgaben (nur Dateien, nie live — B12):
+ *  - `laut`/`name`: Elternaufnahme → im Laut-Studio gewählte Variante → manifest.laute/namen
+ *  - `lautLang`: manifest.laute_lang
+ *  - `fest(schluessel)`: manifest.saetze[schluessel] (Varianten, nie zweimal dieselbe hintereinander)
+ * FREI Geschriebenes (6c): `wort` → Elternaufnahme → manifest.woerter → Live-Stimme;
+ *  `live`/`satz` → Live-Stimme. Live-Stimme nach Einstellung `liveStimme`:
+ *  browser (speechSynthesis) | piper (offline, src/audio/piper.ts) | openrouter (eigener Schlüssel).
+ *  Piper/OpenRouter-Ergebnisse landen in Cache Storage (live-cache.ts).
+ * Tier-Paket-Audio spielen die Modi über `variante()`/`datei()` (Hilfe: src/kern/tierton.ts).
  *
  * Jede neue Ausgabe bricht die laufende ab und liefert dann `abgebrochen` (siehe `Ausgang`).
  * Geworfen wird bei echten Fehlern (`AudioFehler`). Eine Autoplay-Sperre ist nur vor der
@@ -27,22 +28,42 @@ import {
   type AudioSchluessel,
   type Buchstabe,
   type EinstellungenStore,
+  type KettenSchritt,
   type LautVariante,
 } from '../kern/vertrag';
 import { Aufnahmen } from './aufnahmen';
-import { ausCache, vertone, type AzureZugang } from './azure';
 import { browserstimmeVerfuegbar, sprich } from './browserstimme';
-import { lautSsml, nameSsml, textSsml } from './ipa';
+import { ausLiveCache, inLiveCache } from './live-cache';
+import { openrouterSprich, openrouterTranskribiere } from './openrouter';
+import { piperSprich } from './piper';
 import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 
-/** Präfixe für besondere Varianten-URLs (siehe `Einstellungen.gewaehlteLautVarianten`). */
+/** Präfix für Elternaufnahmen als Varianten-URL (siehe `Einstellungen.gewaehlteLautVarianten`). */
 const AUFNAHME = 'aufnahme:';
-const AZURE = 'azure:';
+
+/** Standardpause zwischen festen Sätzen einer Kette (B11). */
+export const KETTEN_PAUSE_MS = 1200;
 
 /** Relativer Pfad (z. B. „audio/laute/m.ki1.mp3“) → URL unter der App-Basis. */
 function aufloesen(pfad: string): string {
   if (/^(blob:|data:|https?:)/.test(pfad)) return pfad;
   return import.meta.env.BASE_URL + pfad.replace(/^\.?\//, '');
+}
+
+/** Ersetzt `{name}` aus `werte`; ein fehlender Platzhalter ist ein Programmierfehler. */
+export function setzePlatzhalter(schluessel: string, werte: Readonly<Record<string, string>> = {}): string {
+  return schluessel.replace(/\{([a-z_]+)\}/gi, (_, n: string) => {
+    const w = werte[n];
+    if (w === undefined) throw new AudioFehler(`Platzhalter „{${n}}“ in „${schluessel}“ ohne Wert.`);
+    return w;
+  });
+}
+
+/** Wählt zufällig einen Index ≠ `zuletzt` (bei nur einer Variante immer 0). */
+export function waehleVariante(anzahl: number, zuletzt: number | undefined, zufall: () => number = Math.random): number {
+  if (anzahl <= 1) return 0;
+  const moeglich = [...Array(anzahl).keys()].filter((i) => i !== zuletzt);
+  return moeglich[Math.floor(zufall() * moeglich.length)] ?? 0;
 }
 
 /** Winzige stille WAV-Datei zum Entsperren der Wiedergabe (iOS) bei der ersten Geste. */
@@ -67,15 +88,28 @@ function stilleWav(): string {
   return URL.createObjectURL(new Blob([puffer], { type: 'audio/wav' }));
 }
 
+/** Prüft die Form von manifest.json; wirft `AudioFehler` mit dem ersten Problem. */
+function pruefeManifest(m: unknown): AudioManifest {
+  const o = m as Partial<AudioManifest> | null;
+  if (!o || typeof o !== 'object' || !o.laute || !o.namen || !o.woerter) throw new AudioFehler('Audio-Verzeichnis ist unvollständig.');
+  const saetze = o.saetze ?? {};
+  for (const [k, v] of Object.entries(saetze)) {
+    if (!Array.isArray(v) || v.length === 0 || v.some((u) => typeof u !== 'string')) {
+      throw new AudioFehler(`Audio-Verzeichnis: Satz „${k}“ braucht eine Liste von Dateien.`);
+    }
+  }
+  return { ...(o as AudioManifest), saetze };
+}
+
 /** Was für eine Ausgabe in Frage kommt. */
 interface Plan {
   aufnahme?: AudioSchluessel;
-  /** Datei-URL (relativ oder Blob-URL) bzw. fertiges Audio, nachdem das Manifest geladen ist; undefined = keine Datei. */
-  datei?: () => Promise<string | Blob | undefined>;
-  /** SSML-Inhalt für Cache und Azure. */
-  ssml: string;
-  /** Text für die Browserstimme. */
-  text: string;
+  /** Datei-URL (relativ oder Blob-URL), nachdem das Manifest geladen ist; undefined = keine Datei. */
+  datei?: () => Promise<string | undefined>;
+  /** Text für die Live-Stimme. Ohne: fehlt die Datei, ist das ein Fehler (`fehlt`). */
+  live?: string;
+  /** Meldung, wenn weder Aufnahme noch Datei da ist und nicht live gesprochen werden darf. */
+  fehlt?: string;
 }
 
 class Dienst implements AudioDienst {
@@ -84,6 +118,10 @@ class Dienst implements AudioDienst {
   private manifest: AudioManifest | undefined;
   private laden: Promise<void> | undefined;
   private ctrl = new AbortController();
+  /** Zählt jede neue Ausgabe und jedes `stopp()` — Ketten erkennen daran fremde Ausgaben in ihrer Pause. */
+  private generation = 0;
+  /** Zuletzt gespielte Variante je Schlüssel (nie zweimal dieselbe hintereinander). */
+  private readonly zuletzt = new Map<string, number>();
   /** true, sobald eine Wiedergabe wirklich gestartet ist (play() aufgelöst). */
   private entsperrt = false;
   private gestenAbmelden: () => void = () => undefined;
@@ -110,11 +148,9 @@ class Dienst implements AudioDienst {
   vorab(): Promise<void> {
     if (!this.laden) {
       this.laden = (async () => {
-        const url = aufloesen('audio/manifest.json');
-        const r = await fetch(url);
+        const r = await fetch(aufloesen('audio/manifest.json'));
         if (!r.ok) throw new AudioFehler(`Audio-Verzeichnis nicht ladbar (HTTP ${r.status}).`);
-        const m = (await r.json()) as AudioManifest;
-        if (!m.laute || !m.namen || !m.woerter) throw new AudioFehler('Audio-Verzeichnis ist unvollständig.');
+        const m = pruefeManifest(await r.json());
         this.manifest = m;
         this.bereinigeLautWahl(m);
       })().catch((f: unknown) => {
@@ -131,7 +167,7 @@ class Dienst implements AudioDienst {
     return this.manifest;
   }
 
-  // ---- Ausgaben ----------------------------------------------------------
+  // ---- Feste Ausgaben ----------------------------------------------------
 
   laut(b: Buchstabe): Promise<Ausgang> {
     return this.ausgabe({
@@ -139,17 +175,6 @@ class Dienst implements AudioDienst {
       datei: async () => {
         const m = await this.m(); // lädt das Manifest und bereinigt dabei veraltete Laut-Studio-Auswahlen
         const gewaehlt = this.einstellungen.lese().gewaehlteLautVarianten[b];
-        if (gewaehlt?.startsWith(AZURE)) {
-          const z = this.azure();
-          if (!z) {
-            throw new AudioFehler(
-              `Im Laut-Studio ist für „${b}“ die Live-Stimme gewählt, aber der eigene Azure-Schlüssel fehlt. ` +
-                'Bitte den Schlüssel eintragen oder im Laut-Studio „Standard“ wählen.',
-            );
-          }
-          const ssml = lautSsml(b);
-          return (await ausCache(z.stimme, ssml)) ?? (await vertone(z, ssml));
-        }
         if (gewaehlt) {
           const url = await this.varianteUrl(gewaehlt);
           if (url) return url;
@@ -159,8 +184,14 @@ class Dienst implements AudioDienst {
         }
         return m.laute[b];
       },
-      ssml: lautSsml(b),
-      text: b,
+      fehlt: `Für „${b}“ gibt es keinen Laut.`,
+    });
+  }
+
+  lautLang(b: Buchstabe): Promise<Ausgang> {
+    return this.ausgabe({
+      datei: async () => (await this.m()).laute_lang?.[b],
+      fehlt: `Für „${b}“ fehlt der gedehnte Laut (laute_lang) im Audio-Verzeichnis.`,
     });
   }
 
@@ -168,8 +199,7 @@ class Dienst implements AudioDienst {
     return this.ausgabe({
       aufnahme: { art: 'name', text: b },
       datei: async () => (await this.m()).namen[b],
-      ssml: nameSsml(b),
-      text: b,
+      fehlt: `Für „${b}“ gibt es keinen Buchstabennamen.`,
     });
   }
 
@@ -177,35 +207,61 @@ class Dienst implements AudioDienst {
     return this.einstellungen.lese().namenStattLaute ? this.name(b) : this.laut(b);
   }
 
+  async fest(schluessel: string, platzhalter?: Readonly<Record<string, string>>): Promise<Ausgang> {
+    const signal = this.neu();
+    const s = setzePlatzhalter(schluessel, platzhalter);
+    const varianten = (await this.m()).saetze[s];
+    if (signal.aborted) return 'abgebrochen';
+    if (!varianten?.length) throw new AudioFehler(`Der feste Satz „${s}“ fehlt im Audio-Verzeichnis.`);
+    return this.spiele(this.naechsteVariante(`fest:${s}`, varianten), signal);
+  }
+
+  async hatFest(schluessel: string): Promise<boolean> {
+    return ((await this.m()).saetze[schluessel]?.length ?? 0) > 0;
+  }
+
+  async variante(schluessel: string, urls: readonly string[]): Promise<Ausgang> {
+    if (!urls.length) throw new AudioFehler(`Keine Audiodatei für „${schluessel}“.`);
+    const signal = this.neu();
+    return this.spiele(this.naechsteVariante(`variante:${schluessel}`, urls), signal);
+  }
+
+  wisch(): Promise<Ausgang> {
+    return this.fest('geraeusch.wisch');
+  }
+
+  async kette(schritte: readonly KettenSchritt[], pauseMs = KETTEN_PAUSE_MS): Promise<Ausgang> {
+    for (let i = 0; i < schritte.length; i++) {
+      const schritt = schritte[i];
+      if (!schritt) continue;
+      if ((await schritt()) === 'abgebrochen') return 'abgebrochen';
+      if (i < schritte.length - 1 && (await this.pause(pauseMs)) === 'abgebrochen') return 'abgebrochen';
+    }
+    return 'fertig';
+  }
+
+  // ---- Frei Geschriebenes -------------------------------------------------
+
   wort(w: string): Promise<Ausgang> {
     // So sprechen, wie es im Wörterbuch steht — aber nie ganz in Großbuchstaben (sonst wird buchstabiert).
     const sprech = w.length > 1 && w === w.toLocaleUpperCase('de-DE') ? w.toLocaleLowerCase('de-DE') : w;
     return this.ausgabe({
       aufnahme: { art: 'wort', text: w },
       datei: async () => (await this.m()).woerter[w],
-      ssml: textSsml(sprech, false),
-      text: sprech,
+      live: sprech,
     });
   }
 
+  live(text: string): Promise<Ausgang> {
+    return this.ausgabe({ live: text });
+  }
+
   satz(text: string): Promise<Ausgang> {
-    return this.ausgabe({
-      datei: async () => (await this.m()).saetze?.[text],
-      ssml: textSsml(text, true),
-      text,
-    });
+    return this.live(text);
   }
 
   async datei(url: string): Promise<Ausgang> {
     const signal = this.neu();
-    if (url.startsWith(AZURE)) {
-      const b = this.buchstabeAus(url, AZURE);
-      const z = this.azure();
-      if (!z) throw new AudioFehler('Für die Live-Vertonung fehlt der eigene Azure-Schlüssel.');
-      const blob = (await ausCache(z.stimme, lautSsml(b))) ?? (await vertone(z, lautSsml(b)));
-      if (signal.aborted) return 'abgebrochen';
-      return this.spieleBlob(blob, signal);
-    }
     const aufgeloest = await this.varianteUrl(url);
     if (signal.aborted) return 'abgebrochen';
     if (!aufgeloest) throw new AudioFehler('Diese Aufnahme gibt es nicht mehr.');
@@ -213,9 +269,16 @@ class Dienst implements AudioDienst {
   }
 
   stopp(): void {
+    this.generation++;
     this.ctrl.abort();
     this.el.pause();
     if (browserstimmeVerfuegbar()) speechSynthesis.cancel();
+  }
+
+  transkribiere(aufnahme: Blob): Promise<string> {
+    const schluessel = this.einstellungen.lese().openrouterSchluessel?.trim();
+    if (!schluessel) return Promise.reject(new AudioFehler('Für die Spracheingabe über OpenRouter fehlt der eigene Schlüssel.'));
+    return openrouterTranskribiere(aufnahme, schluessel);
   }
 
   // ---- Laut-Studio -------------------------------------------------------
@@ -227,8 +290,6 @@ class Dienst implements AudioDienst {
     if (await this.aufnahmen.hat({ art: 'laut', text: b })) {
       liste.push({ id: 'aufnahme', url: AUFNAHME + b, beschreibung: 'eigene Aufnahme', quelle: 'aufnahme' });
     }
-    const z = this.azure();
-    if (z) liste.push({ id: 'azure', url: AZURE + b, beschreibung: `live: ${z.stimme}`, quelle: 'azure' });
     return liste;
   }
 
@@ -264,24 +325,41 @@ class Dienst implements AudioDienst {
     return this.ctrl.signal;
   }
 
-  private azure(): AzureZugang | undefined {
-    const e = this.einstellungen.lese();
-    const schluessel = e.azureSchluessel?.trim();
-    const region = e.azureRegion?.trim();
-    return schluessel && region ? { schluessel, region, stimme: e.stimme } : undefined;
+  /** Stille zwischen Kettenschritten; `abgebrochen`, wenn inzwischen eine andere Ausgabe oder `stopp()` kam. */
+  private pause(ms: number): Promise<Ausgang> {
+    const gen = this.generation;
+    return new Promise((ok) => {
+      const uhr = window.setInterval(() => {
+        if (this.generation !== gen) {
+          window.clearInterval(uhr);
+          window.clearTimeout(ende);
+          ok('abgebrochen');
+        }
+      }, 50);
+      const ende = window.setTimeout(() => {
+        window.clearInterval(uhr);
+        ok(this.generation === gen ? 'fertig' : 'abgebrochen');
+      }, ms);
+    });
+  }
+
+  private naechsteVariante(schluessel: string, urls: readonly string[]): string {
+    const i = waehleVariante(urls.length, this.zuletzt.get(schluessel));
+    this.zuletzt.set(schluessel, i);
+    return urls[i] as string;
   }
 
   /**
    * Migration: Eine im Laut-Studio gespeicherte Datei-URL, die das aktuelle Manifest nicht mehr kennt
    * (z. B. die früheren Varianten „…katja.mp3“), wird entfernt — dann gilt die neue Standard-Aussprache.
-   * Eigene Aufnahmen (`aufnahme:`) und die Live-Stimme (`azure:`) bleiben unberührt.
+   * Eigene Aufnahmen (`aufnahme:`) bleiben unberührt.
    */
   private bereinigeLautWahl(m: AudioManifest): void {
     const alle = this.einstellungen.lese().gewaehlteLautVarianten;
     const neu = { ...alle };
     let geaendert = false;
     for (const [b, url] of Object.entries(alle) as [Buchstabe, string | undefined][]) {
-      if (!url || url.startsWith(AUFNAHME) || url.startsWith(AZURE)) continue;
+      if (!url || url.startsWith(AUFNAHME)) continue;
       const bekannt = url === m.laute[b] || (m.varianten?.[b] ?? []).some((v) => v.url === url);
       if (!bekannt) {
         delete neu[b];
@@ -300,17 +378,12 @@ class Dienst implements AudioDienst {
     this.einstellungen.setze({ gewaehlteLautVarianten: neu });
   }
 
-  private buchstabeAus(url: string, praefix: string): Buchstabe {
-    const b = url.slice(praefix.length);
-    if (!istBuchstabe(b)) throw new AudioFehler(`Unbekannter Buchstabe in „${url}“.`);
-    return b;
-  }
-
   /** Löst Varianten-URLs auf: `aufnahme:<b>` → Blob-URL (oder undefined, wenn gelöscht), sonst die URL selbst. */
   private async varianteUrl(url: string): Promise<string | undefined> {
-    if (url.startsWith(AUFNAHME)) return this.aufnahmen.url({ art: 'laut', text: this.buchstabeAus(url, AUFNAHME) });
-    if (url.startsWith(AZURE)) return undefined;
-    return url;
+    if (!url.startsWith(AUFNAHME)) return url;
+    const b = url.slice(AUFNAHME.length);
+    if (!istBuchstabe(b)) throw new AudioFehler(`Unbekannter Buchstabe in „${url}“.`);
+    return this.aufnahmen.url({ art: 'laut', text: b });
   }
 
   private async ausgabe(p: Plan): Promise<Ausgang> {
@@ -322,21 +395,32 @@ class Dienst implements AudioDienst {
     }
     const d = await p.datei?.();
     if (signal.aborted) return 'abgebrochen';
-    if (d instanceof Blob) return this.spieleBlob(d, signal);
     if (d) return this.spiele(d, signal);
+    if (p.live === undefined) throw new AudioFehler(p.fehlt ?? 'Audiodatei fehlt.');
+    return this.liveAusgabe(p.live, signal);
+  }
 
-    const stimme = this.einstellungen.lese().stimme;
-    const gecacht = await ausCache(stimme, p.ssml);
-    if (signal.aborted) return 'abgebrochen';
-    if (gecacht) return this.spieleBlob(gecacht, signal);
+  /** Live-Stimme nach Einstellung (6c). Piper/OpenRouter werden gecacht. */
+  private async liveAusgabe(text: string, signal: AbortSignal): Promise<Ausgang> {
+    const quelle = this.einstellungen.lese().liveStimme;
+    if (quelle === 'browser') return sprich(text, signal, () => this.entsperrt);
 
-    const z = this.azure();
-    if (z) {
-      const blob = await vertone(z, p.ssml);
-      if (signal.aborted) return 'abgebrochen';
-      return this.spieleBlob(blob, signal);
+    let erzeuge: () => Promise<Blob>;
+    if (quelle === 'openrouter') {
+      const schluessel = this.einstellungen.lese().openrouterSchluessel?.trim();
+      if (!schluessel) throw new AudioFehler('Die Live-Stimme „OpenRouter“ ist gewählt, aber der eigene Schlüssel fehlt.');
+      erzeuge = () => openrouterSprich(text, schluessel, signal);
+    } else {
+      erzeuge = () => piperSprich(text, signal);
     }
-    return sprich(p.text, signal, () => this.entsperrt);
+    let blob = await ausLiveCache(quelle, text);
+    if (signal.aborted) return 'abgebrochen';
+    if (!blob) {
+      blob = await erzeuge();
+      if (signal.aborted) return 'abgebrochen';
+      await inLiveCache(quelle, text, blob);
+    }
+    return this.spieleBlob(blob, signal);
   }
 
   private async spieleBlob(blob: Blob, signal: AbortSignal): Promise<Ausgang> {
@@ -373,6 +457,10 @@ class Dienst implements AudioDienst {
         const grund = el.error?.message || `Code ${el.error?.code ?? '?'}`;
         fehler(new AudioFehler(`Audio ließ sich nicht abspielen: ${pfad.startsWith('blob:') ? 'Aufnahme' : pfad} (${grund}).`));
       };
+      if (signal.aborted) {
+        ok('abgebrochen');
+        return;
+      }
       el.addEventListener('ended', ende);
       el.addEventListener('error', kaputt);
       signal.addEventListener('abort', abbruch, { once: true });

@@ -5,6 +5,7 @@
  * bedient ohnehin ein Erwachsener; abschalten lässt sie sich in den Einstellungen.
  */
 import { el } from './dom';
+import { mitHalten } from './halten';
 import type { EinstellungenStore } from './vertrag';
 
 export const ELTERNSPERRE_SEKUNDEN = 2;
@@ -29,39 +30,13 @@ export function sperreAktiv(einstellungen: EinstellungenStore): boolean {
  * Ein kurzer Tipp zeigt nur den Hinweis. Tastatur (Enter/Leertaste, click.detail === 0) öffnet direkt.
  */
 export function mitElternsperre(knopf: HTMLButtonElement, hinweis: HTMLElement, oeffne: () => void): void {
-  let timer: number | undefined;
-  let geoeffnet = false;
-  const stopp = (): void => {
-    if (timer !== undefined) window.clearTimeout(timer);
-    timer = undefined;
-    delete knopf.dataset.halten;
-  };
-  knopf.classList.add('knopf--halten');
-  knopf.style.setProperty('--halten-dauer', `${HALTEN_MS}ms`);
-  knopf.addEventListener('pointerdown', (ev) => {
-    if (ev.button !== 0) return;
-    stopp();
-    geoeffnet = false;
-    knopf.dataset.halten = 'laeuft';
-    timer = window.setTimeout(() => {
-      timer = undefined;
-      geoeffnet = true;
-      delete knopf.dataset.halten;
-      oeffne();
-    }, HALTEN_MS);
-  });
-  for (const ende of ['pointerup', 'pointerleave', 'pointercancel'] as const) knopf.addEventListener(ende, stopp);
-  knopf.addEventListener('contextmenu', (ev) => ev.preventDefault());
-  knopf.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    if (ev.detail === 0) {
-      oeffne();
-      return;
-    }
-    if (!geoeffnet) {
+  mitHalten(knopf, {
+    ms: HALTEN_MS,
+    beiHalten: oeffne,
+    beiKurz: () => {
       hinweis.textContent = `Für Eltern: ${ELTERNSPERRE_SEKUNDEN} Sekunden gedrückt halten.`;
       hinweis.hidden = false;
-    }
+    },
   });
 }
 

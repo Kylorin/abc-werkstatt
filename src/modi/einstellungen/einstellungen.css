@@ -12,3 +12,6 @@
 .einstellungen__paket strong { overflow-wrap: break-word; line-height: 1.3; }
 .einstellungen__paket small { font-size: var(--gr-s); }
 .einstellungen__fokus { box-shadow: var(--fokus); }
+.einstellungen__mit-icon { display: inline-flex; align-items: center; gap: var(--abstand-2); }
+.feld--kurz { max-width: 6em; text-align: center; }
+.begleitkarte summary { cursor: pointer; font-weight: 700; min-height: var(--touch); display: flex; align-items: center; }

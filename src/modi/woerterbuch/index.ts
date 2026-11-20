@@ -32,6 +32,7 @@ export const modus: Modus = {
   id: 'woerterbuch',
   titel: 'Wörterbuch',
   icon: 'woerterbuch',
+  fuerEltern: true,
   async mount(flaeche, ctx: Kontext) {
     aktiv = true;
     let pausiert = new Set<string>();

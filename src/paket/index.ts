@@ -18,6 +18,7 @@ import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 
 export { kanonischesWort, tiereNachSchwierigkeit, istLautgetreu } from './woerter';
 export { pruefeZip, pruefePaketJson } from './validierung';
+export { anlautBuchstabe, tiereMitAnlaut, kontrastiert, waehleAblenker } from './anlaut';
 
 const PAKETE = 'pakete';
 const PAPIERKORB = 'papierkorb';

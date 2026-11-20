@@ -110,12 +110,7 @@
     "ofen": "audio/woerter/ofen.mp3",
     "rabe": "audio/woerter/rabe.mp3"
   },
-  "saetze": {
-    "Fertig!": "audio/saetze/fertig.mp3",
-    "Wunderbar.": "audio/saetze/wunderbar.mp3",
-    "Das hast du geschrieben.": "audio/saetze/das-hast-du-geschrieben.mp3",
-    "Schön gemacht.": "audio/saetze/schoen-gemacht.mp3"
-  },
+  "saetze": {},
   "varianten": {
     "a": [
       {

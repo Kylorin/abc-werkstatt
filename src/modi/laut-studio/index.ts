@@ -12,7 +12,6 @@ import { aufnahmeKnoepfe, type AufnahmeKnoepfe } from './aufnahme';
 
 const QUELLE: Record<LautVariante['quelle'], string> = {
   vorab: 'vorab vertont',
-  azure: 'live erzeugt',
   aufnahme: 'eigene Aufnahme',
 };
 
@@ -98,6 +97,7 @@ export const modus: Modus = {
   id: 'laut-studio',
   titel: 'Laut-Studio',
   icon: 'welle',
+  fuerEltern: true,
   zurueckZu: 'einstellungen',
   mount(flaeche, ctx) {
     aktiv = true;

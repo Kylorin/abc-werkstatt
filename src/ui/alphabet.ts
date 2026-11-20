@@ -25,7 +25,7 @@ export const erzeugeAlphabet = ((opt: AlphabetOptionenPlus): AlphabetKomponente 
   const auswahl = LAUTE.filter((b) => !zeigen || zeigen.has(b));
 
   const wurzel = el('div', {
-    klasse: ['alphabet', zeigen ? 'alphabet--auswahl' : 'alphabet--voll'],
+    klasse: ['alphabet', zeigen ? 'alphabet--auswahl' : 'alphabet--voll', opt.gross ? 'alphabet--gross' : ''].filter(Boolean),
     attr: { role: 'group', 'aria-label': 'Bewegliches Alphabet' },
   });
   const raster = el('div', { klasse: 'alphabet__raster', attr: { 'data-anzahl': auswahl.length } });
@@ -101,6 +101,17 @@ export const erzeugeAlphabet = ((opt: AlphabetOptionenPlus): AlphabetKomponente 
       if (!t) return;
       t.classList.remove('taste--gedrueckt'); // Wackeln hat Vorrang vor dem Drück-Echo der Tastatur
       animiere(t, 'wackelt');
+    },
+    hinweis(b, an) {
+      const t = tasten.get(b);
+      if (!t) return;
+      if (an) {
+        t.dataset.hinweis = 'ja';
+        t.classList.add('taste--hinweis');
+      } else {
+        delete t.dataset.hinweis;
+        t.classList.remove('taste--hinweis');
+      }
     },
     setzeGross(gross) {
       for (const [b, t] of tasten) {
