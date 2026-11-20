@@ -31,6 +31,9 @@ export default defineConfig({
       workbox: {
         // Alles offline: App, Schrift, Icons und der vorab vertonte Audio-Bestand
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,webmanifest,json,mp3}'],
+        // Offline-Stimme (Piper) NICHT vorab: der Motor-Chunk wird erst beim Wählen geladen, Laufzeit
+        // und Stimme lädt src/audio/piper.ts einmalig in einen eigenen Cache (B18).
+        globIgnores: ['**/node_modules/**/*', '**/*piper*', '**/*.onnx', '**/*.onnx.json', '**/*.wasm', '**/ort-*', '**/ort.*', '**/onnxruntime*'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,

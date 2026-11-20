@@ -11,7 +11,8 @@ import { icon } from '../../kern/ui/icons';
 import { speicherStand, type SpeicherStand } from '../../kern/speicher';
 import { ELTERNSPERRE_SEKUNDEN } from '../../kern/elternsperre';
 import type { Kontext, Modus } from '../../kern/vertrag';
-import { abschnitt, ausDenModi, kindUndHeute, lernpfad, regal, schalter, tonquellen } from './abschnitte';
+import { abschnitt, ausDenModi, kindUndHeute, lernpfad, regal, schalter } from './abschnitte';
+import { tonquellen } from './ton';
 
 let abmelden: (() => void)[] = [];
 let aktiv = false;
@@ -199,7 +200,7 @@ export const modus: Modus = {
       regal(ctx),
       lernpfad(ctx),
       kindUndHeute(ctx),
-      tonquellen(ctx),
+      tonquellen(ctx, (fn) => abmelden.push(fn), () => aktiv),
       pakete(ctx),
       ...ausDenModi(ctx),
       speicher(ctx),

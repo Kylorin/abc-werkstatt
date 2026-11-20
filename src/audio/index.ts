@@ -34,8 +34,8 @@ import {
 import { Aufnahmen } from './aufnahmen';
 import { browserstimmeVerfuegbar, sprich } from './browserstimme';
 import { ausLiveCache, inLiveCache } from './live-cache';
-import { openrouterSprich, openrouterTranskribiere } from './openrouter';
-import { piperSprich } from './piper';
+import { OPENROUTER_MODELL, OPENROUTER_STIMME, openrouterSprich, openrouterTranskribiere } from './openrouter';
+import { PIPER_STIMME, piperSprich } from './piper';
 import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 
 /** Präfix für Elternaufnahmen als Varianten-URL (siehe `Einstellungen.gewaehlteLautVarianten`). */
@@ -125,6 +125,8 @@ class Dienst implements AudioDienst {
   /** true, sobald eine Wiedergabe wirklich gestartet ist (play() aufgelöst). */
   private entsperrt = false;
   private gestenAbmelden: () => void = () => undefined;
+  /** Live-Erzeugungen, die gerade laufen (Quelle + Text → Ergebnis). */
+  private readonly inArbeit = new Map<string, Promise<Blob>>();
 
   constructor(private readonly einstellungen: EinstellungenStore) {
     this.el.preload = 'auto';
@@ -404,23 +406,46 @@ class Dienst implements AudioDienst {
   private async liveAusgabe(text: string, signal: AbortSignal): Promise<Ausgang> {
     const quelle = this.einstellungen.lese().liveStimme;
     if (quelle === 'browser') return sprich(text, signal, () => this.entsperrt);
+    let blob: Blob;
+    try {
+      blob = await this.liveErzeugen(quelle, text);
+    } catch (f) {
+      if (signal.aborted) return 'abgebrochen';
+      throw f;
+    }
+    if (signal.aborted) return 'abgebrochen';
+    return this.spieleBlob(blob, signal);
+  }
 
+  /**
+   * Erzeugt (oder holt aus dem Cache) das Audio für `text`. Läuft unabhängig vom Abbruch der
+   * Wiedergabe zu Ende, damit eine bezahlte Anfrage nie verloren geht; gleiche Texte, die gerade
+   * erzeugt werden, warten auf dieselbe Anfrage.
+   */
+  private liveErzeugen(quelle: 'piper' | 'openrouter', text: string): Promise<Blob> {
     let erzeuge: () => Promise<Blob>;
+    let cacheQuelle: string;
     if (quelle === 'openrouter') {
       const schluessel = this.einstellungen.lese().openrouterSchluessel?.trim();
-      if (!schluessel) throw new AudioFehler('Die Live-Stimme „OpenRouter“ ist gewählt, aber der eigene Schlüssel fehlt.');
-      erzeuge = () => openrouterSprich(text, schluessel, signal);
+      if (!schluessel) return Promise.reject(new AudioFehler('Die Live-Stimme „OpenRouter“ ist gewählt, aber der eigene Schlüssel fehlt.'));
+      cacheQuelle = `openrouter/${OPENROUTER_MODELL}/${OPENROUTER_STIMME}`;
+      erzeuge = () => openrouterSprich(text, schluessel);
     } else {
-      erzeuge = () => piperSprich(text, signal);
+      cacheQuelle = `piper/${PIPER_STIMME}`;
+      erzeuge = () => piperSprich(text);
     }
-    let blob = await ausLiveCache(quelle, text);
-    if (signal.aborted) return 'abgebrochen';
-    if (!blob) {
-      blob = await erzeuge();
-      if (signal.aborted) return 'abgebrochen';
-      await inLiveCache(quelle, text, blob);
-    }
-    return this.spieleBlob(blob, signal);
+    const key = `${cacheQuelle}\n${text}`;
+    const laufend = this.inArbeit.get(key);
+    if (laufend) return laufend;
+    const p = (async () => {
+      const alt = await ausLiveCache(cacheQuelle, text);
+      if (alt) return alt;
+      const neu = await erzeuge();
+      await inLiveCache(cacheQuelle, text, neu);
+      return neu;
+    })().finally(() => this.inArbeit.delete(key));
+    this.inArbeit.set(key, p);
+    return p;
   }
 
   private async spieleBlob(blob: Blob, signal: AbortSignal): Promise<Ausgang> {

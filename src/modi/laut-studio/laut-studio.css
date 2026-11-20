@@ -14,3 +14,4 @@
 .aufnahme__knopf[data-zustand='laeuft'] { color: var(--konsonant); }
 .aufnahme__meldung { flex-basis: 100%; }
 .aufnahme__meldung:empty { display: none; }
+.laut__gedehnt { align-self: flex-start; font-size: var(--gr-s); padding: 0 var(--abstand-3); }
