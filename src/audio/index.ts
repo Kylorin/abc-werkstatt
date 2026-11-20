@@ -39,7 +39,7 @@ import { bitteUmDauerhaftenSpeicher } from '../kern/speicher';
 const AUFNAHME = 'aufnahme:';
 const AZURE = 'azure:';
 
-/** Relativer Pfad (z. B. „audio/laute/m.katja.mp3“) → URL unter der App-Basis. */
+/** Relativer Pfad (z. B. „audio/laute/m-ki1.mp3“) → URL unter der App-Basis. */
 function aufloesen(pfad: string): string {
   if (/^(blob:|data:|https?:)/.test(pfad)) return pfad;
   return import.meta.env.BASE_URL + pfad.replace(/^\.?\//, '');
@@ -116,6 +116,7 @@ class Dienst implements AudioDienst {
         const m = (await r.json()) as AudioManifest;
         if (!m.laute || !m.namen || !m.woerter) throw new AudioFehler('Audio-Verzeichnis ist unvollständig.');
         this.manifest = m;
+        this.bereinigeLautWahl(m);
       })().catch((f: unknown) => {
         this.laden = undefined; // nächster Aufruf versucht es erneut
         throw f instanceof AudioFehler ? f : new AudioFehler(`Audio-Verzeichnis nicht ladbar (${String(f)}).`);
@@ -136,6 +137,7 @@ class Dienst implements AudioDienst {
     return this.ausgabe({
       aufnahme: { art: 'laut', text: b },
       datei: async () => {
+        const m = await this.m(); // lädt das Manifest und bereinigt dabei veraltete Laut-Studio-Auswahlen
         const gewaehlt = this.einstellungen.lese().gewaehlteLautVarianten[b];
         if (gewaehlt?.startsWith(AZURE)) {
           const z = this.azure();
@@ -155,7 +157,7 @@ class Dienst implements AudioDienst {
           this.vergissWahl(b, gewaehlt);
           throw new AudioFehler(`Die gewählte eigene Aufnahme für „${b}“ fehlt. Es gilt wieder die Standard-Aussprache.`);
         }
-        return (await this.m()).laute[b];
+        return m.laute[b];
       },
       ssml: lautSsml(b),
       text: b,
@@ -267,6 +269,26 @@ class Dienst implements AudioDienst {
     const schluessel = e.azureSchluessel?.trim();
     const region = e.azureRegion?.trim();
     return schluessel && region ? { schluessel, region, stimme: e.stimme } : undefined;
+  }
+
+  /**
+   * Migration: Eine im Laut-Studio gespeicherte Datei-URL, die das aktuelle Manifest nicht mehr kennt
+   * (z. B. die früheren Varianten „…katja.mp3“), wird entfernt — dann gilt die neue Standard-Aussprache.
+   * Eigene Aufnahmen (`aufnahme:`) und die Live-Stimme (`azure:`) bleiben unberührt.
+   */
+  private bereinigeLautWahl(m: AudioManifest): void {
+    const alle = this.einstellungen.lese().gewaehlteLautVarianten;
+    const neu = { ...alle };
+    let geaendert = false;
+    for (const [b, url] of Object.entries(alle) as [Buchstabe, string | undefined][]) {
+      if (!url || url.startsWith(AUFNAHME) || url.startsWith(AZURE)) continue;
+      const bekannt = url === m.laute[b] || (m.varianten?.[b] ?? []).some((v) => v.url === url);
+      if (!bekannt) {
+        delete neu[b];
+        geaendert = true;
+      }
+    }
+    if (geaendert) this.einstellungen.setze({ gewaehlteLautVarianten: neu });
   }
 
   /** Entfernt die Laut-Studio-Auswahl für `b`, wenn sie noch `url` ist. */

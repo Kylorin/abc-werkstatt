@@ -64,7 +64,7 @@ npm run dev          # Entwicklungsserver
 npm run build        # Typprüfung + Produktionsbuild nach dist/
 npm run preview      # gebauten Stand unter http://localhost:4173/abc-werkstatt/ ansehen
 npm run testpaket    # tests/fixtures/testpaket.zip neu bauen
-bash tools/vertonen.sh [--neu | --nur laute/m. | --nur-manifest]   # Audio-Bestand in public/audio vertonen (Azure-Schlüssel aus tools/.lokal/, gitignored)
+bash tools/vertonen.sh [--neu | --nur woerter/o | --nur-manifest]   # Wörter und Sätze in public/audio vertonen (Azure-Schlüssel aus tools/.lokal/, gitignored)
 python tools/laute_ki.py alles [--lauf haupt] [--nur m,b,k,a]   # Laute per Sprachmodell erzeugen + von Hör-Modellen bewerten (OpenRouter-Schlüssel aus .env, gitignored; Rohdaten + Hörseite unter tools/.lokal/laute-roh/)
 python tools/laute_ki.py namen [--nur b,c]   # Buchstabennamen (A, Be, Ze …) ebenso erzeugen + bewerten, Lauf tools/.lokal/laute-roh/namen/
 ```
@@ -78,6 +78,28 @@ meldet das Ergebnis (ganz oder je Testgruppe).
 sondern im Actions-Secret `VERBOTENE_BEGRIFFE` bzw. lokal in `tools/.lokal/verboten.txt`
 (gitignored, ein regulärer Ausdruck je Zeile). Fehlt die Liste, ist die Abnahme rot. Geprüft
 werden der Arbeitsbaum und alle neuen Commits (CI checkt mit voller Historie aus).
+
+## Vertonung
+
+Der Ton liegt fertig unter `public/audio/` und ist in `public/audio/manifest.json` verzeichnet
+(Pfade relativ zur App-Basis). Er stammt aus zwei Werkzeugen:
+
+| Was | Woher | Werkzeug |
+|---|---|---|
+| **Laute** `laute/<b>-ki1.mp3` (Standard) und `-ki2.mp3` (zweite Variante im Laut-Studio) | Sprachmodell gpt-audio über OpenRouter, bewertet von drei Hör-Modellen | `tools/laute_ki.py` |
+| **Buchstabennamen** `namen/<b>.mp3` („Be“, „Zett“) | ebenso | `tools/laute_ki.py namen` |
+| **Wörter und Sätze** `woerter/`, `saetze/` | Azure Speech (Stimme Katja) | `tools/vertonen.sh` |
+
+`tools/laute_ki.py` erzeugt je Buchstabe mehrere Kandidaten mit einer Montessori-Vorgabe (Anlaut,
+Dauerlaute gedehnt, Verschlusslaute ohne Vokal), schneidet und normalisiert sie und lässt jeden
+Kandidaten von drei Hör-Modellen zweistufig bewerten (erst blind, dann gegen die Vorgabe). Gewählt
+werden die zwei besten gültigen Kandidaten; alle Rohdaten und eine Hörseite liegen gitignored unter
+`tools/.lokal/laute-roh/<lauf>/`. Die Übernahme nach `public/audio/` ist ein bewusster Schritt
+nach dem Anhören. `tools/vertonen.sh` fasst Laute und Namen nicht an: Es übernimmt deren
+Manifest-Einträge unverändert und prüft nur, dass die Dateien vorhanden sind.
+
+Wer im Laut-Studio eine Variante gewählt hat, die es nicht mehr gibt (frühere Dateinamen), fällt
+beim nächsten Start still auf die neue Standard-Aussprache zurück; eigene Aufnahmen bleiben.
 
 ## Lizenz
 

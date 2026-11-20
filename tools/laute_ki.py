@@ -258,6 +258,13 @@ SPRECHFORM = {
 }
 
 
+# Gleichwertige Transkript-Zeichen je Vorgabe: Spricht das Modell das summende s tatsächlich stimmhaft,
+# schreibt es „zzz“ statt „sss“; beim w schreibt es für [v] oft „vvv“. Beides ist der richtige Laut und
+# darf nicht als „Transkript weicht ab“ verworfen werden (belegt im Lauf dauerlaute: die besten [z]-
+# Kandidaten, von allen Bewertern als [z] gehört, fielen allein daran heraus).
+TRANSKRIPT_GLEICHWERTIG = {"s-laut": "z", "w-laut": "v"}
+
+
 def sprechform(v: Vorgabe) -> str:
     sf = SPRECHFORM.get(f"{v.buchstabe}-{v.id}") or SPRECHFORM[v.buchstabe]
     return f"{sf} … {sf} … {sf}" if KLASSEN[v.klasse].wiederholen else sf
@@ -661,7 +668,8 @@ def kandidaten(lauf: str, bewerter: list[str], ausschluss_anteil: float) -> list
         info = json.loads(bp.read_text(encoding="utf-8")) if bp.exists() else {}
         z["lautdauer"] = round(info.get("lautdauer", 0.0), 3)
         z["mp3"] = f"{slug(v.buchstabe)}/{stamm}.mp3" if basis.with_suffix(".mp3").exists() else ""
-        erlaubt = set(sprechform(v).replace(" … ", "")) | set(" .…!,?\n-")
+        erlaubt = (set(sprechform(v).replace(" … ", "")) | set(TRANSKRIPT_GLEICHWERTIG.get(v.schluessel, ""))
+                   | set(" .…!,?\n-"))
         if not set(meta["transkript"].lower()) <= erlaubt:
             z["gruende"].append("Transkript weicht ab")
         if info.get("fehler"):

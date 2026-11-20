@@ -78,11 +78,11 @@ export interface EinstellungenStore {
 
 /**
  * public/audio/manifest.json — vom Bau „audio“ (tools/vertonen.py) erzeugt.
- * Alle Pfade RELATIV zur App-Basis (z. B. „audio/laute/m.mp3“), damit sie unter
+ * Alle Pfade RELATIV zur App-Basis (z. B. „audio/laute/m-ki1.mp3“), damit sie unter
  * /abc-werkstatt/ und im Test (request.get) funktionieren.
  */
 export interface AudioManifest {
-  /** Laut je Buchstabe, z. B. { m: "audio/laute/m.mp3" } — Standardvariante. */
+  /** Laut je Buchstabe, z. B. { m: "audio/laute/m-ki1.mp3" } — Standardvariante. */
   laute: Record<Buchstabe, string>;
   /** Buchstabenname je Buchstabe, z. B. { m: "audio/namen/m.mp3" }. */
   namen: Record<Buchstabe, string>;
@@ -96,7 +96,7 @@ export interface AudioManifest {
 
 /** Eine auswählbare Aussprache-Variante eines Lauts. */
 export interface LautVariante {
-  /** Stabile ID innerhalb des Buchstabens, z. B. „1“, „kurz“, „katja“. Landet in data-testid `variante-<b>-<id>`. */
+  /** Stabile ID innerhalb des Buchstabens, z. B. „ki1“, „ki2“. Landet in data-testid `variante-<b>-<id>`. */
   id: string;
   /**
    * Relativer Pfad, Blob-URL oder eine der Sonderformen `aufnahme:<b>` (Elternaufnahme) bzw.

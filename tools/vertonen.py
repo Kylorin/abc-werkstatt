@@ -1,11 +1,14 @@
-"""Vertont den Audio-Bestand der ABC-Werkstatt über Azure Speech (REST, SSML).
+"""Vertont Wörter und Sätze der ABC-Werkstatt über Azure Speech (REST, SSML).
 
 Erzeugt unter public/audio/:
-  laute/<slug>.<variante>.mp3   Laute a–z, ä, ö, ü, ß in mehreren Varianten (Stimmen/Aussprachen)
-  namen/<slug>.mp3              deutsche Buchstabennamen („be", „zett")
   woerter/<slug>.mp3            Startwortschatz
   saetze/<slug>.mp3             kurze Lob-Sätze ohne Wort
-  manifest.json                 Pfade RELATIV zur App-Basis (z. B. "audio/laute/m.katja.mp3")
+  manifest.json                 Pfade RELATIV zur App-Basis (z. B. "audio/woerter/oma.mp3")
+
+Laute (laute/<slug>-ki1.mp3, -ki2.mp3) und Buchstabennamen (namen/<slug>.mp3) kommen NICHT von hier,
+sondern aus tools/laute_ki.py (Sprachmodell + Hör-Bewertung). Dieses Skript fasst sie nie an: Es
+übernimmt die Einträge laute/namen/varianten unverändert aus dem vorhandenen manifest.json und prüft
+nur, dass die Dateien da sind.
 
 Schlüssel und Region kommen aus der Umgebung (AZURE_SPEECH_KEY, AZURE_SPEECH_REGION),
 gesetzt von tools/vertonen.sh. Der Schlüssel wird nie ausgegeben.
@@ -33,11 +36,12 @@ ZIEL = WURZEL / "public" / "audio"
 FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 MIN_BYTES = 1024
 
-# Stimmen: KEINE *MultilingualNeural-Stimmen, die ignorieren <phoneme>.
+# Stimme: KEINE *MultilingualNeural-Stimmen, die ignorieren <phoneme>.
 KATJA = "de-DE-KatjaNeural"
-AMALA = "de-DE-AmalaNeural"
 
 LAUTE = list("abcdefghijklmnopqrstuvwxyz") + ["ä", "ö", "ü", "ß"]
+# Diese Manifest-Teile gehören tools/laute_ki.py und werden hier nur übernommen.
+FREMD = ("laute", "namen", "varianten")
 SLUG = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "sz"}
 
 
@@ -48,31 +52,6 @@ def slug(text: str) -> str:
         raise ValueError(f"Kein ASCII-sicherer Dateiname für {text!r}: {aus!r}")
     return aus
 
-
-# Laut je Buchstabe als IPA. Dauerlaute gedehnt (ː), Plosive kurz ohne Schwa.
-LAUT_IPA: dict[str, str] = {
-    "a": "aː", "e": "eː", "i": "iː", "o": "oː", "u": "uː",
-    "ä": "ɛː", "ö": "øː", "ü": "yː", "y": "yː",
-    "b": "b", "c": "k", "d": "d", "g": "ɡ", "k": "k", "p": "p", "t": "t",
-    "q": "kv", "x": "ks", "z": "ts",
-    "f": "fː", "v": "fː", "w": "vː", "s": "sː", "ß": "sː",
-    "m": "mː", "n": "nː", "l": "lː", "r": "ʁː", "j": "jː", "h": "hː",
-}
-DEHNUNG = "-50%"
-PLOSIVE = {"b", "c", "d", "g", "k", "p", "t", "q", "x", "z", "h"}
-# Plosive zusätzlich mit sehr kurzem, leisem Folgevokal (manche Engines verschlucken den nackten Plosiv).
-LAUT_IPA_KURZVOKAL: dict[str, str] = {
-    "b": "bə", "c": "kə", "d": "də", "g": "ɡə", "k": "kə", "p": "pə", "t": "tə",
-    "q": "kvə", "x": "ksə", "z": "tsə", "h": "hə",
-}
-
-NAME_IPA: dict[str, str] = {
-    "a": "aː", "b": "beː", "c": "tseː", "d": "deː", "e": "eː", "f": "ɛf", "g": "ɡeː",
-    "h": "haː", "i": "iː", "j": "jɔt", "k": "kaː", "l": "ɛl", "m": "ɛm", "n": "ɛn",
-    "o": "oː", "p": "peː", "q": "kuː", "r": "ɛʁ", "s": "ɛs", "t": "teː", "u": "uː",
-    "v": "faʊ", "w": "veː", "x": "ɪks", "y": "ʏpsilɔn", "z": "tsɛt",
-    "ä": "ɛː", "ö": "øː", "ü": "yː", "ß": "ɛsˈtsɛt",
-}
 
 # Startwortschatz: STARTWOERTER aus src/kern/woerter.ts (lautgetreu) plus die Wörter der ersten
 # Startliste (bleiben vertont, weil sie auf älteren Geräten noch im Wörterbuch stehen). Kanonisch klein.
@@ -96,10 +75,6 @@ class Auftrag:
     body: str  # SSML-Inhalt innerhalb von <voice>
 
 
-def phonem(ipa: str, text: str) -> str:
-    return f"<phoneme alphabet=\"ipa\" ph={quoteattr(ipa)}>{escape(text)}</phoneme>"
-
-
 def ssml(stimme: str, body: str) -> bytes:
     return (
         "<speak version=\"1.0\" xml:lang=\"de-DE\" xmlns=\"http://www.w3.org/2001/10/synthesis\">"
@@ -107,39 +82,15 @@ def ssml(stimme: str, body: str) -> bytes:
     ).encode("utf-8")
 
 
-def laut_varianten(b: str) -> list[tuple[str, str, str, str]]:
-    """(id, stimme, body, beschreibung) je Variante. Erste Variante = Standard."""
-    ipa = LAUT_IPA[b]
-    body = phonem(ipa, b)
-    if b not in PLOSIVE:
-        # Dauerlaute und Vokale langsamer, damit das „mmm" wirklich klingt.
-        body = f"<prosody rate=\"{DEHNUNG}\">{body}</prosody>"
-    v = [
-        ("katja", KATJA, body, "Stimme Katja"),
-        ("amala", AMALA, body, "Stimme Amala"),
-    ]
-    if b in LAUT_IPA_KURZVOKAL:
-        v.append(("kurz", KATJA, phonem(LAUT_IPA_KURZVOKAL[b], b), "Katja, mit ganz kurzem Vokal"))
-    return v
-
-
 def auftraege() -> tuple[list[Auftrag], dict]:
     jobs: list[Auftrag] = []
+    vorhanden = json.loads((ZIEL / "manifest.json").read_text(encoding="utf-8"))
     manifest: dict = {"laute": {}, "namen": {}, "woerter": {}, "saetze": {}, "varianten": {}}
-
-    for b in LAUTE:
-        s = slug(b)
-        varianten = []
-        for vid, stimme, body, beschr in laut_varianten(b):
-            rel = f"audio/laute/{s}.{vid}.mp3"
-            jobs.append(Auftrag(ZIEL / "laute" / f"{s}.{vid}.mp3", stimme, body))
-            varianten.append({"id": vid, "url": rel, "beschreibung": beschr, "quelle": "vorab"})
-        manifest["laute"][b] = varianten[0]["url"]
-        manifest["varianten"][b] = varianten
-
-        rel = f"audio/namen/{s}.mp3"
-        jobs.append(Auftrag(ZIEL / "namen" / f"{s}.mp3", KATJA, phonem(NAME_IPA[b], b)))
-        manifest["namen"][b] = rel
+    for teil in FREMD:
+        if set(vorhanden.get(teil, {})) != set(LAUTE):
+            raise RuntimeError(f"manifest.json: Teil {teil!r} deckt nicht alle Buchstaben ab "
+                               "(kommt aus tools/laute_ki.py, nicht von hier)")
+        manifest[teil] = vorhanden[teil]
 
     for w in WOERTER:
         s = slug(w)
@@ -181,7 +132,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--neu", action="store_true", help="vorhandene Dateien neu erzeugen")
     ap.add_argument("--nur-manifest", action="store_true", help="nur manifest.json schreiben")
-    ap.add_argument("--nur", metavar="PRAEFIX", help="nur Dateien, deren Pfad unter audio/ so beginnt (z. B. laute/m.)")
+    ap.add_argument("--nur", metavar="PRAEFIX", help="nur Dateien, deren Pfad unter audio/ so beginnt (z. B. woerter/o)")
     args = ap.parse_args()
 
     jobs, manifest = auftraege()
@@ -208,13 +159,16 @@ def main() -> int:
             print(f"  {job.datei.relative_to(ZIEL).as_posix()}  {len(daten)} B")
         print(f"neu: {neu}, übersprungen: {uebersprungen}")
 
-    # Bestand prüfen: jede Datei im Manifest existiert und ist > 1 KB.
+    # Bestand prüfen: jede Datei im Manifest existiert und ist > 1 KB (auch die übernommenen Laute/Namen).
     fehler = []
-    for job in jobs:
-        if not job.datei.exists():
-            fehler.append(f"fehlt: {job.datei.relative_to(ZIEL).as_posix()}")
-        elif job.datei.stat().st_size <= MIN_BYTES:
-            fehler.append(f"zu klein: {job.datei.relative_to(ZIEL).as_posix()}")
+    pfade = [job.datei for job in jobs]
+    pfade += [ZIEL.parent / manifest[t][b] for t in ("laute", "namen") for b in LAUTE]
+    pfade += [ZIEL.parent / v["url"] for b in LAUTE for v in manifest["varianten"][b]]
+    for p in pfade:
+        if not p.exists():
+            fehler.append(f"fehlt: {p.relative_to(ZIEL).as_posix()}")
+        elif p.stat().st_size <= MIN_BYTES:
+            fehler.append(f"zu klein: {p.relative_to(ZIEL).as_posix()}")
     if fehler:
         print("\n".join(fehler), file=sys.stderr)
         return 1
