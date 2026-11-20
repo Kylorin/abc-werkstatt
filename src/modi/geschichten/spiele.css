@@ -1,0 +1,43 @@
+/* Gemeinsame Bausteine der Spiele F5–F7 (Bau „spiele“). */
+
+.spiel-medaillon {
+  display: grid; place-items: center;
+  width: var(--medaillon); height: var(--medaillon);
+  padding: 0; border: 0; border-radius: 50%;
+  background: transparent;
+  touch-action: manipulation;
+}
+.spiel-medaillon .medaillon { width: 100%; height: 100%; }
+.spiel-medaillon[aria-pressed='true'] .medaillon { box-shadow: 0 0 0 5px var(--sonne); }
+
+.spiel-wiese {
+  flex: 1;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: var(--abstand-5);
+  padding: var(--abstand-4) 0;
+}
+.spiel-wiese__leiste { display: flex; justify-content: center; gap: var(--abstand-4); }
+
+.spiel-huepft { animation: spiel-huepfen 620ms var(--kurve-feder); }
+@keyframes spiel-huepfen {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(0) scale(1.08, 0.9); }
+  50% { transform: translateY(-22%) scale(0.95, 1.06); }
+  80% { transform: translateY(0) scale(1.06, 0.94); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+.spiel-weiter { animation: spiel-weiter-puls 2.8s ease-in-out infinite; }
+@keyframes spiel-weiter-puls {
+  0%, 100% { box-shadow: 0 0 0 0 var(--hinweis-ring); }
+  50% { box-shadow: 0 0 0 10px transparent; }
+}
+
+.elternzeile {
+  margin: 0; text-align: center;
+  font-size: var(--gr-s); color: var(--elternzeile);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spiel-huepft, .spiel-weiter { animation: none; }
+}
