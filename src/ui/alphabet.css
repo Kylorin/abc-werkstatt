@@ -46,3 +46,10 @@
 /* Große Tasten (2–6 Stück: Stufe 1, kleiner Kasten, Decke Stufe 1). Feinschliff beim Bau F1/F2. */
 .alphabet--gross .alphabet__raster { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-4); }
 .alphabet--gross .taste { width: var(--taste-gross); height: var(--taste-gross); font-size: clamp(2.6rem, 14vw, 4rem); }
+
+/* Patschhand-Schutz (B6): kein Doppeltipp-Zoom, keine Klick-Verzögerung, kein Markieren beim Patschen. */
+.alphabet .taste {
+  touch-action: manipulation;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}

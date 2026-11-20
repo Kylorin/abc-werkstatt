@@ -67,3 +67,36 @@
 /* Nachfüllen: Wort und Buchstaben stehen mittig im Bildschirm, mit Luft dazwischen. */
 .nachfuellen { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: var(--abstand-6); }
 .nachfuellen .wortarbeit { gap: var(--abstand-5); }
+
+/* Wort + Rückmeldung als eine Spalte (im Querformat links, Tasten rechts). */
+.wortarbeit__wort { display: flex; flex-direction: column; gap: var(--abstand-2); min-width: 0; }
+
+/* Stufen (F1): das Feld, das als Nächstes dran ist, leuchtet sanft; vorbelegte Felder stehen fertig da. */
+@keyframes feld-dran { 0%, 100% { box-shadow: 0 0 0 0 var(--hinweis-ring); } 50% { box-shadow: 0 0 0 5px var(--hinweis-ring); } }
+.zielwort .feld-slot--dran { border-color: var(--sonne); animation: feld-dran 2.4s var(--kurve) infinite; }
+@media (prefers-reduced-motion: reduce) { .zielwort .feld-slot--dran { animation: none; box-shadow: 0 0 0 4px var(--hinweis-ring); } }
+
+/* Nachklingen: jeder vorbelegte Buchstabe leuchtet kurz in seiner Farbe auf, während er klingt. */
+@keyframes slot-klingt {
+  0%, 100% { transform: scale(1); background: var(--karte); }
+  40% { transform: scale(1.12); background: var(--papier-tief); }
+}
+.slot--klingt { animation: slot-klingt 420ms var(--kurve); }
+
+/* Querformat (B17): flaches Handy quer — Wort links, Tasten rechts, nichts scrollt. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .wortarbeit {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center; gap: var(--abstand-3);
+  }
+  .wortarbeit .alphabet { padding: var(--abstand-2); }
+  .zielwort { padding: var(--abstand-2); }
+  .zielwort .felder { --slot-max: 64px; }
+  .zielwort .feld-slot { --slot: clamp(32px, calc((min(50vw, var(--breite) / 2) - 4 * var(--abstand-2) - (var(--n, 8) - 1) * var(--abstand-2)) / var(--n, 8)), var(--slot-max)); }
+  .zielwort__hoeren { width: 44px; height: 44px; }
+  .rueckmeldung { min-height: 32px; }
+  .alphabet--auswahl .taste { width: clamp(48px, 9vw, 72px); font-size: clamp(1.6rem, 4.5vw, 2.4rem); min-height: 48px; }
+  .alphabet--gross .taste { width: min(var(--taste-gross), 30dvh); height: min(var(--taste-gross), 30dvh); font-size: clamp(2rem, 9dvh, 3.4rem); }
+  .nachfuellen { justify-content: center; padding-bottom: 0; }
+  .nachfuellen .wortarbeit { gap: var(--abstand-3); }
+}

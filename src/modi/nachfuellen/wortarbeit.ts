@@ -1,21 +1,53 @@
 /**
  * Wortarbeit (Bau „schreiben“): ein Wort Buchstabe für Buchstabe in Felder legen.
- * Gemeinsam genutzt von Nachfüllen und Tier-Modus.
+ * Gemeinsam genutzt von Nachfüllen, Tier-Modus (F1-Stufen), Wer hilft? (F6) und Meine Leute (F7).
  *
  * Testvertrag:
  * - data-testid="zielwort" mit data-wort = kanonisches, kleines Wort; Antippen liest es vor.
- * - data-testid="slot-<i>" mit data-gefuellt="ja|nein".
+ * - data-testid="slot-<i>" mit data-gefuellt="ja|nein" und data-offen="ja|nein"
+ *   (offen = dieses Feld legt das Kind selbst; nicht offene Felder sind von Anfang an gefüllt).
  * - data-testid="rueckmeldung" mit data-art leer|richtig|falsch|geschafft.
+ * - Hilfe: die gesuchte Taste trägt data-hinweis="ja" (über AlphabetKomponente.hinweis).
  *
  * Fehlerkontrolle im Material: ein falscher Buchstabe klingt mit seinem normalen Laut, wackelt
  * sanft und bleibt im Kasten — kein Rot, kein Fehlerton, keine Strafe. So hört das Kind selbst,
- * dass er nicht passt. Nach dem dritten Fehlversuch am selben Feld klingt danach der gesuchte
- * Laut, und das Feld leuchtet kurz auf. Der richtige fliegt in sein Feld und klingt.
+ * dass er nicht passt. Nach `hilfeNach` Fehlversuchen am selben Feld pulsiert die gesuchte Taste
+ * (bis sie gelegt ist), nach dem eigenen Laut klingt der gesuchte (`hilfeTon`) und das Feld
+ * leuchtet kurz auf. Der richtige Buchstabe fliegt in sein Feld und klingt.
+ *
+ * ---------------------------------------------------------------------------------------------
+ * Stufen (F1) — schnittstellenrein, die Wortarbeit kennt keine „Stufe“, nur diese Optionen:
+ *
+ *   Stufe | offeneFelder                         | Tasten                         | nachklingen
+ *   ------+--------------------------------------+--------------------------------+------------
+ *     1   | [0]                                  | vollesAlphabet:false, ablenker:1 | (Standard: an)
+ *     2   | [0, letzte] (nur bei Einzellaut-Ende)| vollesAlphabet:false, ablenker:1 | (Standard: an)
+ *     3   | — (alle)                             | vollesAlphabet:false, ablenker:2 | —
+ *     4   | — (alle)                             | vollesAlphabet:true              | —
+ *
+ * - `offeneFelder`: Positionen, die das Kind selbst legt, in Wort-Reihenfolge. Alle anderen
+ *   Felder stehen sofort gefüllt da. Fehlt die Option, legt das Kind alles (Bestand).
+ * - `ablenker`: Zahl der Ablenker-Tasten neben den Buchstaben der offenen Felder. Gewählt werden
+ *   nur Buchstaben, die mit JEDEM gesuchten Buchstaben und untereinander kontrastieren
+ *   (`kontrastiert`: nie m/n, b/p/d, f/w/v, s/z/ß/x, g/k …). `bevorzugteAblenker` (z. B. dem Kind
+ *   schon bekannte Buchstaben) kommen zuerst dran. Fehlt `ablenker`, gilt die Bestandsauswahl
+ *   (Wort + 3–4 gut unterscheidbare Ablenker).
+ * - `nachklingen`: Sind alle offenen Felder gelegt, leuchten die übrigen (vorbelegten) Felder der
+ *   Reihe nach auf und jedes klingt mit seinem Laut, ≈ 350 ms Abstand (Lautsynthese über
+ *   `AudioDienst.kette`). Erst danach löst `letzterLaut` in `beiGeschafft` auf. Standard: an,
+ *   sobald mindestens ein Feld vorbelegt ist.
+ * - `hilfeNach` (B3): Fehlversuche am selben Feld bis zur Hilfe. Aufrufer geben die Einstellung
+ *   `einstellungen.hilfeNach` weiter (Standard dort 2). Fehlt die Option: 3 (Bestand).
+ * - `hilfeTon`: was nach dem Fehlversuch zur Hilfe klingt (Tier-Modus: „das Tier sagt {laut}!“).
+ *   Standard: der Laut des gesuchten Buchstabens (`audio.buchstabe`).
+ * - `grosseTasten`: große Tasten (AlphabetOptionen.gross), gedacht für 2–6 Tasten (Stufe 1/2).
+ * ---------------------------------------------------------------------------------------------
  */
-import { LAUTE, type Ausgang, type Buchstabe, type Kontext, type RueckmeldungsArt } from '../../kern/vertrag';
+import { LAUTE, type Ausgang, type Buchstabe, type KettenSchritt, type Kontext, type RueckmeldungsArt } from '../../kern/vertrag';
 import { anzeigeZeichen, artVon, buchstabenVon } from '../../kern/alphabet';
 import { animiere, el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
+import { kontrastiert, waehleAblenker } from '../../paket/anlaut';
 import { erzeugeAlphabet, tasteIn } from '../../ui/alphabet';
 import { spiele } from './sitzung';
 import './wortarbeit.css';
@@ -26,16 +58,31 @@ export interface WortarbeitOptionen {
   wort: string;
   /** Schattenbuchstaben als Vorlage zeigen. */
   vorlage: boolean;
-  /** true = alle 30 Buchstaben (Holzkasten), false = Buchstaben des Worts + 3–4 Ablenker. */
+  /** true = alle 30 Buchstaben (Holzkasten), false = Buchstaben der offenen Felder + Ablenker. */
   vollesAlphabet: boolean;
   /** Klein vor dem Wort angezeigt, wird nicht geschrieben (Tier-Modus). */
   artikel?: string;
   /** Sichtbares Lautsprecher-Zeichen über dem Wort (Nachfüllen: dort gibt es kein Bild zum Antippen). */
   hoerZeichen?: boolean;
+  /** Positionen, die das Kind selbst legt (Stufen, siehe Kopfkommentar). Standard: alle. */
+  offeneFelder?: readonly number[];
+  /** Zahl kontrastierender Ablenker neben den gesuchten Buchstaben (nur ohne volles Alphabet). */
+  ablenker?: number;
+  /** Bevorzugte Ablenker (z. B. schon bekannte Buchstaben), falls sie kontrastieren. */
+  bevorzugteAblenker?: readonly Buchstabe[];
+  /** Vorbelegte Felder nach dem letzten offenen Feld der Reihe nach erklingen lassen. Standard: an, wenn etwas vorbelegt ist. */
+  nachklingen?: boolean;
+  /** Hilfsschwelle (B3). Standard 3; Aufrufer reichen `einstellungen.hilfeNach` durch. */
+  hilfeNach?: number;
+  /** Hilfe-Ton nach dem Fehlversuch. Standard: Laut des gesuchten Buchstabens. */
+  hilfeTon?(soll: Buchstabe): Promise<Ausgang>;
+  /** Große Tasten (2–6 Tasten). Standard false. */
+  grosseTasten?: boolean;
   melde(fehler: unknown): void;
   /**
-   * Wort fertig. `letzterLaut` löst auf, wenn der Laut des letzten Buchstabens verklungen ist:
-   * `fertig`, `abgebrochen` (das Kind hat schon etwas Neues angetippt) oder `undefined` nach einem gemeldeten Fehler.
+   * Wort fertig. `letzterLaut` löst auf, wenn der Laut des letzten Buchstabens (bzw. das
+   * Nachklingen) verklungen ist: `fertig`, `abgebrochen` (das Kind hat schon etwas Neues
+   * angetippt) oder `undefined` nach einem gemeldeten Fehler.
    */
   beiGeschafft(letzterLaut: Promise<Ausgang | undefined>): void;
 }
@@ -44,6 +91,11 @@ export interface Wortarbeit {
   el: HTMLElement;
   zerstoere(): void;
 }
+
+/** Bestand: Fehlversuche bis zur Hilfe, wenn der Aufrufer nichts angibt. */
+export const HILFE_NACH_STANDARD = 3;
+/** Abstand zwischen den Lauten beim Nachklingen (F1). */
+export const NACHKLANG_PAUSE_MS = 350;
 
 /** Ablenker: gut unterscheidbare, häufige Buchstaben (keine Exoten wie q, x, y, c, ß). */
 const ABLENKER_VORRAT: readonly Buchstabe[] = LAUTE.filter((b) => !['q', 'x', 'y', 'c', 'ß'].includes(b));
@@ -77,24 +129,72 @@ export function auswahlFuer(buchstaben: readonly Buchstabe[]): Buchstabe[] {
   return LAUTE.filter((b) => alle.has(b));
 }
 
+/**
+ * Gesuchte Buchstaben + `anzahl` Ablenker, die mit jedem gesuchten und untereinander
+ * kontrastieren, in Alphabet-Reihenfolge. Wirft, wenn es nicht genug solche Buchstaben gibt.
+ */
+export function auswahlMitAblenkern(gesucht: readonly Buchstabe[], anzahl: number, bevorzugt: readonly Buchstabe[] = []): Buchstabe[] {
+  const im = new Set(gesucht);
+  const erster = gesucht[0];
+  if (!erster) throw new Error('Die Wortarbeit braucht mindestens einen gesuchten Buchstaben.');
+  const vorrat = ABLENKER_VORRAT.filter((b) => !im.has(b) && gesucht.every((g) => kontrastiert(g, b)));
+  const ablenker = anzahl > 0 ? waehleAblenker(erster, vorrat, anzahl, bevorzugt) : [];
+  const alle = new Set<Buchstabe>([...im, ...ablenker]);
+  return LAUTE.filter((b) => alle.has(b));
+}
+
+/** Prüft und sortiert die offenen Felder. Ungültige Angaben sind ein Programmierfehler → werfen. */
+function offeneReihe(offen: readonly number[] | undefined, laenge: number): number[] {
+  if (!offen) return Array.from({ length: laenge }, (_, i) => i);
+  const reihe = [...new Set(offen)].sort((a, b) => a - b);
+  if (!reihe.length) throw new Error('Die Wortarbeit braucht mindestens ein offenes Feld.');
+  for (const i of reihe) {
+    if (!Number.isInteger(i) || i < 0 || i >= laenge) throw new Error(`Offenes Feld ${i} liegt außerhalb des Worts (Länge ${laenge}).`);
+  }
+  return reihe;
+}
+
 const ruhig = (): boolean => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
   const { ctx, wort } = o;
   const buchstaben = buchstabenVon(wort); // wirft bei fremden Zeichen
+  const reihe = offeneReihe(o.offeneFelder, buchstaben.length);
+  const offen = new Set(reihe);
+  const hilfeNach = Math.max(1, Math.round(o.hilfeNach ?? HILFE_NACH_STANDARD));
+  const nachklingen = o.nachklingen ?? reihe.length < buchstaben.length;
   let gross = ctx.einstellungen.lese().grossbuchstaben;
-  let index = 0;
+  /** Position in `reihe` (welches offene Feld als Nächstes dran ist). */
+  let schritt = 0;
   let fehlversuche = 0;
   let fertig = false;
+  let zerstoert = false;
+  /** Taste, die gerade als Hilfe pulsiert. */
+  let hinweisAn: Buchstabe | undefined;
   const flieger = new Set<HTMLElement>();
 
-  const slots = buchstaben.map((b, i) =>
-    el(
+  const slots = buchstaben.map((b, i) => {
+    const istOffen = offen.has(i);
+    const slot = el(
       'span',
-      { klasse: 'feld-slot', testid: `slot-${i}`, attr: { 'data-gefuellt': 'nein', 'data-art': artVon(b) } },
-      o.vorlage ? el('span', { klasse: 'slot__schatten', attr: { 'aria-hidden': 'true' }, text: anzeigeZeichen(b, gross) }) : null,
-    ),
-  );
+      {
+        klasse: 'feld-slot',
+        testid: `slot-${i}`,
+        attr: { 'data-gefuellt': istOffen ? 'nein' : 'ja', 'data-offen': istOffen ? 'ja' : 'nein', 'data-art': artVon(b) },
+      },
+      istOffen
+        ? o.vorlage
+          ? el('span', { klasse: 'slot__schatten', attr: { 'aria-hidden': 'true' }, text: anzeigeZeichen(b, gross) })
+          : null
+        : el('span', { klasse: ['slot__buchstabe', 'slot__buchstabe--vorbelegt', artVon(b)], text: anzeigeZeichen(b, gross) }),
+    );
+    return slot;
+  });
+  // Das Feld, das als Nächstes dran ist, leuchtet sanft (nur wenn nicht alle offen sind — sonst ist es klar).
+  const markiereDran = (): void => {
+    if (reihe.length === buchstaben.length) return;
+    slots.forEach((s, i) => s.classList.toggle('feld-slot--dran', i === reihe[schritt] && !fertig));
+  };
 
   const zielwort = el(
     'button',
@@ -127,7 +227,11 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
     }
   }
 
-  const wurzel = el('div', { klasse: 'wortarbeit', attr: { 'data-zustand': 'arbeit' } }, zielwort, rueckmeldung);
+  const wurzel = el(
+    'div',
+    { klasse: 'wortarbeit', attr: { 'data-zustand': 'arbeit' } },
+    el('div', { klasse: 'wortarbeit__wort' }, zielwort, rueckmeldung),
+  );
 
   function fuelle(i: number, b: Buchstabe): void {
     const slot = slots[i];
@@ -169,46 +273,89 @@ export function erzeugeWortarbeit(o: WortarbeitOptionen): Wortarbeit {
     anim.oncancel = landen;
   }
 
+  function hinweisAus(): void {
+    if (hinweisAn) alphabet.hinweis(hinweisAn, false);
+    hinweisAn = undefined;
+  }
+
+  /** Nach dem letzten offenen Feld: vorbelegte Felder der Reihe nach erklingen lassen (Lautsynthese). */
+  function klingNach(letzterLaut: Promise<Ausgang | undefined>): Promise<Ausgang | undefined> {
+    return letzterLaut.then((a) => {
+      if (a === 'abgebrochen' || zerstoert) return a;
+      const schritte: KettenSchritt[] = buchstaben
+        .map((b, i) => ({ b, i }))
+        .filter(({ i }) => !offen.has(i))
+        .map(({ b, i }) => () => {
+          const slot = slots[i];
+          if (slot && !zerstoert) animiere(slot, 'slot--klingt');
+          return ctx.audio.laut(b);
+        });
+      if (!schritte.length) return a;
+      return spiele(ctx.audio.kette(schritte, NACHKLANG_PAUSE_MS), o.melde);
+    });
+  }
+
+  const auswahl = o.vollesAlphabet
+    ? undefined
+    : o.ablenker !== undefined
+      ? auswahlMitAblenkern(
+          reihe.map((i) => buchstaben[i] as Buchstabe),
+          o.ablenker,
+          o.bevorzugteAblenker,
+        )
+      : auswahlFuer(reihe.map((i) => buchstaben[i] as Buchstabe));
+
   const alphabet = erzeugeAlphabet({
     grossbuchstaben: gross,
-    buchstaben: o.vollesAlphabet ? undefined : auswahlFuer(buchstaben),
+    buchstaben: auswahl,
+    gross: o.grosseTasten ?? false,
     beiTaste(b) {
       if (fertig) return;
-      const soll = buchstaben[index];
+      const feld = reihe[schritt];
+      if (feld === undefined) return;
+      const soll = buchstaben[feld];
+      if (!soll) return;
       if (b !== soll) {
         alphabet.wackle(b);
         setzeRueckmeldung('falsch');
         fehlversuche++;
-        const feld = index;
         const klang = spiele(ctx.audio.buchstabe(b), o.melde);
-        if (fehlversuche >= 3 && soll) {
-          // Hilfe ohne Strafe: nach dem eigenen Laut der gesuchte, das Feld leuchtet kurz auf.
+        if (fehlversuche >= hilfeNach) {
+          // Hilfe ohne Strafe: die gesuchte Taste pulsiert, nach dem eigenen Laut klingt der gesuchte.
+          if (hinweisAn !== soll) {
+            hinweisAus();
+            alphabet.hinweis(soll, true);
+            hinweisAn = soll;
+          }
           void klang.then((a) => {
-            if (a !== 'fertig' || fertig || zerstoert || index !== feld) return;
+            if (a !== 'fertig' || fertig || zerstoert || reihe[schritt] !== feld) return;
             const slot = slots[feld];
             if (slot) animiere(slot, 'slot--hinweis');
-            return spiele(ctx.audio.buchstabe(soll), o.melde);
+            return spiele(o.hilfeTon ? o.hilfeTon(soll) : ctx.audio.buchstabe(soll), o.melde);
           });
         }
         return;
       }
       fehlversuche = 0;
-      fuelle(index, b);
+      hinweisAus();
+      fuelle(feld, b);
       const laut = spiele(ctx.audio.buchstabe(b), o.melde);
-      index++;
-      if (index < buchstaben.length) {
+      schritt++;
+      if (schritt < reihe.length) {
         setzeRueckmeldung('richtig');
+        markiereDran();
         return;
       }
       fertig = true;
+      markiereDran();
       wurzel.dataset.zustand = 'geschafft';
       setzeRueckmeldung('geschafft');
-      o.beiGeschafft(laut);
+      o.beiGeschafft(nachklingen ? klingNach(laut) : laut);
     },
   });
   wurzel.append(alphabet.el);
+  markiereDran();
 
-  let zerstoert = false;
   const abmelden = ctx.einstellungen.abonniere((e) => {
     if (e.grossbuchstaben === gross) return;
     gross = e.grossbuchstaben;

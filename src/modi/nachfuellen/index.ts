@@ -54,6 +54,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       vorlage: true,
       vollesAlphabet: false,
       hoerZeichen: true,
+      hilfeNach: ctx.einstellungen.lese().hilfeNach,
       melde: meldung.melde,
       beiGeschafft(letzterLaut) {
         const gesprochen = letzterLaut.then((a) => {
