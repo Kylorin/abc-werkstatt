@@ -128,9 +128,11 @@ dem eigenen Schlüssel der Eltern.
 
 - **Offline-Stimme (Piper):** `src/audio/piper.ts` lädt beim ersten Wählen einmalig ≈ 93 MB
   (ONNX Runtime Web und Piper-Phonemizer von jsDelivr, Stimme `de_DE-thorsten-medium` von
-  Hugging Face), alles fest gepinnt und per SHA-256 geprüft, in einen eigenen Cache. Der Motor
-  (`src/audio/piper-motor.ts`) wird erst beim Sprechen per `import()` geladen und steht nicht im
-  PWA-Precache (`vite.config.ts`, `globIgnores`). Ohne Download gibt es eine klare Meldung.
+  Hugging Face), alles fest gepinnt und per SHA-256 geprüft, in einen eigenen Cache. Laufzeit und
+  Stimme stehen nicht im PWA-Precache (`vite.config.ts`, `globIgnores`). Der kleine Motor-Chunk
+  (`src/audio/stimmen-motor.ts`, ≈ 2,5 kB) wird erst beim Sprechen per `import()` ausgeführt, steht
+  aber im Precache — sonst ginge die Offline-Stimme ohne Internet nicht. Ohne Download gibt es eine
+  klare Meldung.
 - **OpenRouter live:** `openai/gpt-audio-mini`, Antwort als Stream (PCM16, 24 kHz) → WAV. Jedes
   Wort wird je Stimme nur einmal erzeugt und danach aus dem Cache gespielt.
 - **Spracheingabe** (nur wenn Eltern sie einschalten): Browser (Web Speech) oder OpenRouter

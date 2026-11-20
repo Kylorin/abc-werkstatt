@@ -16,7 +16,18 @@ import { anzeigeZeichen, artVon, schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { tierGeraeusch, tierNr, tierTon } from '../../kern/tierton';
-import { ANLAUT_LAUTE, type AnlautTreffer, type Ausgang, type Buchstabe, type KettenSchritt, type Kontext, type Modus } from '../../kern/vertrag';
+import {
+  ANLAUT_LAUTE,
+  type AnlautTreffer,
+  type Ausgang,
+  type Buchstabe,
+  type Dienste,
+  type KettenSchritt,
+  type Kontext,
+  type Modus,
+  type RegalKachel,
+  type TierPaket,
+} from '../../kern/vertrag';
 import { kontrastiert, tiereMitAnlaut, waehleAblenker } from '../../paket/anlaut';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, erzeugeMedaillon, SPRECH_PAUSE_MS, sprichFreudeSatz, sprichTierName, tierBezeichnung } from '../tiere/freude';
@@ -28,6 +39,19 @@ const TIERE_BIS_GUTE_NACHT = 3;
 const LETZTER_HINWEIS = 4;
 
 let sitzung: Sitzung | undefined;
+
+/**
+ * Tiere, die unter die Decke dürfen: mit gültigem Einzel-Anlaut UND festen Sätzen dafür
+ * (`frage.wer-faengt-an.<laut>`, `einladung.<laut>` gibt es nur für ANLAUT_LAUTE — ohne c, q, x, y, ß).
+ */
+export function deckenTiere(pakete: readonly TierPaket[]): AnlautTreffer[] {
+  return [...tiereMitAnlaut(pakete).values()].flat().filter((t) => ANLAUT_LAUTE.includes(t.laut));
+}
+
+/** Regal (B1): ohne passendes Tier fehlt die Arbeit einfach — keine Kachel vor einem Elternhinweis. */
+async function kacheln(dienste: Dienste): Promise<RegalKachel[]> {
+  return deckenTiere(await dienste.pakete.liste()).length ? [{ titel: modus.titel }] : [];
+}
 
 /** Ausgang eines optionalen Tons: fehlt das Audio (`undefined`), ist der Schritt einfach fertig. */
 const oder = async (p: Promise<Ausgang | undefined>, sonst: () => Promise<Ausgang>): Promise<Ausgang> => (await p) ?? sonst();
@@ -42,7 +66,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   s.nachher(() => flaeche.classList.remove('flaeche--decke'));
   flaeche.append(buehne, meldung.el);
 
-  const alle = [...tiereMitAnlaut(await ctx.pakete.liste()).values()].flat();
+  const alle = deckenTiere(await ctx.pakete.liste());
   if (!s.lebt) return;
   if (alle.length === 0) {
     buehne.append(el('p', { klasse: 'hinweis', text: 'Für dieses Spiel braucht ein Tier-Paket Tiere mit Anlaut. Im Elternbereich ein passendes Paket importieren.' }));
@@ -258,6 +282,7 @@ export const modus: Modus = {
   id: 'decke',
   titel: 'Wer ist unter der Decke?',
   icon: 'decke',
+  kacheln,
   begleitkarte:
     'Raten ist ein Angebot, keine Pflicht: Jeder Tipp auf die Decke gibt einen deutlicheren Hinweis, die Auflösung kommt immer. Flüstern Sie den Anfangslaut mit („iii …“). Lauschspiel für unterwegs: „Wer fängt mit mmm an?“',
   mount,

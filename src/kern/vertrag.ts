@@ -278,6 +278,12 @@ export interface AudioDienst {
   datei(url: string): Promise<Ausgang>;
   /** Bricht jede laufende Ausgabe (und Kette) sofort ab. */
   stopp(): void;
+  /**
+   * Momentaufnahme für Ausgaben, die erst nach einer Wartezeit (z. B. IndexedDB) starten: Die
+   * gelieferte Prüfung wird `false`, sobald eine neue Ausgabe beginnt oder `stopp()` kommt. Dann
+   * darf der verspätete Ton nicht mehr starten (sonst klingt er z. B. im nächsten Bildschirm).
+   */
+  gueltig(): () => boolean;
   /** Alle Varianten eines Lauts fürs Laut-Studio (vorab + Aufnahme). */
   lautVarianten(b: Buchstabe): Promise<LautVariante[]>;
   /** Startet eine Mikrofonaufnahme (MediaRecorder). Wirft, wenn kein Mikrofon erlaubt ist. */

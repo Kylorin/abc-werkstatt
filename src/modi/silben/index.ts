@@ -15,7 +15,7 @@ import { schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { tierEinzel, tierNr, tierTon } from '../../kern/tierton';
-import type { Ausgang, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
+import type { Ausgang, Dienste, Kontext, Modus, RegalKachel, TierTreffer } from '../../kern/vertrag';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude } from '../tiere/freude';
 import { elternzeile, hoechstens, huepfe, leerHinweis, medaillonKnopf, sicher, weiterKnopf } from '../geschichten/gemeinsam';
@@ -35,6 +35,12 @@ export function silbenTiere(treffer: readonly TierTreffer[]): TierTreffer[] {
   return treffer
     .filter(({ tier }) => (tier.silben?.length ?? 0) > 0 && tier.audio?.silben?.length === tier.silben?.length)
     .sort((a, b) => (a.tier.silben?.length ?? 0) - (b.tier.silben?.length ?? 0) || a.tier.name.localeCompare(b.tier.name, 'de'));
+}
+
+/** Regal (B1): ohne Tier mit Silben-Ton fehlt die Arbeit einfach — keine Kachel vor einem Elternhinweis. */
+async function kacheln(dienste: Dienste): Promise<RegalKachel[]> {
+  const pakete = await dienste.pakete.liste();
+  return silbenTiere(pakete.flatMap((paket) => paket.tiere.map((tier) => ({ paket, tier })))).length ? [{ titel: modus.titel }] : [];
 }
 
 async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
@@ -265,6 +271,7 @@ export const modus: Modus = {
   id: 'silben',
   titel: 'Silben-Hüpfen',
   icon: 'silben',
+  kacheln,
   begleitkarte:
     'Klatscht den Namen gemeinsam: ein Klatscher je Silbe, so wie man spricht. Es gibt keine falsche Reihenfolge — jeder Tipp bringt die nächste Silbe. Im Alltag geht das mit allem: „Ba-na-ne“, „Ze-bra-strei-fen“.',
   mount,

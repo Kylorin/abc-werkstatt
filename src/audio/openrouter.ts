@@ -22,6 +22,12 @@ export const OPENROUTER_STIMME = 'coral';
 /** Audio-fähiges Modell für die Spracheingabe (Aufnahme → Text). */
 export const TRANSKRIPTION_MODELL = 'google/gemini-2.5-flash';
 
+/**
+ * Höchstdauer einer Anfrage samt Stream. Danach wird abgebrochen und ein Fehler gemeldet — sonst
+ * bliebe eine hängende Antwort für immer „in Arbeit“, und jeder weitere Aufruf wartete darauf.
+ */
+export const OPENROUTER_FRIST_MS = 30_000;
+
 /** gpt-audio liefert PCM16 mit dieser Abtastrate (mono). */
 const PCM_RATE = 24000;
 
@@ -61,11 +67,21 @@ async function httpFehler(r: Response, wofuer: string): Promise<AudioFehler> {
   return new AudioFehler(`${wofuer}: ${grund}`);
 }
 
+/** Abbruch durch die Frist (`AbortSignal.timeout`) erkennen. */
+function istFristAblauf(f: unknown): boolean {
+  return f instanceof DOMException && (f.name === 'TimeoutError' || f.name === 'AbortError');
+}
+
+const fristMeldung = (wofuer: string): AudioFehler =>
+  new AudioFehler(`${wofuer}: OpenRouter hat nicht innerhalb von ${OPENROUTER_FRIST_MS / 1000} s geantwortet. Bitte später noch einmal versuchen.`);
+
 async function anfrage(body: unknown, schluessel: string, wofuer: string): Promise<Response> {
   let r: Response;
   try {
-    r = await fetch(OPENROUTER_URL, { method: 'POST', headers: kopf(schluessel), body: JSON.stringify(body) });
+    // Die Frist gilt für Anfrage UND das Lesen des Streams (gleiches Signal).
+    r = await fetch(OPENROUTER_URL, { method: 'POST', headers: kopf(schluessel), body: JSON.stringify(body), signal: AbortSignal.timeout(OPENROUTER_FRIST_MS) });
   } catch (f) {
+    if (istFristAblauf(f)) throw fristMeldung(wofuer);
     throw new AudioFehler(`${wofuer}: OpenRouter ist nicht erreichbar (${f instanceof Error ? f.message : String(f)}). Ohne Internet bitte eine andere Stimme wählen.`);
   }
   if (!r.ok) throw await httpFehler(r, wofuer);
@@ -106,7 +122,14 @@ async function sammleAudio(r: Response): Promise<Uint8Array> {
   };
 
   while (!fertig) {
-    const { done, value } = await leser.read();
+    let stueck: ReadableStreamReadResult<Uint8Array>;
+    try {
+      stueck = await leser.read();
+    } catch (f) {
+      if (istFristAblauf(f)) throw fristMeldung('Live-Stimme');
+      throw new AudioFehler(`Live-Stimme: Die Antwort von OpenRouter brach ab (${f instanceof Error ? f.message : String(f)}).`);
+    }
+    const { done, value } = stueck;
     if (value) rest += dekoder.decode(value, { stream: true });
     const zeilen = rest.split(/\r?\n/);
     rest = zeilen.pop() ?? '';
@@ -131,8 +154,9 @@ async function sammleAudio(r: Response): Promise<Uint8Array> {
 }
 
 /**
- * Vertont `text` über OpenRouter (gpt-audio-mini). Läuft bewusst ohne Abbruch-Signal zu Ende:
- * Die Anfrage kostet so oder so — so landet das Ergebnis wenigstens im Cache.
+ * Vertont `text` über OpenRouter (gpt-audio-mini). Läuft bewusst ohne Abbruch durch die Wiedergabe
+ * zu Ende (nur die Frist OPENROUTER_FRIST_MS gilt): Die Anfrage kostet so oder so — so landet das
+ * Ergebnis wenigstens im Cache.
  */
 export async function openrouterSprich(text: string, schluessel: string): Promise<Blob> {
   const r = await anfrage({
@@ -175,7 +199,8 @@ export async function openrouterTranskribiere(aufnahme: Blob, schluessel: string
   let j: Antwort;
   try {
     j = (await r.json()) as Antwort;
-  } catch {
+  } catch (f) {
+    if (istFristAblauf(f)) throw fristMeldung('Spracheingabe');
     throw new AudioFehler('Spracheingabe: OpenRouter hat eine unlesbare Antwort geschickt.');
   }
   if (j.error) throw new AudioFehler(`Spracheingabe: OpenRouter meldet einen Fehler (${(j.error.message ?? '').slice(0, 160)}).`);

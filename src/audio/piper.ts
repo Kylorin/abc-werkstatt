@@ -2,7 +2,7 @@
  * Live-Stimme „Offline-Stimme“ (Piper im Browser, B18/6c).
  *
  * Diese Datei ist klein und hängt am Start-Bundle: Dateiliste, Download mit Fortschritt, Stand.
- * Die eigentliche Sprachsynthese (ONNX Runtime + Piper-Phonemizer) steckt in `piper-motor.ts`
+ * Die eigentliche Sprachsynthese (ONNX Runtime + Piper-Phonemizer) steckt in `stimmen-motor.ts`
  * und wird erst per dynamischem `import()` geladen, wenn wirklich gesprochen wird.
  *
  * Laufzeit und Stimme kommen NICHT aus dem PWA-Precache (vite.config.ts), sondern werden beim
@@ -192,7 +192,7 @@ export async function piperDateienAusCache(): Promise<Record<PiperRolle, ArrayBu
 
 // ---- Sprechen ---------------------------------------------------------------
 
-type Motor = typeof import('./piper-motor');
+type Motor = typeof import('./stimmen-motor');
 let motor: Promise<Motor> | undefined;
 
 /** Vertont `text` offline. Liefert WAV als Blob. Ohne geladene Stimme: AudioFehler. */
@@ -201,7 +201,7 @@ export async function piperSprich(text: string): Promise<Blob> {
   if ((await piperStand()) !== 'bereit') {
     throw new AudioFehler('Die Offline-Stimme ist auf diesem Gerät noch nicht geladen. Bitte in den Einstellungen unter „Stimme“ herunterladen.');
   }
-  motor ??= import('./piper-motor').catch((f: unknown) => {
+  motor ??= import('./stimmen-motor').catch((f: unknown) => {
     motor = undefined;
     throw new AudioFehler(`Offline-Stimme: Der Programmteil ließ sich nicht laden (${f instanceof Error ? f.message : String(f)}).`);
   });

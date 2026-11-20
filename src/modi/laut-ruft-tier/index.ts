@@ -7,6 +7,10 @@
  *   (Gucker, siehe gucker.ts). Antippen holt es groß heraus, es sagt seinen „kann“-Satz.
  * - Ergibt das Geschriebene einen Tiernamen, kommt das Tier ganz heraus und freut sich.
  * - Kauderwelsch: nach 2 s Tipp-Pause wird das letzte Wort lautiert und zusammengezogen gelesen (live).
+ *   Die Pause zählt erst, wenn der Ruf des Guckers verklungen ist; kommt ein Tier heraus, entfällt das
+ *   Vorlesen (es läuft immer nur eine Tonquelle — der Tier-Ruf und die Freude haben Vorrang).
+ * - Keine Sackgasse: Der Kasten hält höchstens MAX_ZEICHEN Zeichen. Ist er voll, rutscht das Älteste
+ *   vorne heraus, und jede Taste klingt und ruft weiter wie immer.
  * Testvertrag: `kleiner-kasten`, `taste-<b>`, `text`, `anlaut-gucker`, `tier-freude`.
  */
 import { anzeigeZeichen, artVon, buchstabenVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
@@ -65,6 +69,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   let gross = e.grossbuchstaben;
   let text = '';
   let vorleseTimer: number | undefined;
+  /** Zählt geplante Vorlesungen; ein Tier-Besuch oder ein neuer Tipp macht ältere ungültig. */
+  let vorleseNr = 0;
   let besuchNr = 0;
 
   const textEl = el('p', { klasse: 'lrt__text', testid: 'text', attr: { 'aria-live': 'polite', 'aria-label': 'Geschriebener Text' } });
@@ -85,6 +91,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   /** Ein Tier kommt groß heraus: vom Gucker (sagt „kann“) oder weil sein Name geschrieben wurde (freut sich). */
   async function zeigeBesuch(treffer: TierTreffer, art: 'gucker' | 'geschrieben', nachLaut?: Promise<Ausgang | undefined>): Promise<void> {
     const nr = ++besuchNr;
+    // Das Tier spricht: das Kauderwelsch-Vorlesen darf es nicht abschneiden.
+    stoppeVorlesen();
     const url = await ctx.pakete.bildUrl(treffer.paket.id, treffer.tier.bild);
     if (!s.lebt || nr !== besuchNr) return;
     const name = tierBezeichnung(treffer);
@@ -118,30 +126,47 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     await spiele(ctx.audio.wort(wort), meldung.melde);
   }
 
-  function planeVorlesen(): void {
+  function stoppeVorlesen(): void {
+    vorleseNr++;
     if (vorleseTimer !== undefined) window.clearTimeout(vorleseTimer);
-    vorleseTimer = window.setTimeout(() => {
-      vorleseTimer = undefined;
-      const wort = text.split(' ').pop() ?? '';
-      if (s.lebt && Array.from(wort).length >= 2) void lies(wort);
-    }, VORLESE_PAUSE_MS);
+    vorleseTimer = undefined;
   }
-  s.nachher(() => {
-    if (vorleseTimer !== undefined) window.clearTimeout(vorleseTimer);
-  });
+
+  /** Vorlesen nach VORLESE_PAUSE_MS Stille — gezählt erst, wenn der Ruf des Guckers (`nachRuf`) vorbei ist. */
+  function planeVorlesen(nachRuf: Promise<unknown>): void {
+    stoppeVorlesen();
+    const nr = vorleseNr;
+    void nachRuf.then(() => {
+      if (!s.lebt || nr !== vorleseNr) return;
+      vorleseTimer = window.setTimeout(() => {
+        vorleseTimer = undefined;
+        if (!s.lebt || nr !== vorleseNr) return;
+        const wort = text.split(' ').pop() ?? '';
+        if (Array.from(wort).length >= 2) void lies(wort);
+      }, VORLESE_PAUSE_MS);
+    });
+  }
+  s.nachher(stoppeVorlesen);
+
+  /** Kasten voll: vorne so viel herausrutschen lassen, dass `platz` Zeichen dazupassen (nie eine Sackgasse). */
+  function machePlatz(platz: number): void {
+    const z = Array.from(text);
+    if (z.length + platz <= MAX_ZEICHEN) return;
+    text = z
+      .slice(z.length + platz - MAX_ZEICHEN)
+      .join('')
+      .replace(/^ +/, '');
+  }
 
   function schreibe(b: Buchstabe): void {
-    if (Array.from(text).length >= MAX_ZEICHEN) {
-      alphabet.wackle(b);
-      return;
-    }
+    machePlatz(1);
     text += b;
     zeichne();
     schliesseBesuch();
     const laut = spiele(ctx.audio.buchstabe(b), meldung.melde);
-    gucker.rufe(b, laut);
+    const ruf = gucker.rufe(b, laut);
     ctx.notizen.merke({ art: 'laut', wert: b });
-    planeVorlesen();
+    planeVorlesen(ruf);
     const wort = text.split(' ').pop() ?? '';
     if (Array.from(wort).length >= 2) {
       const stand = text;
@@ -163,11 +188,14 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     beiTaste: schreibe,
     beiLoeschen: () => {
       if (!text) return;
+      stoppeVorlesen();
       text = Array.from(text).slice(0, -1).join('');
       zeichne();
     },
     beiLeertaste: () => {
-      if (text && !text.endsWith(' ') && Array.from(text).length < MAX_ZEICHEN) {
+      if (text && !text.endsWith(' ')) {
+        machePlatz(1);
+        if (!text) return;
         text += ' ';
         zeichne();
       }

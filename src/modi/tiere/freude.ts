@@ -149,7 +149,8 @@ export async function sprichBewegungsGeraeusch(ctx: TonDienste, treffer: TierTre
   const tierlaut = await tierGeraeusch(ctx, treffer);
   if (tierlaut) return tierlaut;
   const schluessel = `geraeusch.bewegung.${bewegungVon(treffer.tier)}`;
-  if (await ctx.audio.hatFest(schluessel)) return ctx.audio.fest(schluessel);
+  const gilt = ctx.audio.gueltig();
+  if (await ctx.audio.hatFest(schluessel)) return gilt() ? ctx.audio.fest(schluessel) : 'abgebrochen';
   return 'fertig';
 }
 

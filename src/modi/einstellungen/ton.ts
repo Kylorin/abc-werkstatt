@@ -167,15 +167,24 @@ export function tonquellen(ctx: Kontext, aufraeumen: (fn: () => void) => void, l
   });
 
   let lauf: SpracheingabeLauf | undefined;
+  /** Start läuft (z. B. getUserMedia wartet auf die Erlaubnis): kein zweiter Lauf. */
+  let startet = false;
+  let weg = false;
+  aufraeumen(() => {
+    weg = true;
+    lauf?.abbrechen();
+  });
   const eingabeProbe = el('button', {
     klasse: 'knopf knopf--icon',
     testid: 'spracheingabe-probe',
     attr: { 'aria-label': 'Spracheingabe ausprobieren', title: 'Spracheingabe ausprobieren', 'aria-pressed': 'false' },
     beiKlick: () => {
+      if (startet) return;
       if (lauf) {
         lauf.fertig();
         return;
       }
+      startet = true;
       meldung.replaceChildren();
       eingabeErgebnis.textContent = '';
       eingabeProbe.setAttribute('aria-pressed', 'true');
@@ -191,18 +200,23 @@ export function tonquellen(ctx: Kontext, aufraeumen: (fn: () => void) => void, l
           lauf = undefined;
           eingabeProbe.setAttribute('aria-pressed', 'false');
         },
-      }).then(
-        (l) => {
-          lauf = l;
-        },
-        (f: unknown) => {
-          eingabeProbe.setAttribute('aria-pressed', 'false');
-          melde(f);
-        },
-      );
+      })
+        .then(
+          (l) => {
+            // Eltern haben die Einstellungen inzwischen verlassen: Mikrofon zu, nichts verschicken.
+            if (weg || !lebt()) l.abbrechen();
+            else lauf = l;
+          },
+          (f: unknown) => {
+            eingabeProbe.setAttribute('aria-pressed', 'false');
+            melde(f);
+          },
+        )
+        .finally(() => {
+          startet = false;
+        });
     },
   }, icon('mikrofon'));
-  aufraeumen(() => lauf?.abbrechen());
 
   function zeigeEingabe(): void {
     const aktuell = ctx.einstellungen.lese();

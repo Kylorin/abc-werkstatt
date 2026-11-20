@@ -35,8 +35,11 @@ export interface GuckerOptionen {
 
 export interface Gucker {
   el: HTMLElement;
-  /** Nach dem Tipp auf `laut`: `nachLaut` löst auf, wenn der Tastenlaut verklungen ist. */
-  rufe(laut: Buchstabe, nachLaut: Promise<Ausgang | undefined>): void;
+  /**
+   * Nach dem Tipp auf `laut`: `nachLaut` löst auf, wenn der Tastenlaut verklungen ist. Das Ergebnis
+   * löst auf, wenn der Ruf vorbei ist (bzw. sofort, wenn kein Tier kommt) — nie mit Fehler.
+   */
+  rufe(laut: Buchstabe, nachLaut: Promise<Ausgang | undefined>): Promise<void>;
   /** Schließt sofort (z. B. wenn das Kind weitertippt oder ein Tier-Besuch kommt). */
   schliesse(): void;
   zerstoere(): void;
@@ -117,8 +120,8 @@ export function erzeugeGucker(o: GuckerOptionen): Gucker {
     rufe(laut, nachLaut) {
       schliesse();
       const meinNr = nr;
-      if (!ctx.einstellungen.lese().lautRuftTier) return;
-      void Promise.all([tiere(), nachLaut])
+      if (!ctx.einstellungen.lese().lautRuftTier) return nachLaut.then(() => undefined);
+      return Promise.all([tiere(), nachLaut])
         .then(([m, a]) => {
           // abgebrochen: das Kind tippt schon weiter — der neue Laut hat Vorrang.
           if (!lebt || meinNr !== nr || a === 'abgebrochen') return;

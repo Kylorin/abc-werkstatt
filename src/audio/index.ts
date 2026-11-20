@@ -120,6 +120,12 @@ class Dienst implements AudioDienst {
   private ctrl = new AbortController();
   /** Zählt jede neue Ausgabe und jedes `stopp()` — Ketten erkennen daran fremde Ausgaben in ihrer Pause. */
   private generation = 0;
+  /**
+   * Zählt nur ausdrückliche `stopp()`-Aufrufe (Moduswechsel, Weiter-Knopf …), nicht den Abbruch durch
+   * eine neue Ausgabe. Eine Kette, in deren Lauf ein `stopp()` kam, ist zu Ende — auch wenn ihr
+   * Schritt gerade auf IndexedDB wartete oder ohne eigenen Ton `fertig` lieferte.
+   */
+  private stopps = 0;
   /** Zuletzt gespielte Variante je Schlüssel (nie zweimal dieselbe hintereinander). */
   private readonly zuletzt = new Map<string, number>();
   /** true, sobald eine Wiedergabe wirklich gestartet ist (play() aufgelöst). */
@@ -233,10 +239,12 @@ class Dienst implements AudioDienst {
   }
 
   async kette(schritte: readonly KettenSchritt[], pauseMs = KETTEN_PAUSE_MS): Promise<Ausgang> {
+    const stoppsVorher = this.stopps;
     for (let i = 0; i < schritte.length; i++) {
       const schritt = schritte[i];
       if (!schritt) continue;
-      if ((await schritt()) === 'abgebrochen') return 'abgebrochen';
+      if (this.stopps !== stoppsVorher) return 'abgebrochen';
+      if ((await schritt()) === 'abgebrochen' || this.stopps !== stoppsVorher) return 'abgebrochen';
       if (i < schritte.length - 1 && (await this.pause(pauseMs)) === 'abgebrochen') return 'abgebrochen';
     }
     return 'fertig';
@@ -270,7 +278,18 @@ class Dienst implements AudioDienst {
     return this.spiele(aufgeloest, signal);
   }
 
+  gueltig(): () => boolean {
+    const gen = this.generation;
+    return () => this.generation === gen;
+  }
+
   stopp(): void {
+    this.stopps++;
+    this.halt();
+  }
+
+  /** Beendet die laufende Ausgabe (gemeinsam für `stopp()` und jede neue Ausgabe). */
+  private halt(): void {
     this.generation++;
     this.ctrl.abort();
     this.el.pause();
@@ -322,7 +341,7 @@ class Dienst implements AudioDienst {
 
   /** Bricht die laufende Ausgabe ab und liefert das Signal der neuen. */
   private neu(): AbortSignal {
-    this.stopp();
+    this.halt();
     this.ctrl = new AbortController();
     return this.ctrl.signal;
   }
@@ -406,15 +425,26 @@ class Dienst implements AudioDienst {
   private async liveAusgabe(text: string, signal: AbortSignal): Promise<Ausgang> {
     const quelle = this.einstellungen.lese().liveStimme;
     if (quelle === 'browser') return sprich(text, signal, () => this.entsperrt);
-    let blob: Blob;
+    // Ein Abbruch (neue Ausgabe, stopp()) beendet DIESE Ausgabe sofort; die Erzeugung läuft im
+    // Hintergrund zu Ende und landet im Cache (siehe liveErzeugen).
+    const erzeugt = this.liveErzeugen(quelle, text);
+    const abbruch = new Promise<'abgebrochen'>((ok) => {
+      if (signal.aborted) ok('abgebrochen');
+      else signal.addEventListener('abort', () => ok('abgebrochen'), { once: true });
+    });
+    let ergebnis: Blob | 'abgebrochen';
     try {
-      blob = await this.liveErzeugen(quelle, text);
+      ergebnis = await Promise.race([erzeugt, abbruch]);
     } catch (f) {
       if (signal.aborted) return 'abgebrochen';
       throw f;
     }
-    if (signal.aborted) return 'abgebrochen';
-    return this.spieleBlob(blob, signal);
+    if (ergebnis === 'abgebrochen' || signal.aborted) {
+      // Fehler der weiterlaufenden Erzeugung nicht verschlucken.
+      erzeugt.catch((f: unknown) => console.error('Live-Stimme (abgebrochene Ausgabe):', f));
+      return 'abgebrochen';
+    }
+    return this.spieleBlob(ergebnis, signal);
   }
 
   /**

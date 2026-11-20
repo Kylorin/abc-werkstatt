@@ -7,8 +7,9 @@
  *   eingestellte Live-Stimme (`audio.live`: Browser | Piper offline | OpenRouter, Konzept 6c).
  * - Spracheingabe (B8) nur, wenn Eltern sie hinter der Elternsperre eingeschaltet haben
  *   (`einstellungen.spracheingabe`): 'aus' = kein Knopf, 'browser' = Web Speech API,
- *   'openrouter' = Aufnahme über den AudioDienst → `audio.transkribiere`. Nie Richter über die
- *   Aussprache des Kindes: erkannter Text wird nur angehängt und vorgelesen.
+ *   'openrouter' = Aufnahme → `audio.transkribiere` (src/audio/spracheingabe.ts, höchstens 8 s).
+ *   In der installierten App startet der Knopf nur nach Halten (Elternsperre). Nie Richter über
+ *   die Aussprache des Kindes: erkannter Text wird nur angehängt und vorgelesen.
  * - Passt das Wort am Ende des Texts zu einem Tier aus einem installierten Paket, kommt das
  *   Tier groß und freut sich (data-testid="tier-freude") — als Einblendung über dem Blatt,
  *   damit das Alphabet beim Tippen nicht verrutscht.
@@ -21,7 +22,9 @@ import { anzeigeZeichen, artVon, istBuchstabe, schreibwort } from '../../kern/al
 import { animiere, el } from '../../kern/dom';
 import { mitHalten } from '../../kern/halten';
 import { icon } from '../../kern/ui/icons';
-import type { Ausgang, Buchstabe, Kontext, LaufendeAufnahme, Modus, Spracheingabe, TierTreffer } from '../../kern/vertrag';
+import type { Ausgang, Buchstabe, Einstellungen, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
+import { erzeugeSperrHinweis, mitElternsperre, sperreAktiv } from '../../kern/elternsperre';
+import { spracheingabeMoeglich, starteSpracheingabe, type SpracheingabeLauf } from '../../audio/spracheingabe';
 import { erzeugeAlphabet } from '../../ui/alphabet';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, sprichFreude, tierBezeichnung } from '../tiere/freude';
@@ -39,42 +42,6 @@ const GERAEUSCH_PAUSE_MS = 250;
 
 /** Text des Kindes über das Verlassen des Modus hinweg (Respekt vor dem Werk, versehentliches Zurück kostet nichts). */
 let gemerkterText = '';
-
-// ---------------------------------------------------------------------------
-// Web Speech API (nicht in allen lib.dom-Ständen typisiert → minimale eigene Typen)
-// ---------------------------------------------------------------------------
-
-interface ErkennungsErgebnis {
-  readonly results: ArrayLike<ArrayLike<{ readonly transcript: string }>>;
-}
-interface ErkennungsFehler {
-  readonly error: string;
-}
-interface Spracherkennung {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  continuous: boolean;
-  onresult: ((ev: ErkennungsErgebnis) => void) | null;
-  onerror: ((ev: ErkennungsFehler) => void) | null;
-  onend: (() => void) | null;
-  start(): void;
-  abort(): void;
-}
-type SpracherkennungKonstruktor = new () => Spracherkennung;
-
-function spracherkennungKonstruktor(): SpracherkennungKonstruktor | undefined {
-  const w = window as unknown as { SpeechRecognition?: SpracherkennungKonstruktor; webkitSpeechRecognition?: SpracherkennungKonstruktor };
-  // Zwei Namen derselben API (Standard und WebKit-Präfix), kein inhaltlicher Ersatzweg.
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition;
-}
-
-const ERKENNUNGS_MELDUNGEN: Record<string, string> = {
-  'not-allowed': 'Das Mikrofon ist nicht erlaubt. Bitte in den Browser-Einstellungen freigeben.',
-  'service-not-allowed': 'Die Spracheingabe ist in diesem Browser nicht erlaubt.',
-  'audio-capture': 'Es wurde kein Mikrofon gefunden.',
-  network: 'Die Spracheingabe braucht gerade eine Internetverbindung.',
-};
 
 /** Erkannte Sprache → nur Buchstaben aus dem Alphabet und einzelne Leerzeichen. */
 export function normiereGesprochenes(text: string): string {
@@ -212,7 +179,7 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
     text += b;
     zeichne();
     const laut = spiele(ctx.audio.buchstabe(b), meldung.melde);
-    gucker.rufe(b, laut);
+    void gucker.rufe(b, laut);
     pruefeTier(laut);
   }
 
@@ -327,115 +294,97 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
 
   /** Laufende Spracheingabe abbrechen (beim Umschalten und beim Verlassen). */
   let beendeSpracheingabe: () => void = () => {};
-  let quelle: Spracheingabe = 'aus';
+  let mikroStand = '';
 
-  function baueMikro(neu: Spracheingabe): void {
-    if (neu === quelle) return;
+  /**
+   * Mikrofon-Knopf nach Einstellung. B8: Spracheingabe ist für Eltern — in der installierten App
+   * (Elternsperre aktiv) startet sie nur nach 2 s Halten wie der Elternbereich; ein Patschtipp
+   * zeigt nur den Hinweis. Ein Lauf dauert höchstens SPRACHEINGABE_MAX_MS (dann wird automatisch
+   * aufgeschrieben, src/audio/spracheingabe.ts). Antippen während des Laufs beendet das Zuhören.
+   */
+  function baueMikro(e: Einstellungen): void {
+    const gesperrt = sperreAktiv(ctx.einstellungen);
+    const moeglich = spracheingabeMoeglich(e);
+    const stand = `${e.spracheingabe}|${moeglich}|${gesperrt}`;
+    if (stand === mikroStand) return;
+    mikroStand = stand;
     beendeSpracheingabe();
     beendeSpracheingabe = () => {};
-    quelle = neu;
     mikroPlatz.replaceChildren();
-    if (neu === 'aus') return;
+    if (e.spracheingabe === 'aus' || !moeglich) return;
 
     const mikro = el(
       'button',
       {
         klasse: 'knopf knopf--icon knopf--gross frei__mikro',
         testid: 'spracheingabe',
-        attr: { 'aria-label': 'Sprechen statt tippen', 'aria-pressed': 'false', 'data-quelle': neu },
+        attr: { 'aria-label': 'Sprechen statt tippen (für Eltern)', 'aria-pressed': 'false', 'data-quelle': e.spracheingabe },
       },
       icon('mikrofon', { groesse: 30 }),
     );
-    const zeigeLaufend = (an: boolean): void => mikro.setAttribute('aria-pressed', String(an));
-    mikroPlatz.append(mikro);
+    const hinweis = erzeugeSperrHinweis();
+    mikroPlatz.append(mikro, hinweis);
 
-    if (neu === 'browser') {
-      let laufend: Spracherkennung | undefined;
-      beendeSpracheingabe = () => laufend?.abort();
-      mikro.addEventListener('click', () => {
-        if (laufend) {
-          laufend.abort();
-          return;
-        }
-        const Erkennung = spracherkennungKonstruktor();
-        if (!Erkennung) {
-          meldung.melde(new Error('Dieser Browser kann keine Spracheingabe. In den Einstellungen „OpenRouter“ wählen oder die Spracheingabe ausschalten.'));
-          return;
-        }
-        const e = new Erkennung();
-        e.lang = 'de-DE';
-        e.interimResults = false;
-        e.continuous = false;
-        e.maxAlternatives = 1;
-        e.onresult = (ev) => haengeAn(ev.results[0]?.[0]?.transcript ?? '');
-        e.onerror = (ev) => {
-          if (ev.error === 'aborted' || ev.error === 'no-speech') return; // selbst abgebrochen bzw. still geblieben
-          meldung.melde(new Error(ERKENNUNGS_MELDUNGEN[ev.error] ?? `Spracheingabe gestört (${ev.error}).`));
-        };
-        e.onend = () => {
-          laufend = undefined;
-          zeigeLaufend(false);
-        };
-        ctx.audio.stopp();
-        e.start();
-        laufend = e;
-        zeigeLaufend(true);
-      });
-      return;
-    }
-
-    // 'openrouter': erster Tipp nimmt auf, zweiter Tipp schickt die Aufnahme zur Transkription.
-    let aufnahme: LaufendeAufnahme | undefined;
+    let lauf: SpracheingabeLauf | undefined;
     let startet = false;
     let gilt = 0;
+    const zeige = (z: 'hoert' | 'schreibt' | undefined): void => {
+      mikro.setAttribute('aria-pressed', String(z === 'hoert'));
+      if (z) mikro.dataset.zustand = z;
+      else delete mikro.dataset.zustand;
+    };
     beendeSpracheingabe = () => {
       gilt++;
-      aufnahme?.abbrechen();
-      aufnahme = undefined;
-      zeigeLaufend(false);
+      lauf?.abbrechen();
+      lauf = undefined;
+      zeige(undefined);
     };
-    mikro.addEventListener('click', () => {
+    const starte = (): void => {
       if (startet) return;
-      if (aufnahme) {
-        const a = aufnahme;
-        aufnahme = undefined;
-        zeigeLaufend(false);
-        const nr = gilt;
-        mikro.dataset.zustand = 'hoert';
-        a.stoppe()
-          .then((blob) => ctx.audio.transkribiere(blob))
-          .then((t) => {
-            if (nr === gilt) haengeAn(t);
-          })
-          .catch(meldung.melde)
-          .finally(() => delete mikro.dataset.zustand);
+      if (lauf) {
+        lauf.fertig();
         return;
       }
       startet = true;
-      const nr = gilt;
-      ctx.audio
-        .aufnahmeStarten()
-        .then((a) => {
-          if (nr !== gilt || !s.lebt) {
-            a.abbrechen();
-            return;
-          }
-          aufnahme = a;
-          zeigeLaufend(true);
+      const nr = ++gilt;
+      starteSpracheingabe(ctx.audio, ctx.einstellungen.lese(), {
+        beiText: (t) => {
+          if (nr === gilt) haengeAn(t);
+        },
+        beiFehler: (f) => {
+          if (nr === gilt) meldung.melde(f);
+        },
+        beiEnde: () => {
+          if (nr !== gilt) return;
+          lauf = undefined;
+          zeige(undefined);
+        },
+        beiZustand: (z) => {
+          if (nr === gilt) zeige(z);
+        },
+      })
+        .then((l) => {
+          // Inzwischen verlassen oder umgeschaltet: Mikrofon sofort wieder zu, nichts verschicken.
+          if (nr !== gilt || !s.lebt) l.abbrechen();
+          else lauf = l;
         })
-        .catch(meldung.melde)
+        .catch((f: unknown) => {
+          if (nr === gilt) meldung.melde(f);
+        })
         .finally(() => {
           startet = false;
         });
-    });
+    };
+    if (gesperrt) mitElternsperre(mikro, hinweis, starte);
+    else mikro.addEventListener('click', starte);
   }
-  baueMikro(ctx.einstellungen.lese().spracheingabe);
+  baueMikro(ctx.einstellungen.lese());
   s.nachher(() => beendeSpracheingabe());
 
   // --- Einstellungen ------------------------------------------------------
   s.nachher(
     ctx.einstellungen.abonniere((e) => {
-      baueMikro(e.spracheingabe);
+      baueMikro(e);
       if (e.grossbuchstaben === gross) return;
       gross = e.grossbuchstaben;
       alphabet.setzeGross(gross);

@@ -30,6 +30,7 @@ import type {
   Tier,
   TierTreffer,
 } from '../../kern/vertrag';
+import { ANLAUT_LAUTE } from '../../kern/vertrag';
 import { anlautBuchstabe } from '../../paket/anlaut';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude } from '../tiere/freude';
@@ -42,7 +43,8 @@ const GESCHICHTEN_BIS_ENDE = 3;
 /** Obergrenze, bis die Helfer erscheinen — nur gegen eine hängende Sprachausgabe. */
 const ERZAEHLUNG_HOECHSTENS_MS = 12_000;
 /** Obergrenze fürs Nachklingen, bevor die Lösung kommt. */
-const NACHKLANG_HOECHSTENS_MS = 8_000;
+/** Obergrenze fürs Nachklingen (hängende Sprachausgabe): alle Buchstaben, Pause und Name — wächst mit dem Wort. */
+const nachklangHoechstensMs = (wort: string): number => 3_500 + 1_600 * Array.from(wort).length;
 
 const ELTERNFRAGEN = ['Wer könnte noch helfen?', 'Was hättest du gemacht?', 'Wem hast du schon einmal geholfen?'];
 
@@ -205,7 +207,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       problemKnopf.classList.add('geschichte__problemtier--getroest');
 
       const laut = anlautBuchstabe(g.helfer);
-      const schreibt = ctx.einstellungen.lese().geschichtenSchreiben && laut !== undefined;
+      // `einladung.<laut>` gibt es nur für ANLAUT_LAUTE (ohne c, q, x, y, ß) — sonst ohne Schreiben.
+      const schreibt = ctx.einstellungen.lese().geschichtenSchreiben && laut !== undefined && ANLAUT_LAUTE.includes(laut);
       if (!schreibt) {
         void spiele(sprichName(t), melde);
         s.warte(1200, () => zeigeLoesung());
@@ -226,7 +229,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
           melde,
           beiGeschafft(klang) {
             ctx.notizen.merke({ art: 'laut', wert: laut });
-            void hoechstens(s, klang, NACHKLANG_HOECHSTENS_MS).then(() => zeigeLoesung());
+            void hoechstens(s, klang, nachklangHoechstensMs(wort)).then(() => zeigeLoesung());
           },
         });
       } catch (f) {

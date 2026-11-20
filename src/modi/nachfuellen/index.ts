@@ -37,13 +37,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
         el(
           'div',
           { klasse: 'hinweis stapel mitte', testid: 'woerterbuch-leer' },
-          el('p', { text: 'Im Wörterbuch ist noch kein Wort.' }),
-          el(
-            'button',
-            { klasse: 'knopf', beiKlick: () => ctx.navigiere('woerterbuch') },
-            icon('woerterbuch'),
-            el('span', { text: 'Zum Wörterbuch' }),
-          ),
+          // Kein Weg ins Wörterbuch von hier: dort kann man Wörter löschen, und der Kind-Modus
+          // umgeht sonst die Elternsperre (die hängt nur am Fuß der Startseite).
+          el('p', { text: 'Im Wörterbuch ist noch kein Wort. Eltern legen Wörter auf der Startseite unten unter „Wörterbuch“ an.' }),
+          el('button', { klasse: 'knopf', beiKlick: () => ctx.navigiere('start') }, icon('zurueck'), el('span', { text: 'Zum Start' })),
         ),
       );
       return;

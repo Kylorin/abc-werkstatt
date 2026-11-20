@@ -18,17 +18,18 @@ import { buchstabenVon, schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { tierTon } from '../../kern/tierton';
-import type {
-  Ausgang,
-  Buchstabe,
-  Dienste,
-  KettenSchritt,
-  Kontext,
-  Modus,
-  RegalKachel,
-  TierPaket,
-  TierStufe,
-  TierTreffer,
+import {
+  ANLAUT_LAUTE,
+  type Ausgang,
+  type Buchstabe,
+  type Dienste,
+  type KettenSchritt,
+  type Kontext,
+  type Modus,
+  type RegalKachel,
+  type TierPaket,
+  type TierStufe,
+  type TierTreffer,
 } from '../../kern/vertrag';
 import { anlautBuchstabe } from '../../paket/anlaut';
 import { bewegungVon } from '../../paket/bewegung';
@@ -49,8 +50,14 @@ import { erzeugeStufenArbeit } from './stufenarbeit';
 import { erzeugeWiese } from './wiese';
 import './tiere.css';
 
-/** Obergrenze bis zur Freude, falls das Nachklingen (Sprachausgabe) hängt. */
-const FREUDE_SPAETESTENS_MS = 7000;
+/**
+ * Obergrenze bis zur Freude, falls das Nachklingen (Sprachausgabe) hängt. Wächst mit dem Wort:
+ * Das Nachklingen spielt Tastenlaut, jeden Buchstaben (Dauerlaute ≈ 1,2 s) und dann das Wort —
+ * eine feste Grenze schnitte bei langen Namen die Freude stumm ab.
+ */
+export function freudeSpaetestensMs(wort: string): number {
+  return 3000 + 1300 * Array.from(wort).length;
+}
 
 const fortschritt = createStore('abc-werkstatt-fortschritt', 'kv');
 const zuletztSchluessel = (paketId: string): string => `tiere-zuletzt:${paketId}`;
@@ -239,7 +246,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
         zeigeFreude(treffer, bildUrl, tierPlatz, a, ausStufen, wiederholt);
       };
       void nachklang.then(freude);
-      s.warte(FREUDE_SPAETESTENS_MS, () => freude('abgebrochen'));
+      s.warte(freudeSpaetestensMs(wort), () => freude('abgebrochen'));
     };
 
     if (stufe === 4) {
@@ -278,7 +285,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     const schritte: KettenSchritt[] = [
       async (): Promise<Ausgang> => (await tierTon(ctx, treffer, 'anlautName')) ?? sprichTierName(ctx, treffer, wort),
     ];
-    if (stufe <= 2 && laut) schritte.push(() => ctx.audio.fest('einladung.{laut}', { laut }));
+    // `einladung.<laut>` gibt es nur für ANLAUT_LAUTE (ohne c, q, x, y, ß).
+    if (stufe <= 2 && laut && ANLAUT_LAUTE.includes(laut)) schritte.push(() => ctx.audio.fest('einladung.{laut}', { laut }));
     ctx.audio.kette(schritte, SPRECH_PAUSE_MS).catch(meldung.melde);
   }
 
@@ -355,9 +363,13 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   await zeigeWiese();
 }
 
-/** Regal: eine Kachel je installiertem Paket (Titel, Untertitel, Cover). Ohne Paket fehlt die Arbeit. */
+/**
+ * Regal: eine Kachel je installiertem Paket (Titel, Untertitel, Cover). Ohne Paket fehlt die Arbeit,
+ * ebenso ein Paket ohne Tier für die eingestellte Stufe (B1: keine Kachel vor einem Elternhinweis).
+ */
 async function kacheln(dienste: Dienste): Promise<RegalKachel[]> {
-  const pakete = await dienste.pakete.liste();
+  const stufe = dienste.einstellungen.lese().tierStufe;
+  const pakete = (await dienste.pakete.liste()).filter((p) => tiereFuerStufe(p, stufe).length > 0);
   return Promise.all(
     pakete.map(async (p) => {
       const k: RegalKachel = { titel: p.titel, param: p.id, daten: { 'data-paket': p.id } };

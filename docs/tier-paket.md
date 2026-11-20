@@ -137,6 +137,13 @@ ist **und** zum ersten Buchstaben des Schreibworts passt. Der Anlaut wird **nie*
 abgeleitet: Ein Tier ohne `anlaut` spielt dort nicht mit, ein „Schaf“ mit `"anlaut": "sch"`
 erscheint nie unter „s“. Falsche Laute lehren das Falsche.
 
+Für **c, q, x, y und ß** gibt es keine festen Sätze („Hör mal: …“, „Wer fängt mit … an?“). Ein
+Tier mit einem dieser Anlaute lugt in „Laut ruft Tier“ hervor, fehlt aber unter der Decke, bekommt
+keine Laut-Einladung beim Schreiben und schreibt in „Wer hilft?“ den Anlaut nicht selbst.
+
+Arbeiten, für die kein Tier passt (Decke, Silben, Tiere auf der eingestellten Stufe), erscheinen
+gar nicht im Regal — das Kind landet nie vor einem Hinweis für Eltern.
+
 ## Bilder
 
 Die App zeigt jedes Tierbild **rund** (Kreis mit hellem Rand) und zoomt dabei etwa 8 % heran.
