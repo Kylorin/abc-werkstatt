@@ -5,9 +5,12 @@
  * Anlegen: Wort (lautgetreu, nur Buchstaben des Alphabets), Foto (Kamera oder Datei, der Store
  * verkleinert auf ≈ 512 px), optional die eigene Aufnahme des Worts. Höchstens LEUTE_MAX Personen.
  * Alles bleibt in IndexedDB — kein localStorage, kein Export, kein Paket.
+ * Je Eintrag: Foto tauschen (Tipp aufs Foto), umbenennen (Stift), anhören, neu aufnehmen, löschen.
  *
  * testids: leute-wort, leute-foto, leute-aufnahme, leute-kind, leute-anlegen, leute-liste,
- * leute-eintrag-<id>, leute-anhoeren-<id>, leute-aufnahme-<id>, leute-loeschen-<id>.
+ * leute-eintrag-<id>, leute-foto-tauschen-<id> (+ Datei-Feld leute-foto-<id>),
+ * leute-umbenennen-<id> (+ leute-wort-<id>, leute-umbenennen-ok-<id>), leute-anhoeren-<id>,
+ * leute-aufnahme-<id>, leute-loeschen-<id>.
  */
 import { el, fehlerHinweis } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
@@ -138,11 +141,79 @@ export function leuteVerwaltung(ctx: Kontext): HTMLElement {
     const neuAufnehmen = aufnahmeKnopf(ctx, `leute-aufnahme-${p.id}`, p.hatAufnahme ? 'Neu aufnehmen' : 'Aufnehmen', (blob) => {
       ctx.leute.aendern(p.id, { aufnahme: blob }).catch(melde);
     }, melde);
+    // Foto tauschen: Tipp aufs Foto öffnet die Auswahl (Kamera oder Datei), der Store verkleinert.
+    const neuesFoto = el('input', { klasse: 'sr-only', testid: `leute-foto-${p.id}`, attr: { type: 'file', accept: 'image/*', tabindex: '-1' } });
+    neuesFoto.addEventListener('change', () => {
+      const datei = neuesFoto.files?.[0];
+      if (!datei) return;
+      ctx.leute.aendern(p.id, { foto: datei }).then(() => sage('Foto getauscht.'), melde);
+    });
+    const fotoKnopf = el(
+      'button',
+      {
+        klasse: 'leute-verwaltung__foto-knopf',
+        testid: `leute-foto-tauschen-${p.id}`,
+        attr: { 'aria-label': `Foto von ${p.wort} tauschen`, title: 'Foto tauschen' },
+        beiKlick: () => neuesFoto.click(),
+      },
+      el('img', { klasse: 'leute-verwaltung__foto', attr: { src: fotoUrl, alt: '' } }),
+      el('span', { klasse: 'leute-verwaltung__foto-marke', attr: { 'aria-hidden': 'true' } }, icon('hochladen', { groesse: 16 })),
+    );
+
+    // Umbenennen: das Wort wird zum Eingabefeld; Enter oder Haken speichert, Escape bricht ab.
+    const wortAnzeige = el('span', { klasse: 'leute-verwaltung__wort', text: p.kind ? `${p.wort} (Kind)` : p.wort });
+    const wortPlatz = el('span', { klasse: 'leute-verwaltung__wort-platz' }, wortAnzeige);
+    const umbenennen = el(
+      'button',
+      {
+        klasse: 'knopf knopf--leise knopf--icon',
+        testid: `leute-umbenennen-${p.id}`,
+        attr: { 'aria-label': `${p.wort} umbenennen`, title: 'Umbenennen' },
+        beiKlick: () => {
+          const feld = el('input', {
+            klasse: 'leute-verwaltung__wort-feld',
+            testid: `leute-wort-${p.id}`,
+            attr: { type: 'text', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', maxlength: 20, value: p.wort, 'aria-label': 'Neues Wort' },
+          });
+          const zurueck = (): void => {
+            wortPlatz.replaceChildren(wortAnzeige);
+            umbenennen.hidden = false;
+          };
+          const speichern = (): void => {
+            const neu = feld.value.trim();
+            if (!neu || neu === p.wort) {
+              zurueck();
+              return;
+            }
+            ctx.leute.aendern(p.id, { wort: neu }).then(
+              () => sage(p.hatAufnahme ? 'Neues Wort gespeichert. Die Aufnahme sagt noch das alte Wort – bitte neu aufnehmen.' : 'Neues Wort gespeichert.'),
+              melde,
+            );
+          };
+          feld.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') speichern();
+            else if (ev.key === 'Escape') zurueck();
+          });
+          const ok = el(
+            'button',
+            { klasse: 'knopf knopf--icon', testid: `leute-umbenennen-ok-${p.id}`, attr: { 'aria-label': 'Wort speichern', title: 'Speichern' }, beiKlick: speichern },
+            icon('haken'),
+          );
+          wortPlatz.replaceChildren(feld, ok);
+          umbenennen.hidden = true;
+          feld.focus();
+          feld.select();
+        },
+      },
+      icon('frei'),
+    );
     return el(
       'li',
       { klasse: 'leute-verwaltung__eintrag', testid: `leute-eintrag-${p.id}` },
-      el('img', { klasse: 'leute-verwaltung__foto', attr: { src: fotoUrl, alt: '' } }),
-      el('span', { klasse: 'leute-verwaltung__wort', text: p.kind ? `${p.wort} (Kind)` : p.wort }),
+      fotoKnopf,
+      neuesFoto,
+      wortPlatz,
+      umbenennen,
       hoeren,
       neuAufnehmen,
       el(
