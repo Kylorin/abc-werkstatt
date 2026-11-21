@@ -8,10 +8,13 @@
  * gibt es nicht —, das Tier hüpft auf den Fleck, darunter wächst der Silbenbogen. Nach der letzten
  * Silbe: das ganze Wort, das Tier freut sich. Kein Auto-Weiter.
  *
+ * Die gespielte Silbe steht groß (≥ 40 px) in Montessori-Farben je Buchstabe. Quer (Handy) steht
+ * alles nebeneinander und passt ohne Scrollen auf den Bildschirm (silben.css).
+ *
  * testids: tier-wiese, tier-wahl-<id> (data-bewegung), tier-wahl-andere, silben-tier,
  * silbe-<i> (data-gespielt), silben-bogen, silben-fertig, silben-weiter.
  */
-import { schreibwort } from '../../kern/alphabet';
+import { artVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { tierEinzel, tierNr, tierTon } from '../../kern/tierton';
@@ -29,6 +32,14 @@ const SILBEN_TAKT_MS = 220;
 let sitzung: Sitzung | undefined;
 /** Wo die Wiese zuletzt stand (bleibt für „andere Tiere“ während der App-Sitzung). */
 let wiesenStart = 0;
+
+/** Silbe Buchstabe für Buchstabe in Montessori-Farben (Vokal blau, Konsonant rot); Fremdzeichen bleiben neutral. */
+export function silbeInLauten(silbe: string): HTMLElement[] {
+  return Array.from(silbe).map((z) => {
+    const b = schreibwort(z);
+    return el('span', { klasse: istBuchstabe(b) ? artVon(b) : 'silbe__zeichen', text: z });
+  });
+}
 
 /** Tiere mit Sprechsilben UND Silben-Audio in gleicher Länge, wenige Silben zuerst. */
 export function silbenTiere(treffer: readonly TierTreffer[]): TierTreffer[] {
@@ -145,7 +156,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
           attr: { 'data-gespielt': 'nein', 'aria-label': `Silbe ${i + 1}: ${silbe}` },
           beiKlick: () => tippeFleck(),
         },
-        el('span', { klasse: 'silbe__text', text: silbe }),
+        el('span', { klasse: 'silbe__text' }, ...silbeInLauten(silbe)),
       ),
     );
     const bogen = el('div', { klasse: 'silben-bogen', testid: 'silben-bogen', attr: { 'aria-hidden': 'true', style: `--n: ${n}` } });

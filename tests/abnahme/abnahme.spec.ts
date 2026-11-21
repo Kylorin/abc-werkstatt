@@ -1033,4 +1033,22 @@ test.describe('Querformat', () => {
     const taste = (await page.getByTestId(`taste-${Array.from(wort)[0]}`).first().boundingBox())!;
     expect(taste.y + taste.height).toBeLessThanOrEqual(390);
   });
+
+  test('Regal und Silben ohne vertikales Scrollen', async ({ page }) => {
+    const ohneScrollen = async () =>
+      expect(await page.evaluate(() => document.scrollingElement!.scrollHeight - window.innerHeight)).toBeLessThanOrEqual(1);
+    await mitPaket(page, ['tiere', 'frei', 'nachfuellen', 'silben']);
+    for (const id of ['tiere', 'frei', 'nachfuellen', 'silben']) await expect(page.getByTestId(`modus-${id}`).first()).toBeInViewport({ ratio: 1 });
+    await ohneScrollen();
+    await oeffne(page, 'silben');
+    await expect(page.getByTestId('tier-wahl-hase')).toBeVisible();
+    await ohneScrollen();
+    await page.getByTestId('tier-wahl-hase').dblclick();
+    await expect(page.getByTestId('silbe-1')).toBeVisible();
+    await ohneScrollen();
+    await page.getByTestId('silbe-0').click();
+    await page.getByTestId('silbe-1').click();
+    await expect(page.getByTestId('silben-fertig')).toBeVisible({ timeout: 10_000 });
+    await ohneScrollen();
+  });
 });
