@@ -305,6 +305,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     const aktuell = (): boolean => s.lebt && meinBild === bild;
     const freude = erzeugeFreude({ bildUrl, alt: name, tier: treffer.tier });
     let tipps = 0;
+    tierPlatz.classList.add('tiere__tier--freude');
     tierPlatz.replaceChildren(
       el(
         'button',

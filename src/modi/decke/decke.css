@@ -1,39 +1,38 @@
-/* Wer ist unter der Decke? (F3). Patchwork-Decke mit Beule in der Mitte, leises Wackeln, keine Musik.
+/* Wer ist unter der Decke? (F3). Weiche Patchwork-Decke (SVG) mit Beule in der Mitte, die sanft atmet, keine Musik.
    Darunter 2 Medaillons (Stufe 0) oder 2 große Buchstaben (Stufe 1). */
 
 .flaeche--decke { gap: var(--abstand-3); }
 .decke-spiel { flex: 1; display: flex; flex-direction: column; }
 .decke-runde { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-5); }
 
-.decke__versteck { position: relative; width: min(78vw, 46dvh, 360px); aspect-ratio: 1.25; display: grid; place-items: end center; }
+.decke__versteck { position: relative; width: min(86vw, 46dvh, 380px); aspect-ratio: 1.2; display: grid; place-items: end center; }
 
 .decke {
   position: relative; z-index: 2;
-  width: 100%; height: 78%;
+  width: 100%; height: 86%;
   padding: 0; border: 0; background: transparent;
   transition: transform 0.7s var(--kurve), opacity 0.7s var(--kurve);
 }
-.decke__stoff {
-  position: absolute; inset: 0;
-  border-radius: 48% 48% var(--radius-l) var(--radius-l) / 70% 70% var(--radius-l) var(--radius-l);
-  background:
-    repeating-linear-gradient(90deg, transparent 0 calc(33.3% - 2px), var(--decke-naht) calc(33.3% - 2px) 33.3%),
-    repeating-linear-gradient(0deg, transparent 0 calc(50% - 2px), var(--decke-naht) calc(50% - 2px) 50%),
-    linear-gradient(90deg, var(--decke-1) 0 33.3%, var(--decke-2) 33.3% 66.6%, var(--decke-3) 66.6%);
-  box-shadow: var(--schatten);
+/* Die Decke selbst ist ein SVG (stoff.ts): weiche Patchwork-Decke mit Beule, Stichen und Schatten. */
+.decke__stoff { position: absolute; inset: 0; }
+/* Die Beule atmet und wackelt sanft — etwas liegt darunter. Das Wackeln liegt auf der SVG-Gruppe,
+   nicht auf dem Knopf: der Knopf bleibt ruhig zu treffen. */
+.decke__stoff .stoff__wiege { transform-box: fill-box; transform-origin: 50% 100%; animation: decke-atmen 3.4s ease-in-out infinite; }
+.decke__stoff .stoff__boden { transform-box: fill-box; transform-origin: 50% 50%; animation: decke-boden 3.4s ease-in-out infinite; }
+@keyframes decke-atmen {
+  0%, 100% { transform: scale(1, 1) rotate(0); }
+  22% { transform: scale(1.012, 1.04) rotate(-0.8deg); }
+  48% { transform: scale(0.995, 0.985) rotate(0.4deg); }
+  70% { transform: scale(1.01, 1.03) rotate(0.9deg); }
 }
-/* Die Beule: etwas wölbt sich unter der Decke. */
-.decke__beule {
-  position: absolute; left: 32%; right: 32%; top: -10%; height: 34%;
-  border-radius: 50% 50% 0 0;
-  background: var(--decke-2);
-  box-shadow: inset 0 0 0 2px var(--decke-naht);
+@keyframes decke-boden { 0%, 100% { transform: scale(1); } 22%, 70% { transform: scale(1.03, 1); } }
+@keyframes decke-zucken {
+  0%, 100% { transform: scale(1, 1) rotate(0); }
+  20% { transform: scale(0.97, 1.08) rotate(-2.5deg); }
+  45% { transform: scale(1.03, 0.95) rotate(2deg); }
+  70% { transform: scale(0.99, 1.04) rotate(-1deg); }
 }
-/* Das Atmen liegt auf Stoff und Beule, nicht auf dem Knopf: der Knopf bleibt ruhig zu treffen. */
-.decke__stoff, .decke__beule { transform-origin: 50% 100%; animation: decke-atmen 3.2s ease-in-out infinite; }
-@keyframes decke-atmen { 0%, 100% { transform: rotate(0) scale(1, 1); } 30% { transform: rotate(-1.2deg) scale(1.01, 0.99); } 60% { transform: rotate(1deg) scale(0.99, 1.01); } }
-@keyframes decke-zucken { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg) translateY(-2%); } 75% { transform: rotate(3deg); } }
-.decke--zuckt .decke__stoff, .decke--zuckt .decke__beule { animation: decke-zucken 0.45s ease-in-out; }
+.decke--zuckt .decke__stoff .stoff__wiege { animation: decke-zucken 0.5s ease-in-out; }
 /* Weggeflogen: bleibt im DOM (data-hinweis="4"), nimmt aber keinen Tipp mehr an. */
 .decke--weg { transform: translate(70%, -90%) rotate(28deg) scale(0.6); opacity: 0; pointer-events: none; }
 
@@ -58,7 +57,7 @@
 .decke__weiter { animation: weiter-atmen 2.8s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .decke__stoff, .decke__beule, .decke__weiter { animation: none !important; }
+  .decke__stoff .stoff__wiege, .decke__stoff .stoff__boden, .decke__weiter { animation: none !important; }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {

@@ -1,43 +1,102 @@
-/* Gute Nacht (B9): warm gedimmtes Licht, eine Patchwork-Decke, die Tiere der Sitzung schlafen darauf.
-   Keine Zahl, keine Sammlung — nur ein ruhiges Bild. Ein Tipp weckt sie. */
+/* Gute Nacht (B9): warm gedimmtes Licht, eine weiche Patchwork-Decke, die Tiere der Sitzung schlafen
+   darauf — groß, nebeneinander, nie übereinander. Unten pulsiert eine Sonne: Antippen weckt.
+   Keine Zahl, keine Sammlung — nur ein ruhiges Bild. Nichts scrollt, hochkant wie quer. */
 
 .gute-nacht {
   position: relative;
-  display: grid; place-items: center;
-  width: 100%; min-height: min(70dvh, 520px);
-  padding: var(--abstand-5);
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: var(--abstand-4);
+  width: 100%; min-height: min(62dvh, 480px);
+  padding: calc(56px + var(--abstand-6)) var(--abstand-4) var(--abstand-4);
   border: 0; border-radius: var(--radius-l);
-  background: radial-gradient(circle at 70% 18%, color-mix(in srgb, var(--nacht-licht) 45%, transparent) 0, transparent 38%), var(--nacht);
+  background: radial-gradient(circle at 78% 14%, color-mix(in srgb, var(--nacht-licht) 40%, transparent) 0, transparent 34%), var(--nacht);
   color: var(--nacht-licht);
   overflow: hidden;
+  container-type: inline-size;
   animation: gute-nacht-dimmen 1.6s var(--kurve) both;
+  transition: background-color 0.8s var(--kurve);
 }
 @keyframes gute-nacht-dimmen { from { filter: brightness(1.6) saturate(0.6); } to { filter: none; } }
 
-.gute-nacht__mond { position: absolute; top: var(--abstand-5); right: var(--abstand-6); color: var(--nacht-licht); }
+.gute-nacht__mond { position: absolute; top: var(--abstand-5); right: var(--abstand-6); color: var(--nacht-licht); transition: opacity 0.6s var(--kurve), transform 0.6s var(--kurve); }
 
-.gute-nacht__decke {
-  position: absolute; left: 8%; right: 8%; bottom: 12%; height: 34%;
-  border-radius: 40% 40% var(--radius-l) var(--radius-l);
-  background:
-    repeating-linear-gradient(90deg, transparent 0 calc(33.3% - 2px), var(--decke-naht) calc(33.3% - 2px) 33.3%),
-    linear-gradient(90deg, var(--decke-1) 0 33.3%, var(--decke-2) 33.3% 66.6%, var(--decke-3) 66.6%);
-  opacity: 0.92;
+/* Bett: die Decke liegt hinter den Tieren und reicht von ihrem oberen Viertel bis unten. */
+.gute-nacht__bett {
+  --gn-luecke: 14px;
+  /* Tiergröße: so groß wie möglich (max. 150 px), aber nie breiter als die Spalten und nie höher als der Platz. */
+  --gn-tier: min(150px,
+    calc((100cqw - 2 * var(--abstand-4) - (var(--spalten-hoch) - 1) * var(--gn-luecke)) / var(--spalten-hoch)),
+    calc((100dvh - 340px) / var(--reihen-hoch) - var(--gn-luecke)));
+  --gn-spalten: var(--spalten-hoch);
+  position: relative;
+  display: grid; place-items: center;
+  width: 100%;
+  padding: 0 var(--abstand-3) var(--abstand-6);
 }
+.gute-nacht__decke { position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--gn-tier) * 0.38); }
 
 .gute-nacht__tiere {
-  position: absolute; left: 10%; right: 10%; bottom: 30%;
-  display: flex; justify-content: center; align-items: flex-end;
+  position: relative; z-index: 1;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: var(--gn-luecke);
+  /* So breit wie die Spalten: übrige Tiere der letzten Reihe stehen mittig. */
+  max-width: calc(var(--gn-spalten) * var(--gn-tier) + (var(--gn-spalten) - 1) * var(--gn-luecke));
 }
 .gute-nacht__tier {
-  width: var(--medaillon-klein); height: var(--medaillon-klein);
-  margin: 0 -6px;
-  filter: brightness(0.8) saturate(0.85);
+  flex: none;
+  width: var(--gn-tier); height: var(--gn-tier);
+  filter: brightness(0.82) saturate(0.85);
+  transition: filter 0.6s var(--kurve);
+}
+/* Das Atmen liegt auf dem Bild im Medaillon: die Bewegung beim Wecken (bewegt--huepft) bleibt frei. */
+.gute-nacht__tier .medaillon__bild {
   animation: gute-nacht-atmen 3.6s ease-in-out infinite;
   animation-delay: calc(var(--i, 0) * 0.5s);
 }
-@keyframes gute-nacht-atmen { 0%, 100% { transform: translateY(0) rotate(-6deg) scale(1); } 50% { transform: translateY(2px) rotate(-6deg) scale(1.03); } }
+@keyframes gute-nacht-atmen { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(-5deg) scale(1.04); } }
+
+/* Wecken-Hinweis: eine Sonne, die langsam pulsiert und ihre Strahlen dreht. */
+.gute-nacht__sonne {
+  flex: none;
+  display: grid; place-items: center;
+  width: var(--touch-gross); height: var(--touch-gross);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sonne) 22%, var(--nacht));
+  color: var(--sonne);
+  animation: sonne-puls 2.2s ease-in-out infinite;
+}
+.gute-nacht__sonne svg { overflow: visible; }
+.gute-nacht__sonne circle { fill: var(--sonne); }
+.gute-nacht__strahlen { stroke: var(--sonne); stroke-width: 4.5; stroke-linecap: round; transform-origin: 32px 32px; animation: sonne-drehen 9s linear infinite; }
+@keyframes sonne-puls {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--sonne) 55%, transparent); }
+  50% { transform: scale(1.1); box-shadow: 0 0 0 16px color-mix(in srgb, var(--sonne) 0%, transparent); }
+}
+@keyframes sonne-drehen { to { transform: rotate(360deg); } }
+
+/* Aufwachen: es wird hell, der Mond geht, die Sonne geht auf, die Tiere strahlen. */
+.gute-nacht--wach { background: radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--sonne) 55%, transparent) 0, transparent 60%), color-mix(in srgb, var(--nacht) 45%, var(--sonne-hell)); }
+.gute-nacht--wach .gute-nacht__mond { opacity: 0; transform: translateY(-30%); }
+.gute-nacht--wach .gute-nacht__tier { filter: none; }
+.gute-nacht--wach .gute-nacht__tier .medaillon__bild { animation: none; }
+.gute-nacht--wach .gute-nacht__sonne { animation: sonne-aufgehen 0.9s var(--kurve-feder) both; }
+@keyframes sonne-aufgehen { from { transform: translateY(0) scale(1); } to { transform: translateY(-10%) scale(1.35); } }
+
+/* Quer (B17): eine Reihe Tiere, Sonne rechts unten in der Ecke — die Höhe reicht sonst nicht. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .gute-nacht { min-height: 0; padding-top: var(--abstand-6); padding-right: calc(var(--touch-gross) + var(--abstand-5)); justify-content: center; }
+  .gute-nacht__mond { top: var(--abstand-3); right: var(--abstand-4); }
+  .gute-nacht__mond svg { width: 44px; height: 44px; }
+  .gute-nacht__bett {
+    --gn-spalten: var(--n);
+    --gn-tier: min(150px,
+      calc((100cqw - 2 * var(--abstand-4) - (var(--n) - 1) * var(--gn-luecke)) / var(--n)),
+      calc(100dvh - 200px));
+  }
+  .gute-nacht__sonne { position: absolute; right: var(--abstand-4); bottom: var(--abstand-4); }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .gute-nacht, .gute-nacht__tier { animation: none; }
+  .gute-nacht, .gute-nacht__tier .medaillon__bild, .gute-nacht__sonne, .gute-nacht__strahlen { animation: none; }
 }

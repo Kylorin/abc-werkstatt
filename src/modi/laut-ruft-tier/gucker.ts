@@ -2,7 +2,7 @@
  * Anlaut-Gucker (F2 „Laut ruft Tier“) — wiederverwendbar im Freien Schreiben und im kleinen Kasten.
  *
  * Tippt das Kind einen Buchstaben, klingt SOFORT der Laut (macht der Aufrufer). Erst wenn er
- * verklungen ist, wackelt am Blattrand die Decke, und EIN Tier, dessen Anlaut genau dieser Buchstabe
+ * verklungen ist (spätestens nach LAUT_FRIST_MS, falls das Audio nicht startet oder hängt), wackelt am Blattrand die Decke, und EIN Tier, dessen Anlaut genau dieser Buchstabe
  * ist, lugt als kleines Medaillon hervor und sagt „{laut} … {tier}!“ (`audio.lautRuf`, sonst sein
  * Name). Passt kein Tier, kommt nichts. Dieselbe Taste noch einmal: das NÄCHSTE Tier mit diesem Laut,
  * der Reihe nach (fest, kein Zufall). Antippen: `beiBesuch` (das Tier kommt groß heraus). Ohne
@@ -25,6 +25,32 @@ import './gucker.css';
 
 /** So lange bleibt das Tier ohne Antippen sichtbar. */
 export const GUCKER_MS = 3000;
+/**
+ * Spätestens so lange wartet der Gucker auf das Ende des Tastenlauts. Startet das Audio nicht oder
+ * hängt es (stumm geschaltet, gesperrter Autoplay, langsame Live-Stimme), kommt das Tier trotzdem —
+ * Fortschritt hängt nie allein an einem Audio-Ende.
+ */
+export const LAUT_FRIST_MS = 1500;
+
+/**
+ * Löst mit dem Ergebnis von `p` auf — oder nach `ms` mit 'fertig', falls `p` bis dahin nicht fertig ist.
+ * Ein Fehler von `p` zählt wie 'fertig' (gemeldet wird er beim Aufrufer von `spiele`).
+ */
+export function mitFrist<T>(p: Promise<T>, ms: number): Promise<T | 'fertig'> {
+  return new Promise((ok) => {
+    const t = window.setTimeout(() => ok('fertig'), ms);
+    p.then(
+      (a) => {
+        window.clearTimeout(t);
+        ok(a);
+      },
+      () => {
+        window.clearTimeout(t);
+        ok('fertig');
+      },
+    );
+  });
+}
 
 export interface GuckerOptionen {
   ctx: Pick<Kontext, 'audio' | 'pakete' | 'einstellungen' | 'notizen'>;
@@ -121,7 +147,7 @@ export function erzeugeGucker(o: GuckerOptionen): Gucker {
       schliesse();
       const meinNr = nr;
       if (!ctx.einstellungen.lese().lautRuftTier) return nachLaut.then(() => undefined);
-      return Promise.all([tiere(), nachLaut])
+      return Promise.all([tiere(), mitFrist(nachLaut, LAUT_FRIST_MS)])
         .then(([m, a]) => {
           // abgebrochen: das Kind tippt schon weiter — der neue Laut hat Vorrang.
           if (!lebt || meinNr !== nr || a === 'abgebrochen') return;
