@@ -35,9 +35,16 @@
   touch-action: manipulation;
 }
 .silbe:active { transform: scale(0.96); }
-.silbe__text { font-size: var(--gr-l); color: var(--tinte-leise); opacity: 0; transition: opacity var(--dauer); }
+/* Silbe groß (mindestens 40 px), nie umgebrochen, je Buchstabe in Montessori-Farbe (.vokal/.konsonant). */
+.silbe__text {
+  font-size: max(2.5rem, min(3.5rem, calc(36vw / var(--n, 2)), 13dvh));
+  font-weight: 700; line-height: 1; white-space: nowrap;
+  color: var(--tinte-leise); opacity: 0; transition: opacity var(--dauer);
+}
 .silbe[data-gespielt='ja'] { border-color: var(--silbe-gespielt); background: radial-gradient(circle at 50% 40%, var(--karte), color-mix(in srgb, var(--silbe-gespielt) 30%, var(--silbe)) 75%); }
 .silbe[data-gespielt='ja'] .silbe__text { opacity: 1; color: var(--silbe-gespielt); }
+.silbe__text .vokal { color: var(--vokal); }
+.silbe__text .konsonant { color: var(--konsonant); }
 
 .silben-bogen { height: 40px; }
 .silben-bogen svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -47,6 +54,25 @@
 .silben__ende:empty { display: none; }
 .silben__freude { border: 0; background: transparent; padding: 0; width: min(60vw, 260px); }
 .silben__wiese { align-self: flex-end; }
+
+/* Quer (Handy 844×390): Bühne, Freude, Elternzeile und Wiese-Knopf nebeneinander, Tier und Flecken
+   kleiner — nichts abgeschnitten, kein Scrollen. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .flaeche.flaeche--silben {
+    --medaillon: clamp(80px, 27dvh, 140px);
+    padding-top: var(--abstand-1);
+    padding-bottom: calc(var(--abstand-2) + env(safe-area-inset-bottom));
+  }
+  .silben { flex-direction: row; flex-wrap: nowrap; gap: var(--abstand-4); min-height: 0; }
+  .silben .spiel-wiese { --medaillon: clamp(80px, 40dvh, 168px); flex: 0 1 auto; padding: 0; }
+  .silben__buehne { flex: 0 1 auto; }
+  .silbe { max-width: min(132px, 27dvh); }
+  .silben-bogen { height: 28px; }
+  .silben__freude { width: auto; }
+  .silben__freude .tier-freude { --buehne: min(40dvh, 160px); }
+  .silben .elternzeile { max-width: 8em; }
+  .silben__wiese { align-self: center; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .silben__tier { transition: none; }

@@ -67,17 +67,41 @@
 .start__titel > span { font-size: 1.25em; }
 .start__tiere { display: flex; flex-direction: column; gap: var(--abstand-4); }
 .start__tiere:empty { display: none; }
-/* Die Arbeiten wachsen in den freien Platz hinein (bis zu einer Obergrenze), statt eine leere
-   Fläche zwischen Kacheln und Elternbereich zu lassen. */
-.start__arbeiten { flex: 1 1 auto; max-height: 460px; display: grid; grid-template-columns: 1fr; grid-auto-rows: minmax(112px, 1fr); gap: var(--abstand-4); }
-@media (min-width: 560px) { .start__arbeiten { grid-template-columns: repeat(2, 1fr); grid-auto-rows: auto; max-height: none; flex: none; } }
+/* Regal hoch: alle Kacheln gleich hoch und wachsen in den freien Platz hinein (bis zu einer
+   Obergrenze) — vier passen auf 390×844 ohne Scrollen. */
+.start__arbeiten {
+  flex: 1 1 auto; min-height: 0; max-height: 600px;
+  display: grid; grid-template-columns: 1fr; grid-auto-rows: minmax(100px, 1fr); gap: var(--abstand-3);
+}
+@media (min-width: 560px) { .start__arbeiten { grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(168px, 1fr); max-height: none; flex: none; } }
 .start__fuss { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abstand-1); padding-top: var(--abstand-3); }
 .start__fuss .knopf { font-size: var(--gr-s); padding: 0 var(--abstand-4); }
+/* Regal quer (Handy 844×390): alle Kacheln (höchstens vier) nebeneinander in einer Reihe, ohne Scrollen. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .start {
+    gap: var(--abstand-3);
+    padding-top: max(var(--abstand-3), env(safe-area-inset-top));
+    padding-bottom: calc(var(--abstand-2) + env(safe-area-inset-bottom));
+  }
+  .start__kopf { padding-top: 0; }
+  .start__titel { font-size: var(--gr-l); }
+  .start__arbeiten {
+    flex: 1 1 auto; max-height: none;
+    grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr); grid-auto-rows: minmax(0, 1fr);
+  }
+  .start__fuss { padding-top: 0; }
+}
 
-/* ---------- Kacheln (Start) ---------- */
+/* ---------- Kacheln (Start) ----------
+   Alle Kacheln sehen gleich aus — auch die eines Tier-Pakets (Cover statt Icon, sonst identisch).
+   Titel höchstens zwei Zeilen, Wörter brechen nie mitten im Wort; was zu lang ist, verkleinert
+   kern/start.ts (passeTitelAn) und kürzt notfalls mit „…“. Der Untertitel bleibt eine Zeile. */
 .kachel {
+  --kachel-bild: 72px;
   display: flex; align-items: center; gap: var(--abstand-4);
-  min-height: 96px; padding: var(--abstand-4) var(--abstand-5);
+  min-width: 0; min-height: 0; overflow: hidden;
+  padding: var(--abstand-3) var(--abstand-5);
   border: 1px solid var(--linie); border-radius: var(--radius-l);
   background: var(--karte); box-shadow: var(--schatten);
   text-align: left; font-size: var(--gr-l); font-weight: 700;
@@ -85,25 +109,34 @@
 }
 .kachel:active { transform: scale(0.985); box-shadow: var(--schatten-s); }
 @media (min-width: 560px) {
-  .start__arbeiten .kachel { flex-direction: column; justify-content: center; text-align: center; min-height: 168px; }
+  .start__arbeiten .kachel { flex-direction: column; justify-content: center; text-align: center; gap: var(--abstand-3); }
+  .start__arbeiten .kachel__text { flex: 0 1 auto; width: 100%; }
+  .start__arbeiten .kachel__untertitel { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 }
-.kachel__icon {
-  flex: none; display: grid; place-items: center;
-  width: 68px; height: 68px; border-radius: var(--radius);
+@media (orientation: landscape) and (max-height: 600px) {
+  .start__arbeiten .kachel { --kachel-bild: 80px; gap: var(--abstand-2); padding: var(--abstand-3); font-size: var(--gr-m); }
+}
+.kachel__icon,
+.kachel__bild {
+  flex: none; display: grid; place-items: center; overflow: hidden;
+  width: var(--kachel-bild); height: var(--kachel-bild); border-radius: var(--radius);
   background: var(--papier-tief); color: var(--tinte-sanft);
 }
+.kachel__bild { background: var(--karte); color: var(--sonne); }
+.kachel__bild img { width: 100%; height: 100%; object-fit: cover; }
 .kachel--frei .kachel__icon { background: var(--vokal-hell); color: var(--vokal); }
 .kachel--nachfuellen .kachel__icon { background: var(--konsonant-hell); color: var(--konsonant); }
 .kachel--woerterbuch .kachel__icon { background: var(--gruen-hell); color: var(--gruen); }
-.kachel__titel { display: block; }
-.kachel__untertitel { display: block; font-size: var(--gr-s); font-weight: 400; color: var(--tinte-leise); }
-.kachel--tiere { min-height: 132px; padding: var(--abstand-3); background: var(--sonne-hell); border-color: color-mix(in srgb, var(--sonne) 35%, var(--linie)); }
-.kachel--tiere .kachel__titel { font-size: var(--gr-xl); }
-.kachel__bild {
-  flex: none; width: 108px; height: 108px; border-radius: var(--radius);
-  overflow: hidden; background: var(--karte); display: grid; place-items: center; color: var(--sonne);
+.kachel--tiere .kachel__icon { background: var(--sonne-hell); color: var(--sonne); }
+.kachel__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.kachel__titel {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  line-height: 1.15; overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: balance;
 }
-.kachel__bild img { width: 100%; height: 100%; object-fit: cover; }
+.kachel__untertitel {
+  display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font-size: var(--gr-s); font-weight: 400; line-height: 1.3; color: var(--tinte-leise);
+}
 
 /* ---------- Bildschirm-Alphabet (Grundfassung, Bau „schreiben" darf verfeinern) ---------- */
 .alphabet { display: flex; flex-direction: column; gap: var(--abstand-2); }
@@ -237,7 +270,6 @@
 
 /* ---------- Regal (B1) ---------- */
 .regal[aria-busy='true'] { min-height: 112px; }
-.kachel__text { display: flex; flex-direction: column; gap: 2px; }
 /* Erster Tipp: Kachel hat gesprochen und wartet auf den zweiten Tipp — sanft hervorgehoben, kein Blinken. */
 .kachel[data-bereit='ja'] { border-color: var(--sonne); box-shadow: 0 0 0 4px var(--sonne-hell), var(--schatten); }
 .start__meldung:empty { display: none; }

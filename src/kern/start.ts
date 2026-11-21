@@ -10,6 +10,9 @@
  * - erster Tipp: spricht `kachel.<id>` und merkt sich die Kachel (`data-bereit="ja"`),
  * - zweiter Tipp auf dieselbe Kachel ODER Halten (0,6 s) öffnet, Enter (Tastatur) öffnet direkt.
  *
+ * Alle Kacheln sind gleich gestaltet und gleich hoch (auch die eines Tier-Pakets); Titel höchstens
+ * zwei Zeilen, zu lange werden kleiner (passeTitelAn). Quer stehen alle Kacheln in einer Reihe.
+ *
  * Unten leise der Elternbereich (Wörterbuch, Einstellungen), in der installierten App hinter der
  * Elternsperre. Das Wörterbuch ist bewusst KEINE Kachel — dort kann man Wörter löschen.
  */
@@ -26,6 +29,55 @@ type Navigiere = (ziel: ModusId | 'start', param?: string) => void;
 const ELTERN: readonly ModusId[] = ['woerterbuch', 'einstellungen'];
 /** Halten öffnet eine Kachel direkt. */
 export const KACHEL_HALTEN_MS = 600;
+/** Kleinste Titelschrift einer Kachel (px); darunter kürzt der Titel mit „…“. */
+const TITEL_MIN_PX = 15;
+
+/**
+ * Titel höchstens zwei Zeilen, ohne Wort-Umbruch (CSS line-clamp): zu lange Titel werden in
+ * 1-px-Schritten kleiner, bis sie passen — erst unter TITEL_MIN_PX kürzt das CSS mit „…“.
+ */
+function passeTitelAn(regal: HTMLElement): void {
+  for (const t of regal.querySelectorAll<HTMLElement>('.kachel__titel')) {
+    t.style.removeProperty('font-size');
+    let px = parseFloat(getComputedStyle(t).fontSize);
+    // Toleranz eine halbe Zeile: Ober- und Unterlängen der Schrift ragen ein paar Pixel über die
+    // Zeilenbox hinaus, eine abgeschnittene dritte Zeile dagegen um eine ganze Zeile.
+    while (px > TITEL_MIN_PX && (t.scrollHeight > t.clientHeight + px / 2 || t.scrollWidth > t.clientWidth + 1)) {
+      px -= 1;
+      t.style.fontSize = `${px}px`;
+    }
+  }
+}
+
+/** Titel neu einpassen bei Größenwechsel (Drehen) und sobald die Schrift geladen ist. */
+function beobachteTitel(regal: HTMLElement): void {
+  let geplant = false;
+  const plane = (): void => {
+    if (geplant) return;
+    geplant = true;
+    requestAnimationFrame(() => {
+      geplant = false;
+      if (regal.isConnected) passeTitelAn(regal);
+    });
+  };
+  if (typeof ResizeObserver !== 'undefined') {
+    let breite = -1;
+    const ro = new ResizeObserver(() => {
+      if (!regal.isConnected) {
+        ro.disconnect();
+        return;
+      }
+      // Nur auf Breitenwechsel reagieren: kleinere Titel ändern die Höhe, das darf keine Schleife geben.
+      const b = regal.clientWidth;
+      if (b === breite) return;
+      breite = b;
+      plane();
+    });
+    ro.observe(regal);
+  }
+  document.fonts?.ready.then(plane).catch((f: unknown) => console.error(f));
+  plane();
+}
 
 /** Kacheln eines Modus; ohne `kacheln()` genau eine mit Titel und Icon. */
 async function kachelnVon(m: Modus, dienste: Dienste): Promise<RegalKachel[]> {
@@ -123,6 +175,7 @@ export function zeigeStart(wurzel: HTMLElement, dienste: Dienste, modi: readonly
         regal.append(k);
       }
       regal.setAttribute('aria-busy', 'false');
+      beobachteTitel(regal);
     },
     (f: unknown) => {
       regal.setAttribute('aria-busy', 'false');
