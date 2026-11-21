@@ -16,10 +16,6 @@
 .geschichten { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--abstand-3); overflow-x: clip; }
 .geschichte { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-4); }
 
-/* Tierbilder ganz zeigen: im Kreis „contain“ auf hellem Grund statt herangezoomtem Ausschnitt —
-   auch ein langes Tier (Schnauze, Schwanz) ist als Ganzes erkennbar. */
-.geschichten .medaillon { background: var(--karte); }
-.geschichten .medaillon__bild { left: 7%; top: 7%; width: 86%; height: 86%; object-fit: contain; object-position: 50% 50%; }
 
 .geschichte__buehne { display: flex; align-items: center; justify-content: center; gap: var(--abstand-4); max-width: 100%; }
 .geschichte__buehne:empty { display: none; }
@@ -31,7 +27,21 @@
 .geschichte__helfer:empty { display: none; }
 .geschichte__helfer .spiel-medaillon { width: var(--g-klein); height: var(--g-klein); flex: 0 0 auto; }
 .geschichte__wahl { animation: geschichte-erscheint var(--dauer-lang) var(--kurve) both; }
+.geschichte__wahl.geschichte__wahl--nicht { animation: none; }
 .geschichte__helfer-da { animation: geschichte-fliegt 700ms var(--kurve-feder) both; }
+/* Während der Erzählung: zwei leere, sanft atmende Plätze — gleich kommt jemand zum Helfen. */
+.geschichte__platzhalter {
+  width: var(--g-klein); height: var(--g-klein); flex: 0 0 auto;
+  display: grid; place-items: center; border-radius: 50%;
+  border: 3px dashed var(--linie-stark); background: var(--papier-tief);
+  color: var(--tinte-leise); font-size: calc(var(--g-klein) * 0.4); font-weight: 700;
+  animation: platzhalter-atmen 2.4s ease-in-out infinite;
+}
+@keyframes platzhalter-atmen { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+/* Umlenken ohne Ton erkennbar: der falsche Helfer tritt zurück, der richtige leuchtet danach. */
+.geschichte__wahl--nicht { opacity: 0.45; transform: scale(0.86); filter: saturate(0.5); transition: opacity var(--dauer-lang), transform var(--dauer-lang) var(--kurve), filter var(--dauer-lang); }
+.geschichte__wahl--tipp .medaillon { animation: wahl-tipp 1.6s ease-in-out infinite; }
+@keyframes wahl-tipp { 0%, 100% { box-shadow: 0 0 0 4px var(--hinweis-ring), var(--schatten); } 50% { box-shadow: 0 0 0 14px var(--hinweis-ring), var(--schatten); } }
 
 /* Schreiben und Helfer-Moment: beide Tiere nebeneinander, gleich groß, passen immer in die Breite. */
 .geschichte[data-schritt='schreiben'] .geschichte__buehne .spiel-medaillon,
@@ -66,7 +76,7 @@
 @keyframes geschichte-fliegt { from { opacity: 0; transform: translateX(40vw) translateY(-20%) scale(0.6); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .geschichte__problemtier, .geschichte__wahl, .geschichte__helfer-da { animation: none; }
+  .geschichte__problemtier, .geschichte__wahl, .geschichte__helfer-da, .geschichte__platzhalter, .geschichte__wahl--tipp .medaillon { animation: none; }
 }
 
 /* ---------- Querformat (844 × 390): Tiere links, Helfer bzw. Wort und Tasten rechts ---------- */
@@ -74,8 +84,8 @@
   .flaeche--geschichten {
     padding-top: 0;
     --g-gross: min(36vw, 56dvh, 260px);
-    --g-klein: min(22vw, 34dvh, 150px);
-    --g-paar: min(16vw, 30dvh, 140px);
+    --g-klein: min(24vw, 46dvh, 180px);
+    --g-paar: min(22vw, 33dvh, 150px);
     --g-freude: min(30vw, 52dvh, 220px);
     --taste-gross: min(84px, 21dvh);
   }
@@ -84,7 +94,7 @@
     align-items: center; justify-content: center; column-gap: var(--abstand-5); row-gap: var(--abstand-2);
   }
   .geschichte__buehne { grid-column: 1; grid-row: 1; }
-  .geschichte__helfer { grid-column: 2; grid-row: 1; justify-content: flex-start; gap: var(--abstand-5); }
+  .geschichte__helfer { grid-column: 2; grid-row: 1; justify-content: center; gap: var(--abstand-6); }
   .geschichte__arbeit { grid-column: 2; grid-row: 1; }
   .geschichte[data-schritt='loesung'] { grid-template-columns: minmax(0, 1fr); }
   .geschichte[data-schritt='loesung'] .geschichte__arbeit { grid-column: 1; flex-direction: row; justify-content: center; }

@@ -61,7 +61,10 @@
 .freude-wackelt { animation: freude-wackeln 2.6s ease-in-out both; }
 
 /* Herzen: kräftiges Rot mit hellem Rand und Schatten, sichtbar auf jedem Stoff. */
-.freude__herzen { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 2; }
+/* Herzen liegen HINTER dem Tier: sie platzen hinter dem Medaillon hervor und steigen ringsum auf,
+   verdecken aber nie das Gesicht, das das Kind gerade anschauen will. */
+.freude__herzen { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 0; }
+.freude__tier { z-index: 1; }
 .freude__herzen .herz {
   opacity: 0;
   color: var(--herz);

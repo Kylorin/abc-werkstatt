@@ -10,16 +10,17 @@
   background: var(--karte); box-shadow: var(--schatten-s);
   display: flex; align-items: center;
 }
-.frei__zeile { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; }
+.frei__zeile { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: baseline; flex-wrap: wrap; }
 .frei__text {
   display: inline;
-  font-size: var(--gr-wort); font-weight: 700; line-height: 1.15; letter-spacing: 0.03em;
-  white-space: pre-wrap; overflow-wrap: anywhere;
+  font-size: var(--fit, var(--gr-wort)); font-weight: 700; line-height: 1.15; letter-spacing: 0.03em;
+  /* Wörter brechen nie mitten im Wort um (zu lange werden kleiner, kern/dom.ts passeSchriftAn). */
+  white-space: pre-wrap; overflow-wrap: normal; word-break: keep-all;
 }
 
 /* ruhiger Cursor: langsames Atmen statt hartem Blinken */
 .frei__cursor {
-  display: inline-block; width: 3px; height: calc(var(--gr-wort) * 0.85);
+  display: inline-block; width: 3px; height: calc(var(--fit, var(--gr-wort)) * 0.85);
   margin-left: 2px; border-radius: 2px; background: var(--tinte-leise);
   align-self: center;
   animation: cursor-atmen 2.4s ease-in-out infinite;
@@ -62,3 +63,31 @@
 /* Spracheingabe (B8): Platzhalter ohne eigene Breite, solange sie aus ist. */
 .frei__mikroplatz { display: contents; }
 .frei__mikro[data-zustand='hoert'] { opacity: 0.6; }
+
+/* Querformat (Handy 844 × 390): oben Blatt und Knöpfe in EINER Reihe, darunter das ganze Alphabet in
+   drei Reihen zu elf (Leertaste zwei breit) — alles sichtbar, nichts scrollt. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .flaeche--frei {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: var(--abstand-2) var(--abstand-3);
+    padding-top: 0; padding-bottom: calc(var(--abstand-2) + env(safe-area-inset-bottom));
+    --gr-wort: 2.6rem;
+  }
+  .flaeche--frei > .frei__blatt { grid-column: 1; grid-row: 1; }
+  .flaeche--frei > .frei__knoepfe { grid-column: 2; grid-row: 1; }
+  .flaeche--frei > .alphabet { grid-column: 1 / -1; grid-row: 2; }
+  .flaeche--frei > .meldung { grid-column: 1 / -1; grid-row: 3; }
+  .frei__blatt { min-height: 0; height: calc(var(--touch-gross) + var(--abstand-2)); padding: var(--abstand-1) var(--abstand-4); }
+  .frei__zeile { align-self: stretch; align-content: center; overflow-y: auto; scrollbar-width: none; }
+  .frei__knopftext { display: none; }
+  .frei__vorlesen { flex: none; width: var(--touch-gross); padding: 0; }
+  .flaeche--frei .alphabet {
+    display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr);
+    gap: 6px; padding: var(--abstand-2);
+  }
+  .flaeche--frei .alphabet__raster, .flaeche--frei .alphabet__leiste { display: contents; }
+  .flaeche--frei .alphabet .taste { aspect-ratio: auto; min-height: 0; height: 100%; width: 100%; min-width: 0; font-size: clamp(1.4rem, 10dvh, 2.2rem); }
+  .flaeche--frei .alphabet .taste--leer { grid-column: span 2; }
+  .flaeche--frei .alphabet .taste--zurueck { width: 100%; }
+  .flaeche--frei .frei__besuch { --buehne: min(30vw, 60dvh, 220px); }
+}

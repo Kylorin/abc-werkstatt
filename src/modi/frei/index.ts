@@ -19,7 +19,7 @@
  *   derselben Stelle „zurückholen“, das mit `zurueckholen.satz` alles wiederbringt.
  */
 import { anzeigeZeichen, artVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
-import { animiere, el } from '../../kern/dom';
+import { animiere, el, passeSchriftAn } from '../../kern/dom';
 import { mitHalten } from '../../kern/halten';
 import { icon } from '../../kern/ui/icons';
 import type { Ausgang, Buchstabe, Einstellungen, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
@@ -75,7 +75,8 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   // --- Schreibblatt -------------------------------------------------------
   const textEl = el('p', { klasse: 'frei__text', testid: 'text', attr: { 'aria-live': 'polite', 'aria-label': 'Geschriebener Text' } });
   const cursor = el('span', { klasse: 'frei__cursor', attr: { 'aria-hidden': 'true' } });
-  const blatt = el('div', { klasse: 'frei__blatt' }, el('div', { klasse: 'frei__zeile' }, textEl, cursor));
+  const zeile = el('div', { klasse: 'frei__zeile' }, textEl, cursor);
+  const blatt = el('div', { klasse: 'frei__blatt' }, zeile);
   const besuch = el('div', { klasse: 'frei__besuch', attr: { 'aria-live': 'polite' } });
 
   // F2 „Laut ruft Tier“: nach dem Tastenlaut lugt ein Anlaut-Tier am Blattrand hervor.
@@ -95,6 +96,10 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
       ),
     );
     blatt.dataset.leer = text.length === 0 ? 'ja' : 'nein';
+    // Wörter brechen nie mitten im Wort um: zu lange werden kleiner; passt es auch dann nicht
+    // (Querformat, feste Blatthöhe), bleibt das Neueste sichtbar.
+    const quer = window.matchMedia('(orientation: landscape) and (max-height: 600px)').matches;
+    if (!passeSchriftAn({ wurzel: blatt, text: textEl, mess: zeile, minPx: 24, auchHoehe: quer })) zeile.scrollTop = zeile.scrollHeight;
     vorlesenKnopf.disabled = text.trim().length === 0;
     const holen = weggeraeumt !== undefined && text.length === 0;
     leerenKnopf.hidden = holen;
@@ -395,6 +400,9 @@ function mount(flaeche: HTMLElement, ctx: Kontext): void {
   flaeche.classList.add('flaeche--frei');
   s.nachher(() => flaeche.classList.remove('flaeche--frei'));
   flaeche.append(besuch, blatt, knoepfe, alphabet.el, meldung.el);
+  const neuEinpassen = (): void => zeichne();
+  window.addEventListener('resize', neuEinpassen);
+  s.nachher(() => window.removeEventListener('resize', neuEinpassen));
   schliesseBesuch();
   zeichne();
 }

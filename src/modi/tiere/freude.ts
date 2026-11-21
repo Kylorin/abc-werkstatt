@@ -97,7 +97,7 @@ export function erzeugeFreude(o: FreudeOptionen): HTMLElement {
       const links = 4 + (92 * (i + 0.5)) / steigend + (Math.random() * 6 - 3);
       h.classList.add('herz--steigt');
       h.style.left = `${links}%`;
-      h.style.bottom = `${10 + Math.random() * 30}%`;
+      h.style.bottom = `${60 + Math.random() * 20}%`; // oberer Rand: sie tauchen hinter dem Tier auf
       h.style.setProperty('--herz-x', `${Math.round(Math.random() * 80 - 40)}px`);
       h.style.animationDelay = `${700 + Math.round(i * 170 + Math.random() * 140)}ms`;
       herzen.append(h);

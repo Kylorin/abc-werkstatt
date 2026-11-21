@@ -6,7 +6,7 @@
  * ist, lugt als kleines Medaillon hervor und sagt „{laut} … {tier}!“ (`audio.lautRuf`, sonst sein
  * Name). Passt kein Tier, kommt nichts. Dieselbe Taste noch einmal: das NÄCHSTE Tier mit diesem Laut,
  * der Reihe nach (fest, kein Zufall). Antippen: `beiBesuch` (das Tier kommt groß heraus). Ohne
- * Antippen verschwindet es nach ≈ 3 s still. Ein neuer Tipp bricht den Ruf sofort ab.
+ * Antippen verschwindet es nach ≈ 6 s still. Ein neuer Tipp bricht den Ruf sofort ab.
  *
  * Testvertrag: EIN Element `anlaut-gucker` (data-tier, data-laut, data-offen="ja|nein"),
  * darin der Knopf `anlaut-gucker-tier`. Einstellung `lautRuftTier` wird bei jedem Tipp gelesen.
@@ -24,7 +24,7 @@ import { schreibwort } from '../../kern/alphabet';
 import './gucker.css';
 
 /** So lange bleibt das Tier ohne Antippen sichtbar. */
-export const GUCKER_MS = 3000;
+export const GUCKER_MS = 6000;
 /**
  * Spätestens so lange wartet der Gucker auf das Ende des Tastenlauts. Startet das Audio nicht oder
  * hängt es (stumm geschaltet, gesperrter Autoplay, langsame Live-Stimme), kommt das Tier trotzdem —

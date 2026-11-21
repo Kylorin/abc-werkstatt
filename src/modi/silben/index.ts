@@ -43,11 +43,20 @@ export function silbeInLauten(silbe: string): HTMLElement[] {
   });
 }
 
-/** Tiere mit Sprechsilben UND Silben-Audio in gleicher Länge, wenige Silben zuerst. */
+/** Reihenfolge nach Silbenzahl: 2, 3, 4 … und einsilbige zuletzt. */
+function silbenRang(t: TierTreffer): number {
+  const n = t.tier.silben?.length ?? 0;
+  return n <= 1 ? 1000 : n;
+}
+
+/**
+ * Tiere mit Sprechsilben UND Silben-Audio in gleicher Länge. Zum Klatschen kommen mehrsilbige
+ * zuerst (zwei Silben, dann drei …), einsilbige erst am Ende — sonst ist nach einem Tipp alles vorbei.
+ */
 export function silbenTiere(treffer: readonly TierTreffer[]): TierTreffer[] {
   return treffer
     .filter(({ tier }) => (tier.silben?.length ?? 0) > 0 && tier.audio?.silben?.length === tier.silben?.length)
-    .sort((a, b) => (a.tier.silben?.length ?? 0) - (b.tier.silben?.length ?? 0) || a.tier.name.localeCompare(b.tier.name, 'de'));
+    .sort((a, b) => silbenRang(a) - silbenRang(b) || a.tier.name.localeCompare(b.tier.name, 'de'));
 }
 
 /** Regal (B1): ohne Tier mit Silben-Ton fehlt die Arbeit einfach — keine Kachel vor einem Elternhinweis. */
@@ -153,9 +162,9 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       el(
         'button',
         {
-          klasse: 'silbe',
+          klasse: ['silbe', Array.from(silbe).length >= 4 ? 'silbe--lang' : ''].filter(Boolean),
           testid: `silbe-${i}`,
-          attr: { 'data-gespielt': 'nein', 'aria-label': `Silbe ${i + 1}: ${silbe}` },
+          attr: { 'data-gespielt': 'nein', 'aria-label': `Silbe ${i + 1}: ${silbe}`, style: `--z: ${Math.max(2, Array.from(silbe).length)}` },
           beiKlick: () => tippeFleck(),
         },
         el('span', { klasse: 'silbe__text' }, ...silbeInLauten(silbe)),
@@ -181,8 +190,9 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     platz.replaceChildren(
       el('div', { klasse: 'silben__buehne', attr: { style: `--n: ${n}` } }, huepfer, fleckenReihe, bogen),
       ende,
-      elternzeile(ctx, 'Klatscht mit!') ?? '',
       zurWiese,
+      // Elternzeile zuletzt: abgesetzt vom Kinderbereich, nie zwischen zwei Kinderknöpfen.
+      elternzeile(ctx, 'Klatscht mit!') ?? '',
     );
     void spiele(ctx.audio.fest('aufforderung.klatschen'), melde);
 
@@ -246,6 +256,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       for (const f of flecken) f.dataset.gespielt = 'nein';
       zeichneBogen();
       ende.replaceChildren();
+      zurWiese.hidden = false;
       huepfer.hidden = false;
     }
 
@@ -253,6 +264,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       fertig = true;
       ctx.notizen.merke({ art: 'tier', wert: t.tier.name });
       huepfer.hidden = true;
+      // Fertig: EIN großer Weiter-Knopf, kein zweiter, gleich aussehender daneben.
+      zurWiese.hidden = true;
       const freude = el(
         'button',
         {
@@ -269,7 +282,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
           ctx.audio.stopp();
           wiesenStart = (wiesenStart + 1) % liste.length;
           void zeigeWiese().catch(melde);
-        }, 'medaillons'),
+        }),
       );
       const freudeTon = (): Promise<Ausgang> =>
         tierTon(ctx, t, 'freude').then((a) => a ?? ctx.audio.fest('freude.allgemein'));

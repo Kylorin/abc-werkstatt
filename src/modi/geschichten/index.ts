@@ -50,6 +50,8 @@ import './geschichten.css';
 const GESCHICHTEN_BIS_ENDE = 3;
 /** Obergrenze, bis die Helfer erscheinen — nur gegen eine hängende Sprachausgabe. */
 const ERZAEHLUNG_HOECHSTENS_MS = 12_000;
+/** Nach einem falschen Helfer leuchtet der richtige nach dieser Zeit auf (sichtbar auch ohne Ton). */
+const UMLENK_TIPP_MS = 2500;
 /** Obergrenze fürs Nachklingen (hängende Sprachausgabe): alle Buchstaben, Pause und Name — wächst mit dem Wort. */
 const nachklangHoechstensMs = (wort: string): number => 3_500 + 1_600 * Array.from(wort).length;
 
@@ -150,8 +152,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     wurzel.addEventListener('click', (ev) => {
       if (ev.target === wurzel || ev.target === buehne || ev.target === helferPlatz) ctx.audio.stopp();
     });
-    // Elternfrage: eigene, abgesetzte Zeile UNTER dem Spielbereich, nicht zwischen den Tieren.
-    platz.replaceChildren(wurzel, elternzeile(ctx, zufall(ELTERNFRAGEN) ?? '') ?? '');
+    // Elternfrage: eigene, abgesetzte Zeile UNTER dem Spielbereich — erst nach der Lösung (zeigeLoesung).
+    platz.replaceChildren(wurzel);
     const schritt = (x: string): void => {
       wurzel.dataset.schritt = x;
     };
@@ -165,6 +167,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       },
     });
     buehne.replaceChildren(problemKnopf);
+    // Zwei leere Plätze zeigen schon während der Erzählung: gleich kommt jemand zum Helfen.
+    helferPlatz.replaceChildren(
+      ...wahl.map(() => el('span', { klasse: 'geschichte__platzhalter', attr: { 'aria-hidden': 'true' } }, el('span', { text: '?' }))),
+    );
 
     const erzaehlung = (): KettenSchritt =>
       sicher(() => situationTon(ctx, problem, g.situation, 'problem').then((a) => a ?? ctx.audio.satz(g.situation.problem)), melde);
@@ -174,8 +180,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     }
 
     let entschieden = false;
+    let helferDa = false;
     function zeigeHelfer(): void {
-      if (!s.lebt || entschieden || helferPlatz.childElementCount) return;
+      if (!s.lebt || entschieden || helferDa) return;
+      helferDa = true;
       schritt('frage');
       helferPlatz.replaceChildren(
         ...wahl.map((t, i) =>
@@ -192,12 +200,20 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       if (entschieden) return;
       schritt('umlenken');
       const knopf = helferPlatz.querySelector<HTMLElement>(`[data-testid="helfer-wahl-${t.tier.id}"]`);
-      if (knopf) bewegeTier(knopf);
+      if (knopf) {
+        bewegeTier(knopf);
+        // Ohne Ton sichtbar: der falsche Helfer tritt zurück, nach seinem Satz leuchtet der richtige.
+        knopf.classList.add('geschichte__wahl--nicht');
+      }
       const schritte: KettenSchritt[] = [];
       if (t.tier.audio?.kann) schritte.push(sicher(() => tierEinzel(ctx, t, 'kann'), melde));
       else if (t.tier.kann) schritte.push(sicher(() => ctx.audio.satz(t.tier.kann ?? ''), melde));
       if (t.tier.audio?.nichtIch?.length) schritte.push(sicher(() => tierTon(ctx, t, 'nichtIch'), melde));
       schritte.push(fest('frage.wer-hilft'));
+      // Der Hinweis auf den richtigen Helfer kommt nach kurzer Zeit — unabhängig davon, wie lang der Ton ist.
+      s.warte(UMLENK_TIPP_MS, () => {
+        if (!entschieden && s.lebt) helferPlatz.querySelector<HTMLElement>(`[data-testid="helfer-wahl-${helfer.tier.id}"]`)?.classList.add('geschichte__wahl--tipp');
+      });
       void ctx.audio.kette(schritte).then(() => {
         if (!entschieden && s.lebt) schritt('frage');
       });
@@ -276,6 +292,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
         erzeugeFreude({ bildUrl: helferBild, alt: `${g.helfer.artikel} ${g.helfer.name}`, tier: g.helfer }),
       );
       arbeitPlatz.replaceChildren(freuen, weiterKnopf('geschichte-weiter', 'Weiter', () => weiter()));
+      const frage = elternzeile(ctx, zufall(ELTERNFRAGEN) ?? '');
+      if (frage) platz.append(frage);
       const loesung = sicher(
         () => situationTon(ctx, problem, g.situation, 'loesung').then((a) => a ?? ctx.audio.satz(g.situation.loesung)),
         melde,

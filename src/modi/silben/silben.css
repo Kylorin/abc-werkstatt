@@ -32,12 +32,17 @@
   background: radial-gradient(circle at 50% 40%, var(--karte), var(--silbe) 70%);
   box-shadow: var(--schatten-s);
   display: grid; place-items: center;
+  container-type: inline-size; overflow: hidden;
   touch-action: manipulation;
 }
 .silbe:active { transform: scale(0.96); }
-/* Silbe groß (mindestens 40 px), nie umgebrochen, je Buchstabe in Montessori-Farbe (.vokal/.konsonant). */
+/* Lange Silben (ab 4 Buchstaben, z. B. ein einsilbiges Tier) bekommen einen breiten, ovalen Fleck. */
+.silbe--lang { aspect-ratio: 1.6; max-width: 212px; }
+.silben__buehne:has(.silbe--lang) { width: min(100%, max(calc(var(--n, 2) * 150px), 230px), 640px); }
+/* Silbe groß, nie umgebrochen und immer GANZ im Fleck: die Schrift richtet sich nach der Fleckbreite
+   (cqw) und der Buchstabenzahl (--z); je Buchstabe in Montessori-Farbe (.vokal/.konsonant). */
 .silbe__text {
-  font-size: max(2.5rem, min(3.5rem, calc(36vw / var(--n, 2)), 13dvh));
+  font-size: min(3.5rem, calc(36vw / var(--n, 2)), 13dvh, calc(150cqw / var(--z, 3)));
   font-weight: 700; line-height: 1; white-space: nowrap;
   color: var(--tinte-leise); opacity: 0; transition: opacity var(--dauer);
 }
@@ -67,6 +72,7 @@
   .silben .spiel-wiese { --medaillon: clamp(80px, 40dvh, 168px); flex: 0 1 auto; padding: 0; }
   .silben__buehne { flex: 0 1 auto; }
   .silbe { max-width: min(132px, 27dvh); }
+  .silbe--lang { max-width: min(212px, 43dvh); }
   .silben-bogen { height: 28px; }
   .silben__freude { width: auto; }
   .silben__freude .tier-freude { --buehne: min(40dvh, 160px); }

@@ -60,3 +60,21 @@ export function fehlerHinweis(fehler: unknown): HTMLElement {
   const text = fehler instanceof Error ? fehler.message : String(fehler);
   return el('p', { klasse: 'hinweis hinweis--fehler', attr: { role: 'alert' }, text });
 }
+
+/**
+ * Wörter brechen nie um: Passt der Inhalt von `mess` nicht in seine Box (Breite oder Höhe), wird
+ * die Schrift über die CSS-Variable `--fit` auf `wurzel` schrittweise kleiner, höchstens bis
+ * `minPx`. Die Grundgröße liest die Funktion an `text` ab. Liefert true, wenn alles hineinpasst.
+ */
+export function passeSchriftAn(o: { wurzel: HTMLElement; text: HTMLElement; mess: HTMLElement; minPx: number; auchHoehe?: boolean }): boolean {
+  o.wurzel.style.removeProperty('--fit');
+  // Die Höhe nur auf Wunsch (feste Blatthöhe): Oberlängen der Schrift ragen sonst ein paar Pixel über.
+  const passt = (): boolean =>
+    o.mess.scrollWidth <= o.mess.clientWidth + 1 && (!o.auchHoehe || o.mess.scrollHeight <= o.mess.clientHeight + 4);
+  let groesse = parseFloat(getComputedStyle(o.text).fontSize);
+  while (!passt() && groesse > o.minPx) {
+    groesse = Math.max(o.minPx, Math.floor(groesse * 0.9));
+    o.wurzel.style.setProperty('--fit', `${groesse}px`);
+  }
+  return passt();
+}

@@ -7,7 +7,7 @@
  *    1 nur Anlaut (2 Tasten) · 2 Anlaut + Endlaut (3 Tasten) · 3 ganzes Wort mit kleiner Auswahl ·
  *    4 volles Alphabet (heutiges Verhalten). Hilfe nach `hilfeNach` Fehlversuchen.
  * 3. Nachklingen, dann freut sich das Tier in seiner Bewegung. KEIN Auto-Weiter: das Tier bleibt
- *    sitzen, jeder Tipp darauf bringt Neues (Name, „kann“, Bewegung + Freude), daneben pulsiert
+ *    sitzen, jeder Tipp darauf bringt Neues (Name, „kann“, Bewegung + Freude), an Stelle der Tasten pulsiert
  *    langsam der Weiter-Knopf.
  * 4. Nach `rundenBisGuteNacht` gelungenen Tieren kommt statt der Wiese die Gute Nacht.
  *
@@ -243,7 +243,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       const freude = (a: Ausgang | undefined): void => {
         if (gezeigt || !aktuell()) return;
         gezeigt = true;
-        zeigeFreude(treffer, bildUrl, tierPlatz, a, ausStufen, wiederholt);
+        zeigeFreude(treffer, bildUrl, tierPlatz, arbeitPlatz, a, ausStufen, wiederholt);
       };
       void nachklang.then(freude);
       s.warte(freudeSpaetestensMs(wort), () => freude('abgebrochen'));
@@ -295,6 +295,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     treffer: TierTreffer,
     bildUrl: string,
     tierPlatz: HTMLElement,
+    arbeitPlatz: HTMLElement,
     nachklang: Ausgang | undefined,
     ausStufen: boolean,
     wiederholt: boolean,
@@ -335,7 +336,15 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       icon('tiere', { groesse: 44, strich: 1.8 }),
       icon('weiter', { groesse: 32, strich: 2.4 }),
     );
-    tierPlatz.append(el('div', { klasse: 'tiere__weiter-platz' }, weiter));
+    // Der Weiter-Knopf tritt an die Stelle der Tasten: nichts rutscht, keine verblassten Tasten
+    // laden zum Weitertippen ins Leere ein, und der Knopf liegt dort, wo der Finger schon ist.
+    const weiterPlatz = el('div', { klasse: 'tiere__weiter-platz' }, weiter);
+    const tasten = arbeitPlatz.querySelector<HTMLElement>('.alphabet');
+    if (tasten) {
+      weiterPlatz.style.minHeight = `${tasten.offsetHeight}px`;
+      tasten.hidden = true;
+      tasten.after(weiterPlatz);
+    } else arbeitPlatz.append(weiterPlatz);
 
     // Sprechen: abgebrochen = das Kind hat schon etwas Neues angetippt — nicht drüberreden.
     if (nachklang === 'abgebrochen') return;

@@ -55,3 +55,20 @@
 @media (prefers-reduced-motion: reduce) {
   .spiel-huepft, .spiel-weiter { animation: none; }
 }
+
+/* Querformat: in „Wer hilft?“ und „Meine Leute“ stehen Wort und Tasten nebeneinander — die Arbeit
+   füllt die Breite statt links eine schmale Spalte zu bilden (Wortarbeit-Grundraster aus wortarbeit.css). */
+@media (orientation: landscape) and (max-height: 520px) {
+  .geschichte__schreiben .stufenarbeit,
+  .leute__arbeit .stufenarbeit {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-areas: 'wort tasten' 'rueck tasten';
+    column-gap: var(--abstand-5);
+  }
+  .geschichte__schreiben .stufenarbeit > .zielwort,
+  .leute__arbeit .stufenarbeit > .zielwort { grid-area: wort; }
+  .geschichte__schreiben .stufenarbeit > .rueckmeldung,
+  .leute__arbeit .stufenarbeit > .rueckmeldung { grid-area: rueck; }
+  .geschichte__schreiben .stufenarbeit > .alphabet,
+  .leute__arbeit .stufenarbeit > .alphabet { grid-area: tasten; align-self: center; }
+}

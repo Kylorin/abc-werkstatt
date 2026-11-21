@@ -44,6 +44,13 @@ const AEHNLICH: readonly (readonly Buchstabe[])[] = [
   ['e', 'ä'],
   ['i', 'ü'],
   ['o', 'ö', 'u'],
+  // Form: für ein Kleinkind kaum zu unterscheiden, auch wenn sie anders klingen
+  // (Stamm mit Bauch bzw. Bogen, schmale Striche, Spitzen).
+  ['b', 'd', 'p', 'q', 'h', 'k'],
+  ['h', 'n', 'u', 'm'],
+  ['i', 'j', 'l', 't'],
+  ['a', 'o', 'c', 'e'],
+  ['v', 'w', 'y'],
 ];
 
 /** true, wenn `a` und `b` gut unterscheidbar sind und als Paar (Laut + Ablenker) angeboten werden dürfen. */

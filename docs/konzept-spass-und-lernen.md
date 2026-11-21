@@ -170,7 +170,8 @@ genau die Tiere mit gültigem Einzel-Anlaut (Phonogramm-Tier fehlt).
 4. **Hilfe:** Nach dem **2.** Fehlversuch (statt heute 3.) pulsiert die gesuchte Taste, und das Tier
    (nicht eine neutrale Stimme) sagt „{laut}!“. Der falsche Buchstabe klingt wie bisher mit
    seinem Laut und wackelt. Es gibt keinen Fehlerton.
-5. **Kein Auto-Weiter:** Nach der Freude bleibt das Tier sitzen, und daneben pulsiert langsam ein
+5. **Kein Auto-Weiter:** Nach der Freude bleibt das Tier sitzen, und an Stelle der Tasten (dort, wo der
+   Finger schon ist, ohne dass etwas verrutscht) pulsiert langsam ein
    großer **Weiter-Knopf** mit der Silhouette eines Tiers. Bis dahin löst jeder Tipp aufs Tier
    etwas Neues aus: 1. Name, 2. „kann“-Satz, 3. Bewegung (F4) und Freude-Variante. Jede Ausgabe
    bricht beim nächsten Tipp ab.

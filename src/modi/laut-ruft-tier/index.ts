@@ -14,7 +14,7 @@
  * Testvertrag: `kleiner-kasten`, `taste-<b>`, `text`, `anlaut-gucker`, `tier-freude`.
  */
 import { anzeigeZeichen, artVon, buchstabenVon, istBuchstabe, schreibwort } from '../../kern/alphabet';
-import { el } from '../../kern/dom';
+import { el, passeSchriftAn } from '../../kern/dom';
 import type { AnlautTreffer, Ausgang, Buchstabe, Kontext, Modus, TierTreffer } from '../../kern/vertrag';
 import { ANLAUT_LAUTE } from '../../kern/vertrag';
 import { kontrastiert, tiereMitAnlaut } from '../../paket/anlaut';
@@ -27,6 +27,8 @@ import './laut-ruft-tier.css';
 const KASTEN_MIN = 4;
 const KASTEN_MAX = 6;
 const MAX_ZEICHEN = 24;
+/** Kleinste Schrift im Blatt; darunter rutscht das Älteste heraus. */
+const MIN_SCHRIFT_PX = 30;
 /** Tipp-Pause, nach der das letzte Wort vorgelesen wird (Kauderwelsch, F2). */
 const VORLESE_PAUSE_MS = 2000;
 const BESUCH_MS = 5200;
@@ -104,11 +106,27 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   let besuchNr = 0;
 
   const textEl = el('p', { klasse: 'lrt__text', testid: 'text', attr: { 'aria-live': 'polite', 'aria-label': 'Geschriebener Text' } });
-  const blatt = el('div', { klasse: 'lrt__blatt' }, textEl);
+  const zeile = el('div', { klasse: 'lrt__zeile' }, textEl);
+  const blatt = el('div', { klasse: 'lrt__blatt' }, zeile);
+  /** Hier lugt das Tier hervor: zwischen Blatt und Tasten, nah am Finger, ohne etwas zu verschieben. */
+  const guckPlatz = el('div', { klasse: 'lrt__guckplatz' });
   const besuch = el('div', { klasse: 'lrt__besuch', attr: { 'data-offen': 'nein' } });
 
-  function zeichne(): void {
+  function setzeText(): void {
     textEl.replaceChildren(...Array.from(text).map((z) => (istBuchstabe(z) ? el('span', { klasse: artVon(z), text: anzeigeZeichen(z, gross) }) : document.createTextNode(z))));
+  }
+
+  /**
+   * Eine Zeile, nie umgebrochen, die Höhe des Blatts bleibt fest (die Tasten wandern nicht weg).
+   * Wird es zu lang, wird die Schrift kleiner; reicht auch die kleinste nicht, rutscht das Älteste
+   * vorne heraus — wie beim vollen Kasten.
+   */
+  function zeichne(): void {
+    setzeText();
+    while (text && !passeSchriftAn({ wurzel: blatt, text: textEl, mess: zeile, minPx: MIN_SCHRIFT_PX })) {
+      text = Array.from(text).slice(1).join('').replace(/^ +/, '');
+      setzeText();
+    }
     blatt.dataset.leer = text ? 'nein' : 'ja';
   }
 
@@ -147,7 +165,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     beiBesuch: (t: AnlautTreffer) => void zeigeBesuch(t, 'gucker').catch(meldung.melde),
   });
   s.nachher(() => gucker.zerstoere());
-  blatt.append(gucker.el);
+  guckPlatz.append(gucker.el);
 
   /** Lautierend, dann zusammengezogen (Kauderwelsch ist erlaubt). Jeder neue Tipp bricht ab. */
   async function lies(wort: string): Promise<void> {
@@ -243,7 +261,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
 
   flaeche.classList.add('flaeche--lrt');
   s.nachher(() => flaeche.classList.remove('flaeche--lrt'));
-  flaeche.append(besuch, blatt, el('div', { klasse: 'lrt__kasten', testid: 'kleiner-kasten' }, alphabet.el), meldung.el);
+  flaeche.append(besuch, blatt, guckPlatz, el('div', { klasse: 'lrt__kasten', testid: 'kleiner-kasten' }, alphabet.el), meldung.el);
+  const neuEinpassen = (): void => zeichne();
+  window.addEventListener('resize', neuEinpassen);
+  s.nachher(() => window.removeEventListener('resize', neuEinpassen));
   schliesseBesuch();
   zeichne();
 }
