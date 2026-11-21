@@ -4,7 +4,7 @@
  * - Stufe 1–2: nur Anlaut-Tiere (gültiger Einzel-Anlaut) mit lautgetreuem Schreibwort und
  *   lautreinem Anfang. Stufe 3: lautgetreue Wörter ohne schweren Anfang. Stufe 4: alle Tiere.
  * - Die Wiese zeigt 3 Medaillons: zwei aus der leichten Vorauswahl, eins, das das Kind lange
- *   nicht hatte. „Andere Tiere“ blättert weiter. Kein Tier ist gesperrt.
+ *   nicht hatte, gemischt nach Anlaut. „Andere Tiere“ blättert weiter. Kein Tier ist gesperrt.
  */
 import { buchstabenVon, schreibwort } from '../../kern/alphabet';
 import { ANLAUT_LAUTE, type Buchstabe, type Tier, type TierPaket, type TierStufe } from '../../kern/vertrag';
@@ -23,23 +23,52 @@ export function tiereFuerStufe(paket: TierPaket, stufe: TierStufe): Tier[] {
   return tiereNachSchwierigkeit(tiere);
 }
 
+/** Anlaut eines Tiers für die Mischung: gültiger Einzel-Anlaut, sonst der erste Buchstabe des Schreibworts. */
+function anlautSchluessel(t: Tier): string {
+  return anlautBuchstabe(t) ?? Array.from(schreibwort(t.name))[0] ?? '';
+}
+
+/**
+ * Ordnet die Tiere so um, dass nie zwei gleiche Anlaute direkt aufeinander folgen, wenn es sich
+ * vermeiden lässt — die Reihenfolge (leicht → schwer) bleibt sonst erhalten (stabil, kein Zufall).
+ */
+export function mischeNachAnlaut(tiere: readonly Tier[]): Tier[] {
+  const rest = [...tiere];
+  const aus: Tier[] = [];
+  while (rest.length > 0) {
+    const vorher = aus.length ? anlautSchluessel(aus[aus.length - 1] as Tier) : undefined;
+    const i = rest.findIndex((t) => anlautSchluessel(t) !== vorher);
+    aus.push(...rest.splice(i < 0 ? 0 : i, 1));
+  }
+  return aus;
+}
+
 /**
  * Drei Medaillons für die Wiese. `zuletzt` = Zeitpunkt, an dem das Kind ein Tier zuletzt
  * geschrieben hat; `blatt` zählt „andere Tiere“ hoch. Weniger als drei Tiere: alle.
+ * Die drei sind nach Anlaut gemischt: möglichst drei verschiedene Anlaute, nie dreimal derselbe,
+ * wenn das Paket es hergibt.
  */
 export function wieseFuer(tiere: readonly Tier[], zuletzt: Readonly<Record<string, number>>, blatt: number): Tier[] {
   if (tiere.length <= WIESE_GROESSE) return [...tiere];
-  // Leichte Vorauswahl: die leichtere Hälfte (mindestens 2 Tiere), der Reihe nach durchblättert.
-  const leicht = tiere.slice(0, Math.max(2, Math.ceil(tiere.length / 2)));
+  // Leichte Vorauswahl: die leichtere Hälfte (mindestens 2 Tiere), nach Anlaut gemischt, der Reihe nach durchblättert.
+  const leicht = mischeNachAnlaut(tiere.slice(0, Math.max(2, Math.ceil(tiere.length / 2))));
   const wahl: Tier[] = [];
-  for (let i = 0; wahl.length < 2 && i < leicht.length; i++) {
-    const t = leicht[(blatt * 2 + i) % leicht.length];
-    if (t && !wahl.includes(t)) wahl.push(t);
+  const anlaute = (): Set<string> => new Set(wahl.map(anlautSchluessel));
+  // Erst mit neuem Anlaut, dann (falls nötig) ohne diese Bedingung.
+  for (const neuerAnlaut of [true, false]) {
+    for (let i = 0; wahl.length < 2 && i < leicht.length; i++) {
+      const t = leicht[(blatt * 2 + i) % leicht.length];
+      if (!t || wahl.includes(t) || (neuerAnlaut && anlaute().has(anlautSchluessel(t)))) continue;
+      wahl.push(t);
+    }
   }
-  // Dazu eins, das das Kind am längsten nicht hatte (nie geschrieben = am längsten her).
+  // Dazu eins, das das Kind am längsten nicht hatte (nie geschrieben = am längsten her) — mit anderem Anlaut, wenn möglich.
   const rest = tiere.filter((t) => !wahl.includes(t));
   const lange = [...rest].sort((a, b) => (zuletzt[a.id] ?? 0) - (zuletzt[b.id] ?? 0) || tiere.indexOf(a) - tiere.indexOf(b));
-  const dritte = lange[blatt % Math.max(1, Math.min(lange.length, 3))] ?? lange[0];
+  const anders = lange.filter((t) => !anlaute().has(anlautSchluessel(t)));
+  const pool = anders.length ? anders : lange;
+  const dritte = pool[blatt % Math.max(1, Math.min(pool.length, 3))] ?? pool[0];
   if (dritte) wahl.push(dritte);
   return wahl;
 }

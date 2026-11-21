@@ -13,7 +13,7 @@
  * Erst nach der Auflösung erscheint klein der Anlaut-Buchstabe (antippbar). Nach 3 Tieren Gute Nacht.
  */
 import { anzeigeZeichen, artVon, schreibwort } from '../../kern/alphabet';
-import { el } from '../../kern/dom';
+import { animiere, el } from '../../kern/dom';
 import { icon } from '../../kern/ui/icons';
 import { tierGeraeusch, tierNr, tierTon } from '../../kern/tierton';
 import {
@@ -32,6 +32,7 @@ import { kontrastiert, tiereMitAnlaut, waehleAblenker } from '../../paket/anlaut
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, erzeugeMedaillon, SPRECH_PAUSE_MS, sprichFreudeSatz, sprichTierName, tierBezeichnung } from '../tiere/freude';
 import { erzeugeGuteNacht } from '../tiere/gute-nacht';
+import { erzeugeDeckenStoff } from './stoff';
 import './decke.css';
 
 /** Nach so vielen Tieren schlägt die Decke vor, schlafen zu gehen (F3), höchstens `rundenBisGuteNacht`. */
@@ -117,8 +118,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
         attr: { 'data-hinweis': 0, 'data-tier': tier.id, 'aria-label': 'Die Decke – antippen für einen Hinweis' },
         beiKlick: () => tippAufDecke(),
       },
-      el('span', { klasse: 'decke__stoff', attr: { 'aria-hidden': 'true' } }),
-      el('span', { klasse: 'decke__beule', attr: { 'aria-hidden': 'true' } }),
+      erzeugeDeckenStoff({ form: 'beule', klasse: 'decke__stoff' }),
     );
     const versteck = el('div', { klasse: 'decke__versteck' }, decke);
     const wahl = el('div', { klasse: 'decke__wahl' });
@@ -145,9 +145,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       if (!aktuell() || geloest) return;
       hinweis = Math.min(LETZTER_HINWEIS, hinweis + 1);
       decke.dataset.hinweis = String(hinweis);
-      decke.classList.remove('decke--zuckt');
-      void decke.offsetWidth;
-      decke.classList.add('decke--zuckt');
+      // Zucken einmal abspielen; danach (animationend) atmet die Beule wieder weiter.
+      animiere(decke, 'decke--zuckt');
       if (hinweis >= LETZTER_HINWEIS) loese();
       else void spiele(hinweisTon(hinweis), meldung.melde);
     }

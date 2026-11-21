@@ -17,7 +17,23 @@
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
 
+/* Kleiner Kasten: ausgewogenes Raster — 3 Spalten (bei 4 Tasten 2 × 2), übrige Tasten der letzten
+   Reihe mittig. Darunter eine Zeile genau so breit: Leertaste über zwei Spalten, Löschtaste über eine. */
 .lrt__kasten { display: grid; place-items: center; }
+.flaeche--lrt {
+  --lrt-luecke: var(--abstand-3);
+  --lrt-spalten: 3;
+  --taste-gross: min(112px, calc((100vw - 2 * var(--rand, 16px) - 2 * var(--abstand-3) - 2 * var(--lrt-luecke)) / 3), calc((100dvh - 400px) / 2));
+}
+.flaeche--lrt:has(.alphabet__raster[data-anzahl='4']),
+.flaeche--lrt:has(.alphabet__raster[data-anzahl='2']),
+.flaeche--lrt:has(.alphabet__raster[data-anzahl='1']) { --lrt-spalten: 2; }
+.lrt__kasten .alphabet { width: calc(var(--lrt-spalten) * var(--taste-gross) + (var(--lrt-spalten) - 1) * var(--lrt-luecke) + 2 * var(--abstand-3)); max-width: 100%; gap: var(--lrt-luecke); }
+.lrt__kasten .alphabet__raster { gap: var(--lrt-luecke); }
+.lrt__kasten .alphabet__leiste { display: grid; grid-template-columns: repeat(var(--lrt-spalten), minmax(0, var(--taste-gross))); justify-content: center; gap: var(--lrt-luecke); }
+.lrt__kasten .alphabet__leiste .taste--leer { grid-column: 1 / -2; }
+.lrt__kasten .alphabet__leiste .taste { width: auto; height: min(var(--touch-gross), var(--taste-gross)); min-height: var(--touch); }
+.lrt__kasten .alphabet__leiste .taste--zurueck { grid-column: -2 / -1; }
 
 /* Tier-Besuch: groß über dem Blatt, belegt keinen Platz im Fluss. */
 .lrt__besuch[data-offen='nein'] { display: none; }
@@ -31,6 +47,7 @@
 .lrt__besuch-knopf { pointer-events: auto; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 
 @media (orientation: landscape) and (max-height: 600px) {
-  .flaeche--lrt { gap: var(--abstand-3); --taste-gross: min(96px, 24dvh); }
+  .flaeche--lrt { gap: var(--abstand-3); --taste-gross: min(96px, 24dvh); --lrt-spalten: 6; }
+  .flaeche--lrt:has(.alphabet__raster[data-anzahl='4']) { --lrt-spalten: 4; }
   .lrt__blatt { min-height: 0; margin-top: var(--abstand-4); }
 }

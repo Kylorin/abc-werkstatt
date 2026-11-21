@@ -21,7 +21,7 @@ import { kontrastiert, tiereMitAnlaut } from '../../paket/anlaut';
 import { erzeugeAlphabet } from '../../ui/alphabet';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
 import { erzeugeFreude, sprichFreude, sprichKann, tierBezeichnung } from '../tiere/freude';
-import { erzeugeGucker } from './gucker';
+import { erzeugeGucker, LAUT_FRIST_MS, mitFrist } from './gucker';
 import './laut-ruft-tier.css';
 
 const KASTEN_MIN = 4;
@@ -30,12 +30,29 @@ const MAX_ZEICHEN = 24;
 /** Tipp-Pause, nach der das letzte Wort vorgelesen wird (Kauderwelsch, F2). */
 const VORLESE_PAUSE_MS = 2000;
 const BESUCH_MS = 5200;
+/** Automatisch gewählt: so viele Tasten (ein ausgewogenes Raster aus 2 Reihen à 3). */
+const KASTEN_ZIEL = 6;
 /** Häufige, gut unterscheidbare erste Buchstaben, falls das Paket zu wenige Anlaut-Laute hat. */
 const GRUNDVORRAT: readonly Buchstabe[] = ['m', 'a', 's', 'i', 'o', 't', 'l', 'u', 'r', 'e'];
+/** Reihenfolge, in der Laute beim automatischen Wählen drankommen (gut hörbar und häufig zuerst). */
+const VORRANG: readonly Buchstabe[] = ['m', 'a', 's', 'i', 'o', 't', 'l', 'u', 'r', 'e', 'n', 'f', 'b', 'h', 'd', 'k', 'p', 'w', 'g', 'z', 'j', 'v', 'ä', 'ö', 'ü'];
+/** Lautklassen: der Kasten mischt sie, damit jede Taste anders klingt (nicht vier Plosive nebeneinander). */
+const KLASSEN: Readonly<Record<string, readonly Buchstabe[]>> = {
+  vokal: ['a', 'e', 'i', 'o', 'u', 'ä', 'ö', 'ü'],
+  nasal: ['m', 'n'],
+  reibe: ['s', 'f', 'w', 'z', 'v', 'h', 'j'],
+  plosiv: ['t', 'p', 'k', 'b', 'd', 'g'],
+  fliess: ['l', 'r'],
+};
+/** Klassen-Folge beim automatischen Wählen: Vokal, dann je ein Konsonant aus verschiedenen Klassen, dann ein zweiter Vokal. */
+const KLASSEN_FOLGE: readonly string[] = ['vokal', 'nasal', 'reibe', 'vokal', 'plosiv', 'fliess', 'reibe', 'plosiv', 'vokal'];
 
 /**
  * Tasten des kleinen Kastens: Papas Wahl (`kastenBuchstaben`) plus Anfangsbuchstabe des Kindes;
- * leer = automatisch aus den Anlauten der Pakete, kontrastierend, aufgefüllt aus dem Grundvorrat.
+ * leer = automatisch aus den Anlauten der Pakete (nur Laute, zu denen ein Tier kommt): ein Vokal,
+ * dann Konsonanten aus verschiedenen Lautklassen (Nasal, Reibelaut, Plosiv, Fließlaut), ein
+ * zweiter Vokal — alle untereinander gut unterscheidbar (z. B. a m s i t l). Fehlt etwas, füllt
+ * der Grundvorrat auf.
  */
 export function kastenTasten(gewaehlt: readonly Buchstabe[], kindAnfang: Buchstabe | undefined, paketLaute: readonly Buchstabe[]): Buchstabe[] {
   const aus: Buchstabe[] = [];
@@ -48,10 +65,23 @@ export function kastenTasten(gewaehlt: readonly Buchstabe[], kindAnfang: Buchsta
   if (gewaehlt.length > 0) {
     for (const b of gewaehlt) nimm(b, false);
   } else {
-    for (const b of paketLaute) nimm(b, true);
+    const kandidaten = new Set(paketLaute.filter((b) => ANLAUT_LAUTE.includes(b)));
+    const nachVorrang = [...kandidaten].sort((a, b) => rang(a) - rang(b));
+    for (const klasse of KLASSEN_FOLGE) {
+      if (aus.length >= KASTEN_ZIEL) break;
+      const passend = nachVorrang.filter((b) => KLASSEN[klasse]?.includes(b) && !aus.includes(b) && aus.every((a) => kontrastiert(a, b)));
+      if (passend[0]) nimm(passend[0], true);
+    }
+    for (const b of nachVorrang) if (aus.length < KASTEN_ZIEL) nimm(b, true);
     for (const b of GRUNDVORRAT) if (aus.length < KASTEN_MIN) nimm(b, true);
   }
   return ANLAUT_LAUTE.filter((b) => aus.includes(b)).concat(aus.filter((b) => !ANLAUT_LAUTE.includes(b)));
+}
+
+/** Position in VORRANG (unbekannte Laute hinten). */
+function rang(b: Buchstabe): number {
+  const i = VORRANG.indexOf(b);
+  return i < 0 ? VORRANG.length : i;
 }
 
 let sitzung: Sitzung | undefined;
@@ -103,7 +133,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     const aktuell = (): boolean => s.lebt && nr === besuchNr;
     if (art === 'gucker') sprichKann(ctx, treffer).catch(meldung.melde);
     else
-      void (nachLaut ?? Promise.resolve(undefined)).then((a) => {
+      void mitFrist(nachLaut ?? Promise.resolve(undefined), LAUT_FRIST_MS).then((a) => {
         if (a !== 'abgebrochen' && aktuell()) return sprichFreude(ctx, treffer, schreibwort(treffer.tier.name), aktuell, meldung.melde);
       });
     s.warte(BESUCH_MS, () => {
