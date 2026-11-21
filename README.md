@@ -12,15 +12,21 @@ Startbildschirm hinzufügen" installieren.
 Der Start ist ein **Regal** mit höchstens vier großen Bildkacheln – genau die Arbeiten, die Eltern
 im Elternbereich hineingestellt haben. Ein erster Tipp sagt, was die Kachel ist, ein zweiter Tipp
 (oder Halten) öffnet sie. In den Arbeiten des Kindes braucht „Zurück" eine Sekunde Halten, das
-Zurück des Handys wird abgefangen und der Bildschirm bleibt an. Neue Arbeiten (Laut ruft Tier,
-Wer ist unter der Decke?, Silben-Hüpfen, Wer hilft?, Meine Leute) beschreibt
-[`docs/konzept-spass-und-lernen.md`](docs/konzept-spass-und-lernen.md); sie entstehen gerade.
+Zurück des Handys wird abgefangen und der Bildschirm bleibt an. Alle Kacheln sind gleich groß;
+zu lange Titel werden erst kleiner gesetzt und erst dann gekürzt. Hoch (390 × 844) wie quer
+(844 × 390) passt jeder Bildschirm ohne Scrollen, Wörter brechen nie um. Die Spiele mit Tieren
+beschreibt [`docs/konzept-spass-und-lernen.md`](docs/konzept-spass-und-lernen.md) genauer.
 
 | Bereich | Was das Kind tut |
 |---|---|
 | **Freies Schreiben** | Buchstaben aus dem beweglichen Alphabet antippen; jeder Buchstabe erklingt als Laut, ganze Wörter werden vorgelesen. Frei Geschriebenes liest die eingestellte Live-Stimme. Der Text bleibt beim Verlassen erhalten. „Alles wegräumen" geht nur per Halten (mit Wisch-Geräusch und Satz) und lässt sich zurückholen. Gegen die Patschhand zählt nur der erste Finger. Den Knopf für die Spracheingabe gibt es nur, wenn die Eltern sie eingeschaltet haben. |
 | **Nachfüllen** | Ein lautgetreues Wort steht als Vorlage mit leeren Feldern da; das Kind legt die Buchstaben der Reihe nach hinein. Leichte Wörter kommen öfter dran als schwere. |
-| **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Bild eines Tiers, das Kind schreibt seinen Namen, und das Tier freut sich. Es geht beim nächsten Mal beim nächsten Tier weiter. |
+| **Tiere** | Erscheint, sobald ein Tier-Paket installiert ist: Das Kind wählt auf einer Wiese ein Tier (möglichst drei verschiedene Anlaute), schreibt seinen Namen, und das Tier freut sich mit seiner Bewegung. Zum Schluss schlafen alle Tiere der Sitzung nebeneinander auf einer Patchwork-Decke (Gute Nacht); ein Tipp auf die Sonne weckt sie. |
+| **Laut ruft Tier** | Wenige große Lauttasten (automatisch nach Lautklassen gewählt, z. B. a m s i t l, oder von den Eltern festgelegt). Nach dem Laut lugt ein Tier mit diesem Anlaut unter der Decke hervor. |
+| **Wer ist unter der Decke?** | Unter einer genähten, atmenden Patchwork-Decke versteckt sich ein Tier. Jeder Tipp gibt einen deutlicheren Hinweis (Rätsel, Anlaut, erste Silbe), dann fliegt die Decke weg — die Auflösung kommt immer. |
+| **Silben-Hüpfen** | Je Silbe ein Trommelfleck; jeder Tipp spielt die nächste Silbe, das Tier hüpft mit, die Silbe steht groß in Montessori-Farben (Vokale blau, Konsonanten rot). Danach freut sich das Tier, ohne Auto-Weiter. |
+| **Wer hilft?** | Ein Tier hat ein Problem, das Kind wählt aus zwei Tieren den Helfer und schreibt (je nach Stufe) seinen Anlaut oder Namen. Für Eltern steht darunter eine Frage zum Weiterreden. |
+| **Meine Leute** | Fotos der eigenen Familie (nur auf dem Gerät); das Kind tippt ein Foto an, hört den Namen und schreibt ihn. Eltern legen Personen an, benennen sie um und tauschen Fotos. |
 | **Wörterbuch** (Eltern, leise im Fuß des Starts) | Eigene Übungswörter anlegen, fürs Üben an-/abwählen und löschen (das zuletzt gelöschte Wort lässt sich zurückholen). |
 | **Einstellungen** (Eltern, leise im Fuß des Starts) | Regal, Lernpfad (Tier-Stufe, Hilfe, Gute Nacht, Laut ruft Tier), Anfangsbuchstabe des Kindes und „heute dran", Live-Stimme für frei Geschriebenes (Gerät, Offline-Stimme oder OpenRouter mit eigenem Schlüssel) und Spracheingabe für Eltern, Buchstabennamen statt Laute, Großbuchstaben, Laut-Studio (Aussprache je Buchstabe wählen oder selbst aufnehmen), Tier-Pakete importieren und löschen (zurückholbar bis zum nächsten Löschen/Import), Speicherstand. |
 
@@ -51,7 +57,7 @@ abc-werkstatt/
 │   ├── main.ts             # Dienste erzeugen, Router starten, Service Worker
 │   ├── kern/               # Fundament: vertrag.ts (Typen), Router, Start, Stores, DOM-Helfer, Icons, Stile
 │   ├── audio/              # Wiedergabe, feste Sätze aus Dateien, Live-Stimme (Browser/Piper/OpenRouter), Elternaufnahmen
-│   ├── paket/              # Tier-Paket-Import und -Speicher (IndexedDB)
+│   ├── paket/              # Tier-Paket-Import und -Speicher (IndexedDB), Bildverkleinerung, Feld-Helfer (felder.ts), Bewegung aus Tierart
 │   ├── ui/alphabet.{ts,css} # Bildschirm-Alphabet (bewegliches Alphabet)
 │   └── modi/               # je Bildschirm ein Ordner (frei, nachfuellen, tiere, laut-ruft-tier, decke, silben, geschichten, leute, woerterbuch, einstellungen, laut-studio)
 ├── public/                 # Schrift (Andika), App-Icons, vorab vertonter Audio-Bestand
@@ -97,6 +103,10 @@ Der Ton liegt fertig unter `public/audio/` und ist in `public/audio/manifest.jso
 | **Laute** `laute/<b>.ki1.mp3` (Standard) und `.ki2.mp3` (zweite Variante im Laut-Studio) | Sprachmodell gpt-audio über OpenRouter, bewertet von drei Hör-Modellen | `tools/laute_ki.py` |
 | **Buchstabennamen** `namen/<b>.mp3` („Be“, „Zett“) | ebenso | `tools/laute_ki.py namen` |
 | **Wörter, feste Sätze, Geräusche** `woerter/`, `saetze/`, gedehnte Laute `laute_lang` | lokal und kostenlos mit Piper (Stimme de_DE-thorsten-high); später in einem Lauf mit gpt-audio ersetzbar | `tools/vertonen.py` |
+
+Auch die Audios eines Tier-Pakets entstehen vorab und kostenlos mit Piper und derselben
+Nachbearbeitung (siehe [`docs/tier-paket.md`](docs/tier-paket.md), „Tonquellen und
+Vorab-Vertonung“). Azure wird nicht mehr genutzt; alte Azure-Einstellungen verwirft die App still.
 
 `tools/laute_ki.py` erzeugt je Buchstabe mehrere Kandidaten mit einer Montessori-Vorgabe (Anlaut,
 Dauerlaute gedehnt, Verschlusslaute ohne Vokal), schneidet und normalisiert sie und lässt jeden

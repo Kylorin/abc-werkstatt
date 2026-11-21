@@ -109,7 +109,7 @@ Je Tier:
 |---|---|---|
 | `anlaut` | Text, 1–12 Zeichen `a–z ä ö ü ß -` | Gesprochener Anlaut als **Laut**, nicht als erster Buchstabe: ein Buchstabe (`"m"`) oder ein Phonogramm (`"sch"`, `"schp"`, `"scht"`, `"ei"`, `"eu"`, `"au"`, `"pf"`, `"z-stimmhaft"` …). |
 | `silben` | Liste, 1–8 Texte | Sprechsilben, von Hand gepflegt (`["i","gel"]`) – so, wie man klatscht. Ohne Feld kein Silben-Hüpfen. |
-| `bewegung` | eins von `huepft`, `fliegt`, `kriecht`, `schwimmt`, `rollt`, `klettert`, `watschelt`, `schlaengelt`, `stampft`, `tanzt` | Wie sich das Tier freut. Ohne Feld hüpft es. |
+| `bewegung` | eins von `huepft`, `fliegt`, `kriecht`, `schwimmt`, `rollt`, `klettert`, `watschelt`, `schlaengelt`, `stampft`, `tanzt` | Wie sich das Tier freut und wie es sich beim Antippen bewegt. Ohne Feld leitet die App die Bewegung aus der **Tierart** im Namen ab (`src/paket/bewegung.ts`: „…vogel“ fliegt, „…fisch“ schwimmt, „schnecke“ kriecht, „ente“ watschelt …, nur allgemeine Tierwörter); passt keines, hüpft es. |
 | `raetsel` | Liste, 1–3 Texte | Kurze Sätze **ohne** den Namen („Ich habe Stacheln.“) für „Wer ist unter der Decke?“ |
 | `situationen` | Liste, höchstens 20 | Kleine Geschichten, in denen **dieses** Tier ein Problem hat: `{ id, problem, helfer, loesung, audio: { problem, loesung } }`. `helfer` ist die `id` eines **anderen** Tiers im selben Paket, sonst wird das Paket abgelehnt. `id` ist im Paket eindeutig. |
 | `audio.anlautName` | mp3-Liste | Name mit gedehntem Anlaut („iiigel“, „{laut_lang} … Igel“) |
@@ -129,6 +129,33 @@ Listen sind **Varianten**: die App wählt zufällig, aber nie zweimal hintereina
 Jede Audio-Liste hat 1–8 Dateien. Alle Audios eines Pakets sollten in **einem** Lauf mit **einer**
 Stimme erzeugt und auf ≈ −16 LUFS normalisiert sein.
 
+### Wo die App die Felder liest
+
+Welche Tiere in welchem Spiel mitspielen, entscheiden die Helfer in `src/paket/felder.ts`
+(`anlautTiere`, `lautreineAnlautTiere`, `silbenTiere`, `situationen`). Sie nehmen nur Tiere, die
+das Feld wirklich haben – geraten wird nie. Gespielt wird Paket-Audio über `src/kern/tierton.ts`.
+
+### Tonquellen und Vorab-Vertonung
+
+Was ein Tier sagt, kommt in dieser Reihenfolge:
+
+1. **Paket-Audio** (`audio.*`, `situationen[].audio.*`), wenn das Feld da ist.
+2. Sonst ein **fester Satz** der App aus `public/audio/manifest.json` (z. B. `freude.allgemein`),
+   oder der Schritt fällt weg.
+3. Nur der **Name** fällt zuletzt auf das Wort zurück: Elternaufnahme → vorab vertontes Wort der
+   App → eingestellte Live-Stimme (Gerät, Offline-Stimme Piper oder OpenRouter mit eigenem
+   Schlüssel).
+
+Paket-Audios werden **vorab** erzeugt, nicht in der App. Empfohlen ist dafür derselbe kostenlose,
+lokale Weg wie für die Sätze der App: Piper mit der Stimme `de_DE-thorsten-high` und der
+Nachbearbeitung aus `tools/vertonen.py` (Ränder kürzen, −16 LUFS, mp3 mono). `{laut}` und
+`{laut_lang}` werden dabei aus den Laut-Dateien der App eingefügt, nie gesprochen, damit sie genau
+wie die Tasten klingen; Silben entstehen aus **einer** Aufnahme und werden geschnitten. Azure wird
+nicht mehr genutzt, frühere Azure-Einstellungen verwirft die App still.
+
+Wartet die App auf einen Ton, um weiterzugehen, hat jede Stelle eine Frist (z. B. 1,5 s nach dem
+Tastenlaut oder der letzten Silbe): Fehlt oder hängt ein Ton, bleibt das Kind nicht stehen.
+
 ### Lautregel für Anlaut-Spiele
 
 Ein Tier nimmt an „Laut ruft Tier“, „Erster Laut“, „Wer ist unter der Decke?“ und am
@@ -147,9 +174,16 @@ gar nicht im Regal — das Kind landet nie vor einem Hinweis für Eltern.
 ## Bilder
 
 Die App zeigt jedes Tierbild **rund** (Kreis mit hellem Rand) und zoomt dabei etwa 8 % heran.
-Ecken und ein schmaler Rand des Bildes sind also nie zu sehen. Das Tier sollte mittig stehen und
-gut die Hälfte des Bildes füllen, sonst ist es auf dem Handy kaum zu erkennen. Quadratische
-Bilder ab 512 × 512 px sind ideal.
+Ecken und ein schmaler Rand des Bildes sind also nie zu sehen. Ausnahme „Wer hilft?“: Dort steht
+das ganze Bild verkleinert (≈ 86 %) auf hellem Grund im Kreis, damit auch lange Tiere ganz zu sehen
+sind. Das Tier sollte mittig stehen und gut die Hälfte des Bildes füllen, sonst ist es auf dem
+Handy kaum zu erkennen. Quadratische Bilder ab 512 × 512 px sind ideal.
+
+**Verkleinerung beim Import:** Rasterbilder (webp, png, jpg), deren längere Seite über 512 px
+liegt, rechnet die App beim Import auf 512 px herunter und speichert sie als webp (Safari: png),
+siehe `src/paket/verkleinern.ts`. So dekodieren Wiese und Freude schnell und das Paket braucht
+weniger Gerätespeicher. Kleinere Bilder und SVG bleiben unverändert. Ein Bild, das sich nicht
+öffnen lässt, lehnt den Import ab.
 
 ## Schreibwort
 

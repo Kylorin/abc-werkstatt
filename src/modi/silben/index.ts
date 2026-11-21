@@ -28,6 +28,8 @@ import './silben.css';
 const WIESE = 3;
 /** Rhythmus beim Vormachen zwischen zwei Silben. */
 const SILBEN_TAKT_MS = 220;
+/** Nach dem letzten Fleck: Freude nach dem Silbenklang, aber spätestens nach dieser Frist (hängt das Audio, wartet das Kind nicht). */
+const SILBE_FERTIG_FRIST_MS = 1500;
 
 let sitzung: Sitzung | undefined;
 /** Wo die Wiese zuletzt stand (bleibt für „andere Tiere“ während der App-Sitzung). */
@@ -232,7 +234,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       const klang = trommelUndSilbe(i);
       if (naechste < n) return;
       const meine = runde;
-      void hoechstens(s, klang, 4000).then(() => {
+      void hoechstens(s, klang, SILBE_FERTIG_FRIST_MS).then(() => {
         if (s.lebt && meine === runde) geschafft();
       });
     }
