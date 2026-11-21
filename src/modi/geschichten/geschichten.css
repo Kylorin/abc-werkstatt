@@ -1,43 +1,96 @@
-/* F6 Wer hilft? (Bau „spiele“). Ein Ding pro Bildschirm: Problemtier, zwei Helfer, dann das Wort. */
+/* F6 Wer hilft? (Bau „spiele“). Ein Ding pro Bildschirm: Problemtier, zwei Helfer, dann das Wort.
+   Handy hochkant (390 × 844) und quer (844 × 390): nichts abgeschnitten, nichts scrollt.
+   Größen je Schritt (data-schritt auf .geschichte):
+   - problem/frage/umlenken: Problemtier groß (--g-gross), Helfer deutlich kleiner darunter (--g-klein)
+   - schreiben/helfer: Problemtier und Helfer nebeneinander, gleich groß (--g-paar)
+   - loesung: beide freuen sich nebeneinander (--buehne der Tier-Freude) */
 
-.flaeche--geschichten { gap: var(--abstand-3); }
-.geschichten { flex: 1; display: flex; flex-direction: column; }
-.geschichte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-4); }
+.flaeche--geschichten {
+  gap: var(--abstand-2);
+  --g-gross: min(64vw, 34dvh, 300px);
+  --g-klein: min(34vw, 17dvh, 150px);
+  --g-paar: min(36vw, 19dvh, 170px);
+  --g-freude: min(38vw, 28dvh, 220px);
+}
+/* Herzen der Freude fliegen weit — sie dürfen am Rand verschwinden, aber nie die Seite verbreitern. */
+.geschichten { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--abstand-3); overflow-x: clip; }
+.geschichte { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--abstand-4); }
 
-.geschichte__buehne { display: flex; align-items: center; justify-content: center; gap: var(--abstand-5); min-height: var(--medaillon); }
-.geschichte__problemtier { filter: saturate(0.45); animation: geschichte-wackeln 2.8s ease-in-out infinite; transition: filter var(--dauer-lang); }
+/* Tierbilder ganz zeigen: im Kreis „contain“ auf hellem Grund statt herangezoomtem Ausschnitt —
+   auch ein langes Tier (Schnauze, Schwanz) ist als Ganzes erkennbar. */
+.geschichten .medaillon { background: var(--karte); }
+.geschichten .medaillon__bild { left: 7%; top: 7%; width: 86%; height: 86%; object-fit: contain; object-position: 50% 50%; }
+
+.geschichte__buehne { display: flex; align-items: center; justify-content: center; gap: var(--abstand-4); max-width: 100%; }
+.geschichte__buehne:empty { display: none; }
+.geschichte__buehne .spiel-medaillon { width: var(--g-gross); height: var(--g-gross); flex: 0 0 auto; }
+.geschichte__problemtier { filter: saturate(0.4) brightness(0.97); animation: geschichte-wackeln 2.8s ease-in-out infinite; transition: filter var(--dauer-lang), width var(--dauer-lang) var(--kurve), height var(--dauer-lang) var(--kurve); }
 .geschichte__problemtier--getroest { filter: none; animation: none; }
-.geschichte__helfer { display: flex; justify-content: center; gap: var(--abstand-6); min-height: var(--medaillon); }
-.geschichte__helfer:empty { min-height: 0; }
+
+.geschichte__helfer { display: flex; justify-content: center; gap: var(--abstand-6); max-width: 100%; }
+.geschichte__helfer:empty { display: none; }
+.geschichte__helfer .spiel-medaillon { width: var(--g-klein); height: var(--g-klein); flex: 0 0 auto; }
 .geschichte__wahl { animation: geschichte-erscheint var(--dauer-lang) var(--kurve) both; }
 .geschichte__helfer-da { animation: geschichte-fliegt 700ms var(--kurve-feder) both; }
+
+/* Schreiben und Helfer-Moment: beide Tiere nebeneinander, gleich groß, passen immer in die Breite. */
+.geschichte[data-schritt='schreiben'] .geschichte__buehne .spiel-medaillon,
+.geschichte[data-schritt='helfer'] .geschichte__buehne .spiel-medaillon { width: var(--g-paar); height: var(--g-paar); }
 
 .geschichte__arbeit { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--abstand-4); }
 .geschichte__arbeit:empty { display: none; }
 .geschichte__schreiben { width: 100%; }
-.geschichte__loesung { display: flex; justify-content: center; gap: var(--abstand-4); }
-.geschichte__freude { width: min(40vw, 200px); }
 
-.geschichte-ende {
-  flex: 1; position: relative; width: 100%; min-height: 60dvh;
-  border: 0; border-radius: var(--radius-l);
-  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--nacht-licht) 35%, var(--nacht)), var(--nacht) 75%);
-  display: grid; place-items: center; overflow: hidden;
+/* Zielwort bricht nie um: Felder skalieren mit der Wortlänge (--n) auf die verfügbare Breite. */
+.geschichte__schreiben .zielwort { container-type: inline-size; padding: var(--abstand-2); }
+.geschichte__schreiben .zielwort .felder { flex-wrap: nowrap; white-space: nowrap; max-width: 100%; --slot-max: 76px; }
+.geschichte__schreiben .zielwort .feld-slot {
+  --slot: clamp(28px, calc((100cqw - (var(--n, 8) - 1) * var(--abstand-2)) / var(--n, 8)), var(--slot-max));
+  flex: 0 0 auto;
 }
-.geschichte-ende__decke {
-  position: absolute; left: 8%; right: 8%; bottom: 14%; height: 34%;
-  border-radius: var(--radius-l);
-  background: repeating-conic-gradient(var(--decke-1) 0 25%, var(--decke-2) 0 50%, var(--decke-3) 0 75%, var(--decke-1) 0 100%) 0 0 / 64px 64px;
-  outline: 2px dashed var(--decke-naht); outline-offset: -8px; opacity: 0.9;
-}
-.geschichte-ende__tiere { position: absolute; bottom: 30%; display: flex; gap: var(--abstand-2); }
-.geschichte-ende__tier { width: var(--medaillon-klein); height: var(--medaillon-klein); border-radius: 50%; object-fit: cover; filter: brightness(0.8); animation: geschichte-atmet 4s ease-in-out infinite; }
+.geschichte__schreiben .zielwort__artikel { font-size: var(--gr-m); }
+
+/* Lösung: beide Freuden nebeneinander, die Bühne der Tier-Freude passt zu zweit in die Breite. */
+.geschichte__loesung { --buehne: var(--g-freude); display: flex; justify-content: center; align-items: center; gap: var(--abstand-4); max-width: 100%; }
+.geschichte__loesung .tier-freude { margin: 0; flex: 0 0 auto; }
+
+/* Sanftes Ende: die gemeinsame Gute Nacht füllt die Fläche. */
+.geschichte-ende { flex: 1; display: flex; align-items: stretch; }
+.geschichte-ende .gute-nacht { flex: 1; }
+
+/* Elternfrage: unten, außerhalb des Spielbereichs. */
+.geschichten > .elternzeile { margin-top: auto; }
 
 @keyframes geschichte-wackeln { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
 @keyframes geschichte-erscheint { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: none; } }
-@keyframes geschichte-fliegt { from { opacity: 0; transform: translateX(60vw) translateY(-20%) scale(0.6); } to { opacity: 1; transform: none; } }
-@keyframes geschichte-atmet { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes geschichte-fliegt { from { opacity: 0; transform: translateX(40vw) translateY(-20%) scale(0.6); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .geschichte__problemtier, .geschichte__wahl, .geschichte__helfer-da, .geschichte-ende__tier { animation: none; }
+  .geschichte__problemtier, .geschichte__wahl, .geschichte__helfer-da { animation: none; }
+}
+
+/* ---------- Querformat (844 × 390): Tiere links, Helfer bzw. Wort und Tasten rechts ---------- */
+@media (orientation: landscape) and (max-height: 600px) {
+  .flaeche--geschichten {
+    padding-top: 0;
+    --g-gross: min(36vw, 56dvh, 260px);
+    --g-klein: min(22vw, 34dvh, 150px);
+    --g-paar: min(16vw, 30dvh, 140px);
+    --g-freude: min(30vw, 52dvh, 220px);
+    --taste-gross: min(84px, 21dvh);
+  }
+  .geschichte {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    align-items: center; justify-content: center; column-gap: var(--abstand-5); row-gap: var(--abstand-2);
+  }
+  .geschichte__buehne { grid-column: 1; grid-row: 1; }
+  .geschichte__helfer { grid-column: 2; grid-row: 1; justify-content: flex-start; gap: var(--abstand-5); }
+  .geschichte__arbeit { grid-column: 2; grid-row: 1; }
+  .geschichte[data-schritt='loesung'] { grid-template-columns: minmax(0, 1fr); }
+  .geschichte[data-schritt='loesung'] .geschichte__arbeit { grid-column: 1; flex-direction: row; justify-content: center; }
+  .geschichte[data-schritt='schreiben'] .geschichte__buehne { flex-direction: column; gap: var(--abstand-2); }
+  .geschichte__schreiben .wortarbeit { gap: var(--abstand-1); }
+  .geschichte__schreiben .zielwort .felder { --slot-max: 56px; }
+  .geschichte__schreiben .rueckmeldung { min-height: 28px; }
+  .geschichte__schreiben .alphabet { padding: var(--abstand-2); }
 }

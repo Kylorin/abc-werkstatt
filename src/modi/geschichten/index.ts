@@ -5,15 +5,22 @@
  * Paket fehlt die Arbeit im Regal (`kacheln()` liefert []).
  *
  * Ablauf: Problemtier groß, entsättigt, leises Wackeln → Erzählung (`audio.problem`, sonst der
- * Text über die Live-Stimme) → „Wer kann helfen?“ (`frage.wer-hilft`) → 2 Helfer-Medaillons (der
- * Helfer + ein anderes Tier, die Stimme verrät nichts). Falscher: sagt seinen „kann“-Satz, lenkt
- * freundlich um (`audio.nichtIch`), die Frage kommt wieder. Richtiger: fliegt heran, sein Name
- * liegt als Schattenwort da, nur der Anlaut fehlt (2 Tasten; Einstellung `geschichtenSchreiben`,
- * nur mit gültigem Einzel-Anlaut). Danach Lösung (`audio.loesung`), beide freuen sich, Weiter-Knopf.
- * Nach 3 Geschichten (höchstens `rundenBisGuteNacht`) das sanfte Ende; ein Tipp weckt.
+ * Text über die Live-Stimme) → „Wer kann helfen?“ (`frage.wer-hilft`) → 2 Helfer-Medaillons, klein
+ * unter dem Problemtier (der Helfer + ein anderes Tier, die Stimme verrät nichts). Falscher: sagt
+ * seinen „kann“-Satz, lenkt freundlich um (`audio.nichtIch`), die Frage kommt wieder. Richtiger:
+ * fliegt heran, sein Name liegt als Schattenwort da, nur der Anlaut fehlt (2 Tasten; Einstellung
+ * `geschichtenSchreiben`, nur mit gültigem Einzel-Anlaut). Danach Lösung (`audio.loesung`), beide
+ * freuen sich, Weiter-Knopf (kein Auto-Weiter).
+ * Nach 3 Geschichten (höchstens `rundenBisGuteNacht`) das sanfte Ende über die gemeinsame
+ * Gute Nacht (src/modi/tiere/gute-nacht.ts, nur die Tiere DIESER Sitzung); ein Tipp weckt.
+ *
+ * Schreiben: dieselbe Stufen-Arbeit wie der Tier-Modus (src/modi/tiere/stufenarbeit.ts, Stufe 1).
+ * Medaillons tragen `data-bewegung` (F4) und bewegen sich beim Antippen in IHRER Bewegung.
+ * Die Elternfrage steht als eigene, abgesetzte Zeile unter dem Spielbereich.
  *
  * testids: geschichte (data-situation, data-schritt), geschichte-problemtier, helfer-wahl-<id>,
- * geschichte-schreiben, geschichte-loesung, geschichte-weiter, geschichte-ende.
+ * geschichte-helfer, geschichte-schreiben, geschichte-loesung, geschichte-weiter, geschichte-ende
+ * (darin gute-nacht), elternzeile.
  */
 import { schreibwort } from '../../kern/alphabet';
 import { el } from '../../kern/dom';
@@ -27,22 +34,22 @@ import type {
   PaketDienst,
   RegalKachel,
   SituationTreffer,
-  Tier,
   TierTreffer,
 } from '../../kern/vertrag';
 import { ANLAUT_LAUTE } from '../../kern/vertrag';
 import { anlautBuchstabe } from '../../paket/anlaut';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
+import { stufenAufgabe } from '../tiere/auswahl';
 import { erzeugeFreude } from '../tiere/freude';
-import { elternzeile, hoechstens, huepfe, leerHinweis, medaillonKnopf, sicher, weiterKnopf } from './gemeinsam';
-import { aufbauFuer, erzeugeLegearbeit, type Legearbeit } from './legearbeit';
+import { erzeugeGuteNacht } from '../tiere/gute-nacht';
+import { erzeugeStufenArbeit, type StufenArbeit } from '../tiere/stufenarbeit';
+import { bewegeTier, elternzeile, hoechstens, leerHinweis, medaillonKnopf, sicher, weiterKnopf } from './gemeinsam';
 import './geschichten.css';
 
 /** Nach so vielen Geschichten kommt das sanfte Ende (Konzept F6). */
 const GESCHICHTEN_BIS_ENDE = 3;
 /** Obergrenze, bis die Helfer erscheinen — nur gegen eine hängende Sprachausgabe. */
 const ERZAEHLUNG_HOECHSTENS_MS = 12_000;
-/** Obergrenze fürs Nachklingen, bevor die Lösung kommt. */
 /** Obergrenze fürs Nachklingen (hängende Sprachausgabe): alle Buchstaben, Pause und Name — wächst mit dem Wort. */
 const nachklangHoechstensMs = (wort: string): number => 3_500 + 1_600 * Array.from(wort).length;
 
@@ -99,11 +106,12 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   flaeche.append(platz, meldung.el);
   s.nachher(() => ctx.audio.stopp());
 
-  let arbeit: Legearbeit | undefined;
+  /** Was gerade auf dem Bildschirm lebt (Stufen-Arbeit oder Gute Nacht) und beim Wechsel weg muss. */
+  let arbeit: { zerstoere(): void } | undefined;
   s.nachher(() => arbeit?.zerstoere());
   let runden = 0;
-  /** Tiere dieser Sitzung (für das sanfte Ende: nur sie liegen auf der Decke). */
-  const dabei = new Map<string, { tier: Tier; bildUrl: string }>();
+  /** Tiere dieser Sitzung in Auftrittsreihenfolge (für das sanfte Ende: nur sie liegen auf der Decke). */
+  const dabei: TierTreffer[] = [];
   const grenze = (): number => Math.max(1, Math.min(GESCHICHTEN_BIS_ENDE, ctx.einstellungen.lese().rundenBisGuteNacht));
 
   const bild = (t: TierTreffer): Promise<string> => ctx.pakete.bildUrl(t.paket.id, t.tier.bild);
@@ -125,7 +133,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     const wahl: TierTreffer[] = mische([helfer, ...(andere ? [{ paket: g.paket, tier: andere }] : [])]);
     const [problemBild, ...wahlBilder] = await Promise.all([bild(problem), ...wahl.map(bild)]);
     if (!s.lebt) return;
-    dabei.set(`${g.paket.id}/${g.problemtier.id}`, { tier: g.problemtier, bildUrl: problemBild ?? '' });
+    dabei.push(problem);
+    const helferBild = wahlBilder[wahl.indexOf(helfer)] ?? '';
 
     const buehne = el('div', { klasse: 'geschichte__buehne' });
     const helferPlatz = el('div', { klasse: 'geschichte__helfer' });
@@ -136,13 +145,13 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       buehne,
       helferPlatz,
       arbeitPlatz,
-      elternzeile(ctx, zufall(ELTERNFRAGEN) ?? '') ?? '',
     );
     // Jeder Satz ist durch Antippen abbrechbar (Tipp neben die Knöpfe).
     wurzel.addEventListener('click', (ev) => {
       if (ev.target === wurzel || ev.target === buehne || ev.target === helferPlatz) ctx.audio.stopp();
     });
-    platz.replaceChildren(wurzel);
+    // Elternfrage: eigene, abgesetzte Zeile UNTER dem Spielbereich, nicht zwischen den Tieren.
+    platz.replaceChildren(wurzel, elternzeile(ctx, zufall(ELTERNFRAGEN) ?? '') ?? '');
     const schritt = (x: string): void => {
       wurzel.dataset.schritt = x;
     };
@@ -150,7 +159,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     const problemKnopf = medaillonKnopf(problemBild ?? '', g.problemtier, {
       testid: 'geschichte-problemtier',
       klasse: 'geschichte__problemtier',
-      beiKlick: () => void erzaehleProblem(),
+      beiKlick: () => {
+        bewegeTier(problemKnopf);
+        void erzaehleProblem();
+      },
     });
     buehne.replaceChildren(problemKnopf);
 
@@ -170,7 +182,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
           medaillonKnopf(wahlBilder[i] ?? '', t.tier, {
             testid: `helfer-wahl-${t.tier.id}`,
             klasse: 'geschichte__wahl',
-            beiKlick: () => (t.tier.id === g.helfer.id ? void richtig(t, wahlBilder[i] ?? '') : falsch(t)),
+            beiKlick: () => (t === helfer ? void richtig(t) : falsch(t)),
           }),
         ),
       );
@@ -179,8 +191,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     function falsch(t: TierTreffer): void {
       if (entschieden) return;
       schritt('umlenken');
-      const knopf = helferPlatz.querySelector(`[data-testid="helfer-wahl-${t.tier.id}"]`);
-      if (knopf) huepfe(knopf);
+      const knopf = helferPlatz.querySelector<HTMLElement>(`[data-testid="helfer-wahl-${t.tier.id}"]`);
+      if (knopf) bewegeTier(knopf);
       const schritte: KettenSchritt[] = [];
       if (t.tier.audio?.kann) schritte.push(sicher(() => tierEinzel(ctx, t, 'kann'), melde));
       else if (t.tier.kann) schritte.push(sicher(() => ctx.audio.satz(t.tier.kann ?? ''), melde));
@@ -191,17 +203,20 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       });
     }
 
-    async function richtig(t: TierTreffer, helferBild: string): Promise<void> {
+    async function richtig(t: TierTreffer): Promise<void> {
       if (entschieden) return;
       entschieden = true;
       ctx.audio.stopp();
-      dabei.set(`${g.paket.id}/${g.helfer.id}`, { tier: g.helfer, bildUrl: helferBild });
+      dabei.push(helfer);
       ctx.notizen.merke({ art: 'tier', wert: g.helfer.name });
       helferPlatz.replaceChildren();
       const herangeflogen = medaillonKnopf(helferBild, g.helfer, {
         testid: 'geschichte-helfer',
         klasse: 'geschichte__helfer-da',
-        beiKlick: () => void spiele(sprichName(t), melde),
+        beiKlick: () => {
+          bewegeTier(herangeflogen);
+          void spiele(sprichName(t), melde);
+        },
       });
       buehne.append(herangeflogen);
       problemKnopf.classList.add('geschichte__problemtier--getroest');
@@ -210,6 +225,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       // `einladung.<laut>` gibt es nur für ANLAUT_LAUTE (ohne c, q, x, y, ß) — sonst ohne Schreiben.
       const schreibt = ctx.einstellungen.lese().geschichtenSchreiben && laut !== undefined && ANLAUT_LAUTE.includes(laut);
       if (!schreibt) {
+        schritt('helfer');
         void spiele(sprichName(t), melde);
         s.warte(1200, () => zeigeLoesung());
         return;
@@ -217,12 +233,14 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       schritt('schreiben');
       const wort = schreibwort(g.helfer.name);
       const e = ctx.einstellungen.lese();
-      let neu: Legearbeit;
+      let neu: StufenArbeit;
       try {
-        neu = erzeugeLegearbeit({
+        const aufgabe = stufenAufgabe(g.helfer, 1, e.kindAnfang ? [e.kindAnfang] : []);
+        neu = erzeugeStufenArbeit({
           ctx,
           wort,
-          aufbau: aufbauFuer(wort, 1, e.kindAnfang ? [e.kindAnfang] : []),
+          offen: aufgabe.offen,
+          tasten: aufgabe.tasten,
           artikel: g.helfer.artikel,
           hilfeNach: e.hilfeNach,
           sprichWort: () => sprichName(t),
@@ -254,8 +272,8 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       const freuen = el(
         'div',
         { klasse: 'geschichte__loesung', testid: 'geschichte-loesung' },
-        el('div', { klasse: 'geschichte__freude' }, erzeugeFreude({ bildUrl: problemBild ?? '', alt: `${g.problemtier.artikel} ${g.problemtier.name}` })),
-        el('div', { klasse: 'geschichte__freude' }, erzeugeFreude({ bildUrl: dabei.get(`${g.paket.id}/${g.helfer.id}`)?.bildUrl ?? '', alt: `${g.helfer.artikel} ${g.helfer.name}` })),
+        erzeugeFreude({ bildUrl: problemBild ?? '', alt: `${g.problemtier.artikel} ${g.problemtier.name}`, tier: g.problemtier }),
+        erzeugeFreude({ bildUrl: helferBild, alt: `${g.helfer.artikel} ${g.helfer.name}`, tier: g.helfer }),
       );
       arbeitPlatz.replaceChildren(freuen, weiterKnopf('geschichte-weiter', 'Weiter', () => weiter()));
       const loesung = sicher(
@@ -281,31 +299,22 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
     if (g) void zeigeGeschichte(g).catch(melde);
   }
 
-  /** Sanftes Ende: nur die Tiere DIESER Sitzung kuscheln sich auf die Decke, warmes Licht. */
+  /** Sanftes Ende: die gemeinsame Gute Nacht mit den Tieren DIESER Sitzung; ein Tipp weckt sie. */
   function zeigeEnde(): void {
     arbeit?.zerstoere();
     arbeit = undefined;
-    const ende = el(
-      'button',
-      {
-        klasse: 'geschichte-ende',
-        testid: 'geschichte-ende',
-        attr: { 'aria-label': 'Aufwecken' },
-        beiKlick: () => {
-          runden = 0;
-          dabei.clear();
-          weiter();
-        },
+    const nacht = erzeugeGuteNacht({
+      ctx,
+      tiere: [...dabei],
+      melde,
+      beiWecken: () => {
+        runden = 0;
+        dabei.length = 0;
+        weiter();
       },
-      el('span', { klasse: 'geschichte-ende__decke', attr: { 'aria-hidden': 'true' } }),
-      el(
-        'span',
-        { klasse: 'geschichte-ende__tiere' },
-        ...[...dabei.values()].map((d) => el('img', { klasse: 'geschichte-ende__tier', attr: { src: d.bildUrl, alt: `${d.tier.artikel} ${d.tier.name} schläft`, draggable: 'false' } })),
-      ),
-    );
-    platz.replaceChildren(ende);
-    void ctx.audio.kette([fest('geschichte.ende')]);
+    });
+    arbeit = nacht;
+    platz.replaceChildren(el('div', { klasse: 'geschichte-ende', testid: 'geschichte-ende' }, nacht.el));
   }
 
   weiter();

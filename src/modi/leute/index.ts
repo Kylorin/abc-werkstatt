@@ -2,20 +2,24 @@
  * F7 Meine Leute (Bau „spiele“). Spezifikation: docs/konzept-spass-und-lernen.md (F7).
  *
  * Wiese mit den Fotos, die Papa im Elternbereich angelegt hat (`elternAbschnitt`, siehe
- * verwaltung.ts). Erster Tipp: Papas Aufnahme (sonst das Wort über den Audio-Dienst: vorab
- * vertont oder live). Zweiter Tipp: Legearbeit auf der eingestellten Stufe (`tierStufe`, Stufe 1 =
- * nur der Anlaut, 2 Tasten). Danach Nachklingen, die Elternaufnahme, dann `lob.leute`.
+ * verwaltung.ts). Wenige Fotos werden groß und mittig gezeigt (ein einzelnes füllt die Wiese und
+ * lädt mit einem ruhig atmenden Leuchtring zum Antippen ein) — nie ein kleines Bild auf leerer Seite.
+ * Erster Tipp: Papas Aufnahme (sonst das Wort über den Audio-Dienst: vorab vertont oder live).
+ * Zweiter Tipp: dieselbe Stufen-Arbeit wie der Tier-Modus (src/modi/tiere/stufenarbeit.ts) auf der
+ * eingestellten Stufe (`tierStufe`, Stufe 1 = nur der Anlaut, 2 Tasten). Danach Nachklingen, die
+ * Elternaufnahme, dann `lob.leute`.
  *
  * Datenschutz: Wörter, Fotos und Aufnahmen liegen nur in IndexedDB (LeuteDienst). Hier wird
  * nichts davon in localStorage oder in die Sitzungsnotizen geschrieben.
  *
- * testids: leute-wiese, leute-<id> (mit img), leute-weiter, zielwort/slot/taste wie die Wortarbeit.
+ * testids: leute-wiese (data-anzahl), leute-<id> (mit img), leute-bild, leute-weiter,
+ * zielwort/slot/taste wie die Wortarbeit.
  */
 import { el } from '../../kern/dom';
 import type { Ausgang, Kontext, Modus, Person } from '../../kern/vertrag';
 import { Sitzung, erzeugeMeldung, spiele } from '../nachfuellen/sitzung';
-import { hoechstens, huepfe, leerHinweis, sicher, weiterKnopf } from '../geschichten/gemeinsam';
-import { aufbauFuer, erzeugeLegearbeit, type Legearbeit } from '../geschichten/legearbeit';
+import { erzeugeStufenArbeit, type StufenArbeit } from '../tiere/stufenarbeit';
+import { hoechstens, huepfe, leerHinweis, sicher, weiterKnopf, wortAufgabe } from '../geschichten/gemeinsam';
 import { leuteVerwaltung } from './verwaltung';
 import './leute.css';
 
@@ -43,7 +47,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
   flaeche.append(platz, meldung.el);
   s.nachher(() => ctx.audio.stopp());
 
-  let arbeit: Legearbeit | undefined;
+  let arbeit: StufenArbeit | undefined;
   s.nachher(() => arbeit?.zerstoere());
 
   /** Papas Aufnahme, sonst das Wort (vorab vertont oder live, 6c). */
@@ -74,6 +78,7 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
             }
             gewaehlt = p.id;
             for (const k of knoepfe) k.setAttribute('aria-pressed', String(k === knopf));
+            wiese.dataset.gewaehlt = 'ja';
             huepfe(knopf);
             void spiele(sprich(p), melde);
           },
@@ -82,7 +87,10 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       );
       return knopf;
     });
-    platz.replaceChildren(el('div', { klasse: 'spiel-wiese leute__wiese', testid: 'leute-wiese' }, ...knoepfe));
+    // Anzahl steuert die Größe: 1 Foto füllt die Wiese, 2–3 groß, ab 4 Medaillon-Größe.
+    const anzahl = leute.length <= 3 ? String(leute.length) : 'viele';
+    const wiese = el('div', { klasse: 'spiel-wiese leute__wiese', testid: 'leute-wiese', attr: { 'data-anzahl': anzahl } }, ...knoepfe);
+    platz.replaceChildren(wiese);
   }
 
   function zeigeArbeit(i: number, p: Person): void {
@@ -95,12 +103,14 @@ async function mount(flaeche: HTMLElement, ctx: Kontext): Promise<void> {
       fotoBild(i, p, 'leute__foto'),
     );
     const ende = el('div', { klasse: 'leute__ende' });
-    let neu: Legearbeit;
+    let neu: StufenArbeit;
     try {
-      neu = erzeugeLegearbeit({
+      const aufgabe = wortAufgabe(p.wort, e.tierStufe, e.kindAnfang ? [e.kindAnfang] : []);
+      neu = erzeugeStufenArbeit({
         ctx,
         wort: p.wort,
-        aufbau: aufbauFuer(p.wort, e.tierStufe, e.kindAnfang ? [e.kindAnfang] : []),
+        offen: aufgabe.offen,
+        tasten: aufgabe.tasten,
         hilfeNach: e.hilfeNach,
         sprichWort: () => sprich(p),
         melde,

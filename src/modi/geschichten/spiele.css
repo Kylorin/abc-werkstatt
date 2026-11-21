@@ -33,9 +33,23 @@
   50% { box-shadow: 0 0 0 10px transparent; }
 }
 
+/* Elternzeile: klar als Hinweis für Erwachsene abgesetzt — eigene Zeile, gestrichelte Linie
+   darüber, kleine Marke „Für Eltern“, kursiv. Nicht antippbar (kein Spielelement). */
 .elternzeile {
-  margin: 0; text-align: center;
-  font-size: var(--gr-s); color: var(--elternzeile);
+  align-self: center;
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: var(--abstand-1) var(--abstand-2);
+  max-width: 100%;
+  margin: 0; padding: var(--abstand-2) var(--abstand-3) 0;
+  border-top: 1px dashed var(--linie);
+  text-align: center;
+  font-size: var(--gr-s); font-style: italic; color: var(--elternzeile);
+  pointer-events: none; user-select: none;
+}
+.elternzeile__marke {
+  font-style: normal; font-size: 0.72em; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 1px var(--abstand-2); border-radius: var(--radius-rund);
+  background: var(--papier-tief); color: var(--tinte-leise);
 }
 
 @media (prefers-reduced-motion: reduce) {
